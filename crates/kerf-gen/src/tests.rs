@@ -14,12 +14,8 @@ const STYLES: [&str; 6] = [
 /// Styles whose bass goes Dovetail to Chisel, with the key in Chisel's tune.
 pub(super) const TUNED_STYLES: [&str; 2] = ["acid-line", "foundry"];
 /// Styles whose pitches go through a Fret that carries the key.
-pub(super) const NEW_STYLES: [&str; 4] = [
-    "dub-chamber",
-    "slow-grain",
-    "broken-joinery",
-    "tape-keys",
-];
+pub(super) const NEW_STYLES: [&str; 4] =
+    ["dub-chamber", "slow-grain", "broken-joinery", "tape-keys"];
 
 fn text(p: &Patch) -> String {
     print(p)

@@ -18,7 +18,9 @@
 
 mod rules;
 
-use kerf_core::{Cable, Catalogue, JackDescriptor, JackKind, JackRef, Key, ModuleDescriptor, ModuleId, Patch};
+use kerf_core::{
+    Cable, Catalogue, JackDescriptor, JackKind, JackRef, Key, ModuleDescriptor, ModuleId, Patch,
+};
 use serde::Serialize;
 
 use crate::SessionError as E;
@@ -124,7 +126,11 @@ impl<C: Catalogue> Planner<'_, C> {
     }
 
     /// Whether anything leaves `m` through one of the `jacks`.
-    fn any_used<'j>(&self, m: &ModuleId, mut jacks: impl Iterator<Item = &'j JackDescriptor>) -> bool {
+    fn any_used<'j>(
+        &self,
+        m: &ModuleId,
+        mut jacks: impl Iterator<Item = &'j JackDescriptor>,
+    ) -> bool {
         jacks.any(|j| self.used(m, j.key))
     }
 
@@ -148,10 +154,19 @@ impl<C: Catalogue> Planner<'_, C> {
     }
 
     fn jack(module: &ModuleId, key: &str) -> JackRef {
-        JackRef::new(module.clone(), Key::new(key).expect("catalogue keys are valid"))
+        JackRef::new(
+            module.clone(),
+            Key::new(key).expect("catalogue keys are valid"),
+        )
     }
 
-    fn connect(&mut self, from: JackRef, to: JackRef, reason: impl Into<String>, score: f32) -> bool {
+    fn connect(
+        &mut self,
+        from: JackRef,
+        to: JackRef,
+        reason: impl Into<String>,
+        score: f32,
+    ) -> bool {
         let cable = Cable {
             from: from.clone(),
             to: to.clone(),
@@ -178,7 +193,9 @@ impl<C: Catalogue> Planner<'_, C> {
             _ => {}
         }
         for j in d.inputs {
-            let Some(need) = rules::need(d, j) else { continue };
+            let Some(need) = rules::need(d, j) else {
+                continue;
+            };
             if self.fed(m, j.key) {
                 continue;
             }
@@ -205,7 +222,9 @@ impl<C: Catalogue> Planner<'_, C> {
                 Only::Anyone => Only::Anyone,
             };
             for j in d.inputs {
-                let Some(need) = rules::need(d, j) else { continue };
+                let Some(need) = rules::need(d, j) else {
+                    continue;
+                };
                 if self.fed(&o, j.key) {
                     continue;
                 }
@@ -236,7 +255,9 @@ impl<C: Catalogue> Planner<'_, C> {
             if s.id == *t || !sources.allows(&s.id) || self.reaches(t, &s.id) {
                 continue;
             }
-            let Some(sd) = self.cat.get(&s.kind) else { continue };
+            let Some(sd) = self.cat.get(&s.kind) else {
+                continue;
+            };
             for (idx, out) in sd.outputs.iter().enumerate() {
                 let Some((score, reason)) = self.score(s, sd, idx, out, tm, td, need) else {
                     continue;
@@ -255,7 +276,12 @@ impl<C: Catalogue> Planner<'_, C> {
 
     /// A stereo `in_r` follows whatever feeds `in_l`: its `r` output if it has
     /// one, otherwise the same output again (a mono send feeds both sides).
-    fn stereo_partner(&self, t: &ModuleId, td: &ModuleDescriptor, jack: &JackDescriptor) -> Option<Pick> {
+    fn stereo_partner(
+        &self,
+        t: &ModuleId,
+        td: &ModuleDescriptor,
+        jack: &JackDescriptor,
+    ) -> Option<Pick> {
         if jack.key != "in_r" || td.input("in_l").is_none() {
             return None;
         }
@@ -305,7 +331,9 @@ impl<C: Catalogue> Planner<'_, C> {
         // A reverb returns to the master; its input is what the mixer feeds.
         if d.kind != "Kiln" {
             for r in self.ids().into_iter().filter(|r| only.allows(r)) {
-                let Some(rd) = self.desc(&r).filter(|rd| rd.kind == "Router") else { continue };
+                let Some(rd) = self.desc(&r).filter(|rd| rd.kind == "Router") else {
+                    continue;
+                };
                 let Some(channel) = rd
                     .inputs
                     .iter()

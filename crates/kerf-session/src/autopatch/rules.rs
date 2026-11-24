@@ -102,11 +102,15 @@ impl<C: Catalogue> Planner<'_, C> {
                 let ok = !used || same;
                 match (sd.kind, out.key) {
                     ("Fret", "pitch") if td.kind != "Fret" && ok && self.fed(&s.id, "pitch") => {
-                        Some((9.0 + bonus + unused, reason("the quantiser keeps it in key")))
+                        Some((
+                            9.0 + bonus + unused,
+                            reason("the quantiser keeps it in key"),
+                        ))
                     }
-                    ("Dovetail" | "Inlay", "pitch") if ok => {
-                        Some((8.0 + bonus + unused, reason("the sequencer plays the notes")))
-                    }
+                    ("Dovetail" | "Inlay", "pitch") if ok => Some((
+                        8.0 + bonus + unused,
+                        reason("the sequencer plays the notes"),
+                    )),
                     _ => None,
                 }
             }
@@ -114,9 +118,10 @@ impl<C: Catalogue> Planner<'_, C> {
                 .map(|s| (s, reason("a rhythm lane triggers the drum")))
                 .or_else(|| self.clock_gate(sd, out, 3.0, "the clock triggers it every step")),
             Need::MelodicGate => match (sd.kind, out.key) {
-                ("Dovetail" | "Inlay", "gate") if !used || same => {
-                    Some((9.0 + bonus + unused, reason("the sequencer's gate plays the note")))
-                }
+                ("Dovetail" | "Inlay", "gate") if !used || same => Some((
+                    9.0 + bonus + unused,
+                    reason("the sequencer's gate plays the note"),
+                )),
                 _ => lane(6.0)
                     .map(|s| (s, reason("a rhythm lane plays the note")))
                     .or_else(|| self.clock_gate(sd, out, 3.0, "the clock plays it every step")),
@@ -150,7 +155,10 @@ impl<C: Catalogue> Planner<'_, C> {
         (sd.kind == "Tally" && out.key == "clock").then(|| (score, reason.to_owned()))
     }
 
-    #[expect(clippy::too_many_arguments, reason = "one candidate pair, scored in place")]
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "one candidate pair, scored in place"
+    )]
     fn audio_score(
         &self,
         s: &Module,
@@ -174,7 +182,8 @@ impl<C: Catalogue> Planner<'_, C> {
             return None;
         }
         let alone = !self.any_used(&s.id, sd.outputs.iter());
-        let score = 5.0 + if same { 3.0 } else { 0.0 } + if alone { 1.0 } else { 0.0 } - 0.01 * idx as f32;
+        let score =
+            5.0 + if same { 3.0 } else { 0.0 } + if alone { 1.0 } else { 0.0 } - 0.01 * idx as f32;
         Some((score, format!("the {} goes into the {}", s.kind, t.kind)))
     }
 
@@ -184,10 +193,13 @@ impl<C: Catalogue> Planner<'_, C> {
     fn feeds_processor(&self, id: &ModuleId, sd: &ModuleDescriptor) -> bool {
         self.patch.cables.iter().any(|c| {
             &c.from.module == id
-                && sd.output(c.from.jack.as_str()).is_some_and(|o| o.kind == JackKind::Audio)
+                && sd
+                    .output(c.from.jack.as_str())
+                    .is_some_and(|o| o.kind == JackKind::Audio)
                 && self.desc(&c.to.module).is_some_and(|d| {
                     !matches!(d.kind, "Router" | "Finish")
-                        && d.input(c.to.jack.as_str()).is_some_and(|j| j.kind == JackKind::Audio)
+                        && d.input(c.to.jack.as_str())
+                            .is_some_and(|j| j.kind == JackKind::Audio)
                 })
         })
     }

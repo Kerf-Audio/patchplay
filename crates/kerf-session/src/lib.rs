@@ -15,9 +15,12 @@ mod snippets;
 mod validate;
 
 pub use autopatch::PlannedCable;
-pub use language::{Completions, LanguageDocs, Section, completions, fenced_blocks, format_guide, language_docs, writing_guide};
-pub use snippets::{CATEGORIES, Category, Snippet, doc_files, snippets};
+pub use language::{
+    Completions, LanguageDocs, Section, completions, fenced_blocks, format_guide, language_docs,
+    writing_guide,
+};
 pub use lineage::{Lineage, Node, Origin};
+pub use snippets::{CATEGORIES, Category, Snippet, doc_files, snippets};
 
 #[cfg(test)]
 mod autopatch_tests;

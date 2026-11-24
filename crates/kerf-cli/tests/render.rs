@@ -26,8 +26,16 @@ fn render_rejects_rates_outside_the_supported_range() {
     }
 
     let run = render("8000", &out);
-    assert!(run.status.success(), "{}", String::from_utf8_lossy(&run.stderr));
+    assert!(
+        run.status.success(),
+        "{}",
+        String::from_utf8_lossy(&run.stderr)
+    );
     let bytes = std::fs::read(&out).unwrap();
     std::fs::remove_file(&out).unwrap();
-    assert_eq!(&bytes[24..28], &8_000u32.to_le_bytes(), "the WAV header carries the rate");
+    assert_eq!(
+        &bytes[24..28],
+        &8_000u32.to_le_bytes(),
+        "the WAV header carries the rate"
+    );
 }

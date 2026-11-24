@@ -81,11 +81,31 @@ const fn kw(word: &'static str, snippet: Option<&'static str>, doc: &'static str
 /// The grammar of the text format, one line each.
 fn keywords() -> Vec<Keyword> {
     vec![
-        kw("kerf", Some("kerf 1"), "The first line: the format version."),
-        kw("tempo", Some("tempo ${1:120}"), "Beats per minute, 20 to 300."),
-        kw("key", Some("key ${1:A minor}"), "The musical key, as a label for people and generators."),
-        kw("style", Some("style ${1:dub-chamber} seed ${2:1}"), "The style this patch grew from, and its seed."),
-        kw("tags", Some("tags ${1:four-four}"), "Category words for the starting-point browser, such as `four-four`, `abstract` or `crazy`."),
+        kw(
+            "kerf",
+            Some("kerf 1"),
+            "The first line: the format version.",
+        ),
+        kw(
+            "tempo",
+            Some("tempo ${1:120}"),
+            "Beats per minute, 20 to 300.",
+        ),
+        kw(
+            "key",
+            Some("key ${1:A minor}"),
+            "The musical key, as a label for people and generators.",
+        ),
+        kw(
+            "style",
+            Some("style ${1:dub-chamber} seed ${2:1}"),
+            "The style this patch grew from, and its seed.",
+        ),
+        kw(
+            "tags",
+            Some("tags ${1:four-four}"),
+            "Category words for the starting-point browser, such as `four-four`, `abstract` or `crazy`.",
+        ),
         kw(
             "part",
             Some("part ${1:bass} \"${2:Bass}\" colour #${3:3d63c9}"),
@@ -106,12 +126,28 @@ fn keywords() -> Vec<Keyword> {
             Some("scene ${1:A} ${2:module}.${3:param}=${4:0.5}"),
             "A stored set of param values, A to D, to morph between.",
         ),
-        kw("lock", None, "On a module line, `lock` freezes the module; `lock=a,b` freezes those params. On a part line it freezes the part."),
+        kw(
+            "lock",
+            None,
+            "On a module line, `lock` freezes the module; `lock=a,b` freezes those params. On a part line it freezes the part.",
+        ),
         kw("mute", None, "On a part line: mutes the part."),
         kw("colour", None, "On a part line: `colour #rrggbb`."),
-        kw("seed", None, "In a `style` line: the whole number the generator started from."),
-        kw("level=", Some("level=${1:0.8}"), "On a part line: its level, 0 to 1 (1 is unity, 0.5 is -6 dB); scales audio leaving the part."),
-        kw("sample=", Some("sample=\"${1:samples/loop.wav}\""), "On a Veneer or Splinter line: the audio file it plays."),
+        kw(
+            "seed",
+            None,
+            "In a `style` line: the whole number the generator started from.",
+        ),
+        kw(
+            "level=",
+            Some("level=${1:0.8}"),
+            "On a part line: its level, 0 to 1 (1 is unity, 0.5 is -6 dB); scales audio leaving the part.",
+        ),
+        kw(
+            "sample=",
+            Some("sample=\"${1:samples/loop.wav}\""),
+            "On a Veneer or Splinter line: the audio file it plays.",
+        ),
     ]
 }
 

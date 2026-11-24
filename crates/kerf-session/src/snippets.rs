@@ -202,7 +202,11 @@ fn parse_snippet(id: &'static str, source: &str) -> Snippet {
     comment(&mut code, &title, "");
     comment(&mut code, "", &about);
     if !needs.is_empty() {
-        comment(&mut code, "Needs:", &format!("{}. See the Clock and output snippet.", needs.join(", ")));
+        comment(
+            &mut code,
+            "Needs:",
+            &format!("{}. See the Clock and output snippet.", needs.join(", ")),
+        );
     }
     if !feed.is_empty() {
         comment(&mut code, "Feed it audio:", &feed.join(", "));
@@ -212,13 +216,26 @@ fn parse_snippet(id: &'static str, source: &str) -> Snippet {
     }
     code.push('\n');
     code.push_str(&body);
-    Snippet { id, category, title, about, ports, feed, needs, body, code }
+    Snippet {
+        id,
+        category,
+        title,
+        about,
+        ports,
+        feed,
+        needs,
+        body,
+        code,
+    }
 }
 
 /// Every snippet, in the order of [`CATEGORIES`] and then the source list.
 pub fn snippets() -> &'static [Snippet] {
     static ALL: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
-        let mut all: Vec<Snippet> = SOURCES.iter().map(|(id, src)| parse_snippet(id, src)).collect();
+        let mut all: Vec<Snippet> = SOURCES
+            .iter()
+            .map(|(id, src)| parse_snippet(id, src))
+            .collect();
         all.sort_by_key(|s| CATEGORIES.iter().position(|c| c.dir == s.category));
         all
     });
@@ -238,7 +255,11 @@ pub const INTRO: &str = "Each snippet is one `part`: its modules, plus the cable
 pub fn category_markdown(category: &Category) -> String {
     let mut md = format!("{}\n", category.blurb);
     for s in snippets().iter().filter(|s| s.category == category.dir) {
-        let _ = write!(md, "\n### {}\n\n{}\n\n```kerf snippet\n{}```\n", s.title, s.about, s.code);
+        let _ = write!(
+            md,
+            "\n### {}\n\n{}\n\n```kerf snippet\n{}```\n",
+            s.title, s.about, s.code
+        );
     }
     md
 }
@@ -246,14 +267,29 @@ pub fn category_markdown(category: &Category) -> String {
 /// The generated doc files, as (path under `docs/`, content): an index and one
 /// page per category. A test compares them with the files on disk.
 pub fn doc_files() -> Vec<(String, String)> {
-    let mut index = String::from("# Snippets\n\nParts to paste into the code editor: drums, bass, lead, pads, chords and melodies, percussion, modulation and effects. This page and the pages it links to are generated from the `.kerf` files in `snippets/`, so edit those rather than the pages.\n\n");
+    let mut index = String::from(
+        "# Snippets\n\nParts to paste into the code editor: drums, bass, lead, pads, chords and melodies, percussion, modulation and effects. This page and the pages it links to are generated from the `.kerf` files in `snippets/`, so edit those rather than the pages.\n\n",
+    );
     index.push_str(INTRO);
     index.push_str("\n\nSee [WRITING-PATCHES.md](WRITING-PATCHES.md) for how to write a patch from scratch and [KERF-FORMAT.md](KERF-FORMAT.md) for the full format.\n\n## Pages\n\n");
     let mut files = Vec::new();
     for c in &CATEGORIES {
-        let titles: Vec<&str> = snippets().iter().filter(|s| s.category == c.dir).map(|s| s.title.as_str()).collect();
-        let _ = writeln!(index, "- [{}](snippets/{}.md): {}", c.title, c.dir, titles.join(", "));
-        files.push((format!("snippets/{}.md", c.dir), format!("# {}\n\n{}", c.title, category_markdown(c))));
+        let titles: Vec<&str> = snippets()
+            .iter()
+            .filter(|s| s.category == c.dir)
+            .map(|s| s.title.as_str())
+            .collect();
+        let _ = writeln!(
+            index,
+            "- [{}](snippets/{}.md): {}",
+            c.title,
+            c.dir,
+            titles.join(", ")
+        );
+        files.push((
+            format!("snippets/{}.md", c.dir),
+            format!("# {}\n\n{}", c.title, category_markdown(c)),
+        ));
     }
     files.insert(0, ("SNIPPETS.md".to_owned(), index));
     files

@@ -210,7 +210,10 @@ impl State {
             return Err(usage.into());
         }
         let seed = seed.text.parse().map_err(|_| {
-            Fail::at(seed, format!("`{}` is not a seed (whole number)", seed.text))
+            Fail::at(
+                seed,
+                format!("`{}` is not a seed (whole number)", seed.text),
+            )
         })?;
         self.patch.style = Some(StyleRef {
             name: name.text.to_owned(),
@@ -258,10 +261,7 @@ impl State {
         }
         let id: PartId = parsed(id)?;
         if self.patch.part(&id).is_some() {
-            return Err(Fail::at(
-                &args[0],
-                format!("part `{id}` defined twice"),
-            ));
+            return Err(Fail::at(&args[0], format!("part `{id}` defined twice")));
         }
         if !Part::valid_name(name.text) {
             return Err(Fail::at(name, "part name must not be empty"));
@@ -275,10 +275,7 @@ impl State {
                     level = Some(unit_str(v).map_err(|m| Fail::at(f, m))?);
                 }
                 _ => {
-                    return Err(Fail::at(
-                        f,
-                        format!("unexpected `{}` on part line", f.text),
-                    ));
+                    return Err(Fail::at(f, format!("unexpected `{}` on part line", f.text)));
                 }
             }
         }
@@ -340,7 +337,10 @@ impl State {
                         .strip_prefix('"')
                         .and_then(|p| p.strip_suffix('"'))
                         .ok_or_else(|| {
-                            Fail::at(t, "expected `sample=\"<path>\"` with the path in double quotes")
+                            Fail::at(
+                                t,
+                                "expected `sample=\"<path>\"` with the path in double quotes",
+                            )
                         })?;
                     if !Module::valid_sample_path(path) {
                         return Err(Fail::at(t, "sample path must not be empty"));
@@ -349,7 +349,9 @@ impl State {
                 }
                 Some(("sample", _)) => return Err(Fail::at(t, "`sample` set twice")),
                 Some((k, v)) => {
-                    let key: Key = k.parse().map_err(|e: crate::IdError| Fail::at(t, e.to_string()))?;
+                    let key: Key = k
+                        .parse()
+                        .map_err(|e: crate::IdError| Fail::at(t, e.to_string()))?;
                     if params.iter().any(|p| p.key == key) {
                         return Err(Fail::at(t, format!("`{key}` set twice")));
                     }
@@ -367,7 +369,10 @@ impl State {
                     .iter_mut()
                     .find(|p| p.key.as_str() == k)
                     .ok_or_else(|| {
-                        Fail::at(t, format!("`lock={k}` names a param with no value on this line"))
+                        Fail::at(
+                            t,
+                            format!("`lock={k}` names a param with no value on this line"),
+                        )
                     })?;
                 p.locked = true;
             }
@@ -438,7 +443,9 @@ fn parsed<T: FromStr>(t: &Token) -> R<T>
 where
     T::Err: std::fmt::Display,
 {
-    t.text.parse().map_err(|e: T::Err| Fail::at(t, e.to_string()))
+    t.text
+        .parse()
+        .map_err(|e: T::Err| Fail::at(t, e.to_string()))
 }
 
 fn number(t: &Token) -> R<f32> {

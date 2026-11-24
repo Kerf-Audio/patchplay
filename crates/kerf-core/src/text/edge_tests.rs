@@ -44,7 +44,16 @@ fn diagnose_measures_spans_inside_quoted_words_from_the_word_not_the_quote() {
         .filter(|d| d.line > 1)
         .map(|d| (d.line, d.col, d.end_col))
         .collect();
-    assert_eq!(spans, [(2, 18, 20), (3, 8, 9), (4, 19, 21), (5, 12, 13), (6, 10, 11)]);
+    assert_eq!(
+        spans,
+        [
+            (2, 18, 20),
+            (3, 8, 9),
+            (4, 19, 21),
+            (5, 12, 13),
+            (6, 10, 11)
+        ]
+    );
 }
 
 #[test]

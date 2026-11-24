@@ -280,7 +280,11 @@ mod tests {
         ];
         for &(src, line, col, end_col) in cases {
             let e = parse(src).unwrap_err();
-            assert_eq!((e.line, e.col, e.end_col), (line, col, end_col), "{src:?}: {e}");
+            assert_eq!(
+                (e.line, e.col, e.end_col),
+                (line, col, end_col),
+                "{src:?}: {e}"
+            );
         }
         let e = parse("kerf 1\ntempo 5\n").unwrap_err();
         assert!(e.to_string().starts_with("line 2, column 7: "), "{e}");

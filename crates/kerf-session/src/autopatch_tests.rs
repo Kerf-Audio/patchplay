@@ -20,8 +20,10 @@ fn cmd(v: serde_json::Value) -> Command {
 }
 
 fn add(s: &mut Session<Builtin>, kind: &str, id: &str, near: Option<&str>) {
-    s.apply(cmd(json!({"op":"add_module","kind":kind,"id":id,"auto_patch":true,"near":near})))
-        .unwrap();
+    s.apply(cmd(
+        json!({"op":"add_module","kind":kind,"id":id,"auto_patch":true,"near":near}),
+    ))
+    .unwrap();
 }
 
 fn has(s: &Session<Builtin>, from: &str, to: &str) -> bool {
@@ -66,7 +68,11 @@ fn a_mortise_takes_the_clock_and_goes_to_the_output() {
     let mut s = open(BASE);
     add(&mut s, "Mortise", "kick", None);
     assert!(has(&s, "rhythm.a", "kick.trig") || has(&s, "clock.clock", "kick.trig"));
-    assert!(has(&s, "kick.out", "out.l") && has(&s, "kick.out", "out.r"), "{:?}", cables(&s));
+    assert!(
+        has(&s, "kick.out", "out.l") && has(&s, "kick.out", "out.r"),
+        "{:?}",
+        cables(&s)
+    );
     assert!(acyclic(s.patch()));
     assert_eq!(s.last_plan().len(), cables(&s).len() - 1);
 }
@@ -81,7 +87,9 @@ fn a_mortise_in_an_empty_patch_has_nothing_to_wire() {
 
 #[test]
 fn a_veneer_prefers_the_router() {
-    let mut s = open(&format!("{BASE}module mix Router\ncable mix.mix_l -> out.l\ncable mix.mix_r -> out.r\n"));
+    let mut s = open(&format!(
+        "{BASE}module mix Router\ncable mix.mix_l -> out.l\ncable mix.mix_r -> out.r\n"
+    ));
     add(&mut s, "Veneer", "loop", None);
     assert!(has(&s, "loop.l", "mix.in1"), "{:?}", cables(&s));
     // A stereo pair shares one channel rather than using up two.
@@ -95,18 +103,32 @@ fn a_chisel_takes_pitch_and_a_gate_less_voice_goes_to_the_output() {
     let mut s = open(&text);
     add(&mut s, "Chisel", "osc", None);
     assert!(has(&s, "seq.pitch", "osc.voct"), "{:?}", cables(&s));
-    assert!(cables(&s).iter().any(|c| c.starts_with("osc.") && c.contains("out.")));
+    assert!(
+        cables(&s)
+            .iter()
+            .any(|c| c.starts_with("osc.") && c.contains("out."))
+    );
     assert!(acyclic(s.patch()));
 }
 
 #[test]
 fn a_bandsaw_takes_audio_and_the_clock() {
-    let text = format!("{BASE}module kick Mortise\ncable rhythm.a -> kick.trig\ncable kick.out -> out.l\n");
+    let text = format!(
+        "{BASE}module kick Mortise\ncable rhythm.a -> kick.trig\ncable kick.out -> out.l\n"
+    );
     let mut s = open(&text);
     add(&mut s, "Bandsaw", "echo", None);
     assert!(has(&s, "clock.clock", "echo.clock"), "{:?}", cables(&s));
-    assert!(cables(&s).iter().any(|c| c.ends_with("-> echo.in")), "{:?}", cables(&s));
-    assert!(cables(&s).iter().any(|c| c.starts_with("echo.") && c.contains("out.")));
+    assert!(
+        cables(&s).iter().any(|c| c.ends_with("-> echo.in")),
+        "{:?}",
+        cables(&s)
+    );
+    assert!(
+        cables(&s)
+            .iter()
+            .any(|c| c.starts_with("echo.") && c.contains("out."))
+    );
     assert!(acyclic(s.patch()));
 }
 
@@ -114,12 +136,22 @@ fn a_bandsaw_takes_audio_and_the_clock() {
 fn near_wires_only_between_the_two_modules() {
     let text = format!("{BASE}module kick Mortise\nmodule mix Router\n");
     let mut s = open(&text);
-    s.apply(cmd(json!({"op":"auto_patch","module":"rhythm","near":"kick"}))).unwrap();
+    s.apply(cmd(
+        json!({"op":"auto_patch","module":"rhythm","near":"kick"}),
+    ))
+    .unwrap();
     assert!(has(&s, "rhythm.a", "kick.trig"), "{:?}", cables(&s));
     assert!(!cables(&s).iter().any(|c| c.contains("out.")));
 
-    s.apply(cmd(json!({"op":"auto_patch","module":"kick","near":"mix"}))).unwrap();
-    assert!(cables(&s).iter().any(|c| c.starts_with("kick.out -> mix.in")), "{:?}", cables(&s));
+    s.apply(cmd(json!({"op":"auto_patch","module":"kick","near":"mix"})))
+        .unwrap();
+    assert!(
+        cables(&s)
+            .iter()
+            .any(|c| c.starts_with("kick.out -> mix.in")),
+        "{:?}",
+        cables(&s)
+    );
 }
 
 #[test]
@@ -128,7 +160,8 @@ fn auto_patch_is_idempotent_and_never_overwrites() {
     add(&mut s, "Mortise", "kick", None);
     let before = cables(&s);
     let steps = s.undo.len();
-    s.apply(cmd(json!({"op":"auto_patch","module":"kick"}))).unwrap();
+    s.apply(cmd(json!({"op":"auto_patch","module":"kick"})))
+        .unwrap();
     assert_eq!(cables(&s), before);
     assert_eq!(s.undo.len(), steps, "a no-op is not an undo step");
     assert!(s.last_plan().is_empty());
@@ -152,17 +185,32 @@ fn suggestions_match_what_auto_patch_adds() {
     };
     let plan = s.suggest_cables(&ask).unwrap();
     assert!(!plan.is_empty());
-    assert!(plan.iter().all(|c| c.to.to_string().starts_with("out.") || c.to.module.as_str() == "new"));
+    assert!(
+        plan.iter()
+            .all(|c| c.to.to_string().starts_with("out.") || c.to.module.as_str() == "new")
+    );
     let mut applied = open(BASE);
     applied
-        .apply(cmd(json!({"op":"add_module","kind":"Mortise","id":"new","auto_patch":true})))
+        .apply(cmd(
+            json!({"op":"add_module","kind":"Mortise","id":"new","auto_patch":true}),
+        ))
         .unwrap();
-    let mut a: Vec<_> = plan.iter().map(|c| format!("{} -> {}", c.from, c.to)).collect();
-    let mut b: Vec<_> = applied.last_plan().iter().map(|c| format!("{} -> {}", c.from, c.to)).collect();
+    let mut a: Vec<_> = plan
+        .iter()
+        .map(|c| format!("{} -> {}", c.from, c.to))
+        .collect();
+    let mut b: Vec<_> = applied
+        .last_plan()
+        .iter()
+        .map(|c| format!("{} -> {}", c.from, c.to))
+        .collect();
     a.sort();
     b.sort();
     assert_eq!(a, b);
-    assert!(s.patch().module(&"new".parse().unwrap()).is_none(), "read-only");
+    assert!(
+        s.patch().module(&"new".parse().unwrap()).is_none(),
+        "read-only"
+    );
 }
 
 #[test]
@@ -195,28 +243,45 @@ fn replace_text_errors_name_line_and_column() {
 #[test]
 fn move_module_changes_its_part() {
     let mut s = open("kerf 1\nmodule a Mortise\npart p \"P\" colour #112233\n  module b Ruler\n");
-    s.apply(cmd(json!({"op":"move_module","module":"a","part":"p"}))).unwrap();
-    assert_eq!(s.patch().module(&"a".parse().unwrap()).unwrap().part, Some("p".parse().unwrap()));
-    s.apply(cmd(json!({"op":"move_module","module":"a","part":null}))).unwrap();
+    s.apply(cmd(json!({"op":"move_module","module":"a","part":"p"})))
+        .unwrap();
+    assert_eq!(
+        s.patch().module(&"a".parse().unwrap()).unwrap().part,
+        Some("p".parse().unwrap())
+    );
+    s.apply(cmd(json!({"op":"move_module","module":"a","part":null})))
+        .unwrap();
     assert_eq!(s.patch().module(&"a".parse().unwrap()).unwrap().part, None);
 }
 
 #[test]
 fn part_level_is_validated_and_undoable() {
     let mut s = open("kerf 1\npart p \"P\" colour #112233\n  module b Ruler\n");
-    s.apply(cmd(json!({"op":"set_part_level","part":"p","level":0.5}))).unwrap();
+    s.apply(cmd(json!({"op":"set_part_level","part":"p","level":0.5})))
+        .unwrap();
     assert_eq!(s.patch().parts[0].level, 0.5);
-    assert!(s.apply(cmd(json!({"op":"set_part_level","part":"p","level":1.5}))).is_err());
-    assert!(s.apply(cmd(json!({"op":"set_part_level","part":"q","level":0.5}))).is_err());
+    assert!(
+        s.apply(cmd(json!({"op":"set_part_level","part":"p","level":1.5})))
+            .is_err()
+    );
+    assert!(
+        s.apply(cmd(json!({"op":"set_part_level","part":"q","level":0.5})))
+            .is_err()
+    );
     s.apply(Command::Undo).unwrap();
     assert_eq!(s.patch().parts[0].level, 1.0);
 }
 
 #[test]
 fn diagnostics_point_at_line_and_column() {
-    let text = "kerf 1\nmodule a Mortise\nmodule b Foo\ncable a.out -> c.in\ncable a.nope -> a.trig\n";
+    let text =
+        "kerf 1\nmodule a Mortise\nmodule b Foo\ncable a.out -> c.in\ncable a.nope -> a.trig\n";
     let d = diagnose(&Builtin, text);
-    let at = |line| d.iter().find(|d| d.line == line).unwrap_or_else(|| panic!("{d:?}"));
+    let at = |line| {
+        d.iter()
+            .find(|d| d.line == line)
+            .unwrap_or_else(|| panic!("{d:?}"))
+    };
     assert_eq!((at(3).col, at(3).end_col), (10, 13));
     assert_eq!(at(3).severity, Severity::Error);
     assert!(at(4).message.contains('c'));
@@ -266,7 +331,9 @@ fn the_format_guide_examples_open() {
 fn completions_and_docs_come_from_the_catalogue() {
     let c = crate::completions(&Builtin);
     let words: Vec<_> = c.keywords.iter().map(|k| k.word).collect();
-    for w in ["kerf", "tempo", "part", "cable", "scene", "sample=", "level="] {
+    for w in [
+        "kerf", "tempo", "part", "cable", "scene", "sample=", "level=",
+    ] {
         assert!(words.contains(&w), "{w}");
     }
     assert_eq!(c.kinds.len(), kerf_core::Catalogue::all(&Builtin).len());

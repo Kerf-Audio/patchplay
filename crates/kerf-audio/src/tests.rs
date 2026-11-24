@@ -202,7 +202,10 @@ fn a_full_queue_is_busy_not_a_panic() {
 
 /// The mono mix of interleaved stereo, as the tap records it.
 fn mono(stereo: &[f32]) -> Vec<f32> {
-    stereo.chunks_exact(2).map(|f| 0.5 * (f[0] + f[1])).collect()
+    stereo
+        .chunks_exact(2)
+        .map(|f| 0.5 * (f[0] + f[1]))
+        .collect()
 }
 
 #[test]
@@ -214,7 +217,10 @@ fn the_scope_tap_returns_the_latest_output_in_order() {
     let mut tap = vec![0.0; crate::SCOPE_SAMPLES];
     assert_eq!(rig.peaks.tap.read_latest(&mut tap), crate::SCOPE_SAMPLES);
     assert_eq!(tap, out[out.len() - crate::SCOPE_SAMPLES..]);
-    assert!(tap.iter().any(|&x| x.abs() > 0.01), "the scope should hear the patch");
+    assert!(
+        tap.iter().any(|&x| x.abs() > 0.01),
+        "the scope should hear the patch"
+    );
 }
 
 #[test]

@@ -14,7 +14,11 @@ fn repo() -> PathBuf {
 }
 
 fn start() -> &'static str {
-    &snippets().iter().find(|s| s.id == "start/clock-out").unwrap().code
+    &snippets()
+        .iter()
+        .find(|s| s.id == "start/clock-out")
+        .unwrap()
+        .code
 }
 
 fn assert_clean(text: &str, what: &str) {
@@ -31,7 +35,11 @@ fn every_file_in_the_folder_is_listed_and_back() {
         let dir = dir.unwrap().path();
         for file in std::fs::read_dir(&dir).unwrap() {
             let file = file.unwrap().path();
-            assert_eq!(file.extension().and_then(|e| e.to_str()), Some("kerf"), "{file:?}");
+            assert_eq!(
+                file.extension().and_then(|e| e.to_str()),
+                Some("kerf"),
+                "{file:?}"
+            );
             on_disk.insert(format!(
                 "{}/{}",
                 dir.file_name().unwrap().to_string_lossy(),
@@ -43,18 +51,30 @@ fn every_file_in_the_folder_is_listed_and_back() {
     assert_eq!(on_disk, listed);
     let dirs: BTreeSet<&str> = CATEGORIES.iter().map(|c| c.dir).collect();
     assert!(snippets().iter().all(|s| dirs.contains(s.category)));
-    assert!(CATEGORIES.iter().all(|c| snippets().iter().any(|s| s.category == c.dir)));
+    assert!(
+        CATEGORIES
+            .iter()
+            .all(|c| snippets().iter().any(|s| s.category == c.dir))
+    );
 }
 
 #[test]
 fn every_snippet_opens_with_the_start_snippet_and_has_no_diagnostics() {
     for s in snippets() {
         assert!(!s.title.is_empty() && !s.about.is_empty(), "{}", s.id);
-        assert!(s.code.lines().all(|l| l.len() <= 90 || !l.starts_with('#')), "{}: long comment", s.id);
+        assert!(
+            s.code.lines().all(|l| l.len() <= 90 || !l.starts_with('#')),
+            "{}: long comment",
+            s.id
+        );
         let text = if s.category == "start" {
             format!("{HEADER}{}", s.code)
         } else {
-            assert!(!s.needs.is_empty() && s.needs.iter().all(|n| n == "clock" || n == "out"), "{}", s.id);
+            assert!(
+                !s.needs.is_empty() && s.needs.iter().all(|n| n == "clock" || n == "out"),
+                "{}",
+                s.id
+            );
             format!("{HEADER}{}\n{}", start(), s.code)
         };
         assert_clean(&text, s.id);
@@ -66,7 +86,11 @@ fn effects_name_inputs_and_sounds_do_not() {
     for s in snippets() {
         assert_eq!(s.feed.is_empty(), s.category != "effects", "{}", s.id);
         for jack in &s.feed {
-            assert!(s.body.contains(jack.split('.').next().unwrap()), "{}: {jack}", s.id);
+            assert!(
+                s.body.contains(jack.split('.').next().unwrap()),
+                "{}: {jack}",
+                s.id
+            );
         }
     }
 }
@@ -107,7 +131,11 @@ fn doc_sections_have_unique_ids() {
     for s in &docs.sections {
         assert!(seen.insert(s.id.clone()), "duplicate section id {}", s.id);
     }
-    assert!(seen.contains("snippets") && seen.contains("snippets-effects") && seen.contains("step-1-a-clock-and-a-kick"));
+    assert!(
+        seen.contains("snippets")
+            && seen.contains("snippets-effects")
+            && seen.contains("step-1-a-clock-and-a-kick")
+    );
 }
 
 #[test]

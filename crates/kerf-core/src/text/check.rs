@@ -140,7 +140,11 @@ fn check_module(cat: &impl Catalogue, l: &Line, out: &mut Vec<Diagnostic>) {
         out.push(l.at(
             kind,
             Severity::Error,
-            format!("no module kind `{}`; kinds: {}", kind.text, known.join(", ")),
+            format!(
+                "no module kind `{}`; kinds: {}",
+                kind.text,
+                known.join(", ")
+            ),
         ));
         return;
     };
@@ -156,7 +160,10 @@ fn check_module(cat: &impl Catalogue, l: &Line, out: &mut Vec<Diagnostic>) {
                 out.push(l.at(
                     t,
                     Severity::Error,
-                    format!("{} does not play a sample; only a Veneer or Splinter does", d.kind),
+                    format!(
+                        "{} does not play a sample; only a Veneer or Splinter does",
+                        d.kind
+                    ),
                 ));
             }
         } else if d.param(key).is_none() {
@@ -165,7 +172,11 @@ fn check_module(cat: &impl Catalogue, l: &Line, out: &mut Vec<Diagnostic>) {
                 t.body(),
                 t.body() + key.len(),
                 Severity::Error,
-                format!("{} has no param `{key}`; params: {}", d.kind, keys.join(", ")),
+                format!(
+                    "{} has no param `{key}`; params: {}",
+                    d.kind,
+                    keys.join(", ")
+                ),
             ));
         }
     }
@@ -215,7 +226,11 @@ fn check_jack(
     } else if keys.is_empty() {
         format!("{} has no {word}s", d.kind)
     } else {
-        format!("{} has no {word} `{jack}`; {word}s: {}", d.kind, keys.join(", "))
+        format!(
+            "{} has no {word} `{jack}`; {word}s: {}",
+            d.kind,
+            keys.join(", ")
+        )
     };
     out.push(l.diag(start, t.end, Severity::Error, message));
     None
