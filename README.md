@@ -1,4 +1,6 @@
-# patchplay
+<p align="center"><img src="ui/public/icon-512.png" alt="patchplay icon" width="128" height="128"></p>
+
+<h1 align="center">patchplay</h1>
 
 A modular audio playground by [Kerf Audio](https://kerfaudio.com). Patch 37 modules together, or let it
 patch them for you, then roll random patches in a style, evolve them and breed two together. The sound
