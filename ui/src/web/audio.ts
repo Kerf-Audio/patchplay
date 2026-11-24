@@ -28,6 +28,8 @@ export class WebAudio {
 
   private async start(): Promise<void> {
     this.mute = new URLSearchParams(location.search).has('mute');
+    // Browsers only offer AudioWorklet on secure pages (https or localhost).
+    if (!window.isSecureContext) throw new Error('sound needs a secure page: open this site with https://');
     const ctx = new AudioContext({ latencyHint: 'interactive' });
     try {
       await ctx.audioWorklet.addModule(workletUrl);

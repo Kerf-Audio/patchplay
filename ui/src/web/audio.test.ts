@@ -50,6 +50,7 @@ beforeEach(() => {
   vi.stubGlobal('AudioWorkletNode', FakeNode);
   vi.stubGlobal('location', { search: '' });
   vi.stubGlobal('window', globalThis);
+  vi.stubGlobal('isSecureContext', true);
 });
 afterEach(() => vi.unstubAllGlobals());
 
@@ -76,6 +77,14 @@ describe('WebAudio.flush', () => {
     expect(FakeContext.made).toHaveLength(2);
     expect(FakeContext.made[1]?.close).not.toHaveBeenCalled();
     expect(FakeContext.made[1]?.resume).toHaveBeenCalled();
+  });
+
+  it('explains that sound needs https on a plain http page, without making a context', async () => {
+    vi.stubGlobal('isSecureContext', false);
+    const audio = new WebAudio(new ArrayBuffer(0), () => []);
+    queue('patch\none');
+    await expect(audio.flush()).rejects.toThrow('https://');
+    expect(FakeContext.made).toHaveLength(0);
   });
 });
 
