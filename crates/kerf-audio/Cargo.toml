@@ -1,0 +1,28 @@
+[package]
+name = "kerf-audio"
+description = "Live audio output: runs a kerf-engine Engine on the default device, or headless inside a host that owns the device (the browser's AudioWorklet)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+default = ["device"]
+# The cpal output device and `Player`. Off for the wasm build, which uses `Headless`.
+device = ["dep:cpal"]
+
+[dependencies]
+kerf-core.workspace = true
+kerf-engine.workspace = true
+cpal = { workspace = true, optional = true }
+rtrb.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+kerf-modules.workspace = true
+kerf-session.workspace = true
+
+[lints]
+workspace = true

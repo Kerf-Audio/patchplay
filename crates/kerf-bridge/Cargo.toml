@@ -1,0 +1,23 @@
+[package]
+name = "kerf-bridge"
+description = "Everything the UI can ask for, as plain Rust: session, commands, checks, presets and offline render. No windows, sound card, sockets or files, so it runs in the desktop app and in the browser."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+build = "build.rs"
+
+[dependencies]
+kerf-core.workspace = true
+kerf-engine.workspace = true
+kerf-gen.workspace = true
+kerf-modules.workspace = true
+kerf-session.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

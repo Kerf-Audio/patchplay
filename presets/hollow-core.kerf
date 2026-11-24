@@ -1,0 +1,79 @@
+kerf 1
+tempo 100
+key E dorian
+tags abstract polyrhythm
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667
+  module kick Mortise engine=0 pitch=0.4 punch=0.55 decay=0.3 tone=0.5
+  module r_chat Ruler hits_a=0.7143 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.08 tone=0.65
+  module r_tom Ruler hits_a=0.6 hits_b=0 hits_c=0 hits_d=0 steps_a=0.2667
+  module tom Mortise engine=1 pitch=0.45 punch=0.5 decay=0.3 tone=0.5
+
+part arp "Arp" colour #d1a233 level=0.5
+  module arpseq Dovetail steps_a=0.4 steps_b=0.2667 interlock=0.5 chance=0.85 glide=0.2 range=0.4
+  module arpfret Fret root=0.3333 scale=0.57 octave=0.5
+  module arposc Lathe tune=0.5 table=0.4 turn=0.5 warp=0.3
+  module arpenv Bevel attack=0 decay=0.3 sustain=0.15 release=0.4 curve=0.4
+  module arpflt Plane cutoff=0.5 res=0.3 mode=0 drive=0.1
+  module arpamp Clamp level=0 response=0.5
+  module arpecho Bandsaw time=0.375 feedback=0.5 wear=0.35 mix=1
+  module arplfo Spokeshave rate=0.15 spread=0.5 shape=0 phase=0.25
+
+part drone "Core" colour #7a4fb5 level=0.45
+  module droneflt Plane cutoff=0.4 res=0.2 mode=0 drive=0.1
+  module dronelfo Spokeshave rate=0.05 spread=0.6 shape=0 phase=0.25
+  module droneo0 Lathe tune=0.25 table=0.5 turn=0.5 warp=0.25
+  module droneo1 Lathe tune=0.5 table=0.3 turn=0.6 warp=0.25
+
+part mac "Macros" colour #b5654f
+  module macjig Jig m1=0.1 m2=0.5 m3=0.5 m4=0.5
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_tom.clock
+cable r_tom.a -> tom.trig
+cable tom.out -> mix.in4
+
+cable clock.clock -> arpseq.clock
+cable arpseq.pitch -> arpfret.pitch
+cable arpfret.pitch -> arposc.voct
+cable arpseq.gate -> arpenv.gate
+cable arposc.out -> arpflt.in
+cable arpflt.out -> arpamp.in
+cable arpenv.env -> arpamp.cv
+cable arpamp.out -> mix.in5
+cable clock.clock -> arpecho.clock
+cable arpamp.out -> arpecho.in
+cable arpecho.l -> mix.in5
+cable arpecho.r -> mix.in5
+cable arplfo.lfo1 -> arpflt.cutoff
+
+cable droneo0.out -> droneflt.in
+cable dronelfo.lfo1 -> droneo0.turn
+cable droneo1.out -> droneflt.in
+cable dronelfo.lfo2 -> droneo1.turn
+cable dronelfo.lfo1 -> droneflt.cutoff
+cable droneflt.out -> mix.in6
+
+cable macjig.m1 -> arpflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A arpflt.cutoff=0.38 droneflt.cutoff=0.28 macjig.m1=0
+scene B arpflt.cutoff=0.65 droneflt.cutoff=0.58 macjig.m1=0.22

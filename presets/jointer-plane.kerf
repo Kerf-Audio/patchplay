@@ -1,0 +1,88 @@
+kerf 1
+tempo 174
+key F minor
+tags dnb breakbeat
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.8 level3=0.4 level4=0.65 level5=0.4 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.25 tone=0.5
+  module r_kick2 Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.625
+  module kick2 Mortise engine=0 pitch=0.45 punch=0.55 decay=0.25 tone=0.5
+  module r_snare Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module snare Mortise engine=0.25 pitch=0.55 punch=0.65 decay=0.3 tone=0.5
+  module r_chat Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.06 tone=0.65
+  module r_ohat Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.875
+  module ohat Mortise engine=0.5 pitch=0.55 punch=0.5 decay=0.25 tone=0.7
+  module duck Bevel attack=0 decay=0.3 sustain=0 release=0.3 curve=0.3
+
+part bass "Reese" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=0.4667 steps_b=0.1333 interlock=0.6 chance=1 glide=0.3 range=0.2
+  module bassfret Fret root=0.4167 scale=0.43 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.6 sustain=0.5 release=0.15 curve=0.4
+  module bassflt Plane cutoff=0.3 res=0.45 mode=0 drive=0.45
+  module bassamp Clamp level=0 response=0.1
+  module bassrasp Rasp drive=0.4 fold=0.2 bias=0.5 mix=0.5
+  module bassduck Clamp level=0 response=0
+  module bassburl Burl rate=0.25 smooth=0.7 bias=0.5
+
+part pad "Wash" colour #7a4fb5 level=0.45
+  module padseq Dovetail steps_a=1 steps_b=0.0667 interlock=0 chance=1 glide=0.1 range=0.3
+  module padfret Fret root=0.4167 scale=0.43 octave=0.5
+  module padply Ply layers=0.8 detune=0.3 width=1 tone=0.4
+  module padflt Plane cutoff=0.45 res=0.15 mode=0 drive=0
+  module paddrift Spokeshave rate=0.07 spread=0.5 shape=0 phase=0.25
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_kick2.clock
+cable r_kick2.a -> kick2.trig
+cable kick2.out -> mix.in1
+cable clock.clock -> r_snare.clock
+cable r_snare.a -> snare.trig
+cable snare.out -> mix.in4
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_ohat.clock
+cable r_ohat.a -> ohat.trig
+cable ohat.out -> mix.in3
+cable r_kick.a -> duck.gate
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.saw -> bassflt.in
+cable bassflt.out -> bassrasp.in
+cable bassrasp.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> bassduck.in
+cable duck.inverted -> bassduck.cv
+cable bassduck.out -> mix.in2
+cable bassburl.drift -> bassflt.cutoff
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padply.voct
+cable padply.l -> padflt.in
+cable padply.r -> padflt.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable padflt.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bassflt.cutoff=0.18 padflt.cutoff=0.3
+scene B bassflt.cutoff=0.45 padflt.cutoff=0.65

@@ -1,0 +1,16 @@
+# title: Clap with a stray
+# about: A clap on beats 2 and 4, and now and then a stray clap between them.
+# port: clap_rhythm.a (gate): the backbeat. clap_rhythm.b is the stray lane.
+# port: clap_drum.out, clap_stray.out (audio): both already cabled to out.
+part clap "Clap" colour #c94a3d level=0.7
+  module clap_rhythm Ruler hits_a=0.125 steps_a=1 hits_b=0.1875 steps_b=1 hits_c=0 hits_d=0 rotate=0.25 chance=0.3
+  module clap_drum Mortise engine=0.75 pitch=0.5 punch=0.6 decay=0.4 tone=0.5
+  module clap_stray Mortise engine=0.75 pitch=0.55 punch=0.4 decay=0.25 tone=0.6
+
+cable clock.clock -> clap_rhythm.clock
+cable clap_rhythm.a -> clap_drum.trig
+cable clap_rhythm.b -> clap_stray.trig
+cable clap_drum.out -> out.l
+cable clap_drum.out -> out.r
+cable clap_stray.out -> out.l
+cable clap_stray.out -> out.r

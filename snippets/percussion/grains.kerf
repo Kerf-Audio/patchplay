@@ -1,0 +1,12 @@
+# title: Sampled grains
+# about: A Splinter scans slowly through its sample. Without a file it plays the built-in demo sample.
+# port: grain_scan.lfo1 (cv): the slow scan across the sample.
+# port: grain_cloud.trig (gate): fire a burst of eight grains instead of a steady stream.
+# port: grain_cloud.l, grain_cloud.r (audio): the grains, already cabled to out.
+part grain "Sampled grains" colour #e0802e level=0.9
+  module grain_cloud Splinter position=0.3 spray=0.6 size=0.45 density=0.8 pitch=0.5 scatter=0 reverse=0 shape=0.25 spread=0.5 level=0.8 hold=0
+  module grain_scan Spokeshave rate=0.05 spread=0.5 shape=0 phase=0
+
+cable grain_scan.lfo1 -> grain_cloud.position
+cable grain_cloud.l -> out.l
+cable grain_cloud.r -> out.r

@@ -1,0 +1,70 @@
+kerf 1
+tempo 40
+key D minor
+tags ominous drone dark
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module mix Router level1=0.6 level2=0.9 level3=0.9 level4=0.5 level5=0.5 level6=0.5 send=0.55
+module room Kiln size=1 heat=0.4 bloom=0.8 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part drone "Drone" colour #5a4a7a level=0.4
+  module roottr Tread step1=0.3167 step2=0.3167 step3=0.275 step4=0.2583 step5=0.2583 step6=0.2583 step7=0.2583 step8=0.2583 length=0.4286 glide=0.8
+  module rootwarp Warp amount=0.18 speed=0.08 rough=0.1 chaos=0.2
+  module d1 Chisel tune=0.5 fine=0.5 shape=0.85 pw=0.5
+  module d2 Chisel tune=0.5208 fine=0.5 shape=0.85 pw=0.5
+  module d3 Chisel tune=0.625 fine=0.49 shape=0.85 pw=0.5
+  module dflt Plane cutoff=0.38 res=0.3 mode=0 drive=0.15
+  module dlfo Rocker rate=0.08 sync=0 shape=0 depth=0.5 offset=0.5
+
+part choir "Choir" colour #8a6aa5
+  module chfret Fret root=0.1667 scale=0.43 octave=0.75
+  module choir Ply layers=0.85 detune=0.55 width=1 tone=0.3
+  module chflt Plane cutoff=0.5 res=0.35 mode=0.33 drive=0
+  module chlfo Rocker rate=0.05 sync=0 shape=0.05 depth=0.6 offset=0.5 phase=0.3
+  module champ Clamp level=0.45 response=0
+
+part bellp "Tolling bell" colour #d1a233
+  module belrl Ruler hits_a=0 hits_b=0.0909 hits_c=0 hits_d=0 steps_a=1 steps_b=0.6667 rotate=0 chance=1
+  module beltr Tread step1=0.6167 step2=0.5167 step3=0.4917 step4=0.5583 step5=0.6167 step6=0.6 step7=0.5167 step8=0.4583 length=1.0 glide=0
+  module bell Mallet material=0.45 size=0.35 strike=0.35 damp=0.85
+
+part air "Whispers" colour #3da3a3 level=0.5
+  module whisper Static tune=0.3 width=0.3 hiss=0.2 crackle=0.05 whistle=0.2 fade=0.6 ghost=0.6 level=0.5
+  module spring Chatter energy=0.3 tension=0.2 damping=0.3 rate=0.1 depth=0.8
+
+cable clock.bar -> roottr.clock
+cable roottr.cv -> rootwarp.in
+cable rootwarp.out -> d1.voct
+cable rootwarp.out -> d2.voct
+cable rootwarp.out -> d3.voct
+cable d1.saw -> dflt.in
+cable d2.saw -> dflt.in
+cable d3.saw -> dflt.in
+cable dlfo.out -> dflt.cutoff
+cable spring.position -> dflt.cutoff
+cable dflt.out -> mix.in1
+cable roottr.cv -> chfret.pitch
+cable chfret.pitch -> choir.voct
+cable choir.l -> chflt.in
+cable choir.r -> chflt.in
+cable chlfo.out -> chflt.cutoff
+cable chlfo.out -> champ.cv
+cable chflt.out -> champ.in
+cable champ.out -> mix.in2
+cable clock.clock -> belrl.clock
+cable belrl.b -> beltr.clock
+cable belrl.b -> bell.trig
+cable beltr.cv -> bell.voct
+cable bell.out -> mix.in3
+cable whisper.out -> mix.in4
+cable whisper.crackle -> spring.kick
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A dflt.cutoff=0.28 chflt.cutoff=0.4 whisper.fade=0.4
+scene B dflt.cutoff=0.55 chflt.cutoff=0.65 whisper.fade=0.8

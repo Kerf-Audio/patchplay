@@ -1,0 +1,67 @@
+kerf 1
+tempo 60
+key A minor
+tags abstract granular ambient
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module room Kiln size=0.85 heat=0.5 bloom=0.7 mix=1
+module out Finish volume=0.55 glue=0.3 ceiling=0.8
+
+part roots "Roots" colour #8a8f98 level=1
+  module roottr Tread step1=0.475 step2=0.4417 step3=0.4583 step4=0.4333 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 direction=0 glide=0.2
+  module rootfret Fret root=0.75 scale=0.43 octave=0.5
+  module drift Warp amount=0.12 speed=0.12 rough=0.15 chaos=0.25
+
+part bed "Granular bed" colour #b5527a level=1
+  module bedsp Splinter position=0.5 spray=0.5 size=0.85 density=0.7 pitch=0.5625 scatter=0.03 reverse=0.25 shape=0.15 spread=1 level=0.9 hold=0
+  module bedscan Rocker rate=0.06 sync=0 shape=0 depth=0.5 offset=0.5
+
+part tone "Tonal grains" colour #7a4fb5 level=0.7
+  module tonesp Splinter position=0.385 spray=0.1 size=0.9 density=0.85 pitch=0.3125 scatter=0 reverse=0 shape=0.1 spread=1 level=0.9 hold=0
+
+part pad "Mitre pad" colour #3d63c9 level=0.4
+  module chord Mitre chord=0.1538 inversion=0 spread=0.34 root=0.75 snap=0
+  module pad1 Chisel tune=0.25 fine=0.5 shape=0.95 pw=0.5
+  module pad2 Chisel tune=0.25 fine=0.51 shape=0.95 pw=0.5
+  module pad3 Chisel tune=0.25 fine=0.49 shape=0.95 pw=0.5
+  module pad4 Chisel tune=0.25 fine=0.5 shape=0.95 pw=0.5
+  module padflt Plane cutoff=0.3 res=0.15 mode=0 drive=0
+  module padsweep Spokeshave rate=0.03 spread=0.5 shape=0 phase=0.25 depth=0.4
+
+part tone2 "Filters" colour #8a8f98 level=1
+  module fltl Plane cutoff=0.6 res=0.15 mode=0 drive=0
+  module fltr Plane cutoff=0.6 res=0.15 mode=0 drive=0
+
+cable clock.bar -> roottr.clock
+cable roottr.cv -> rootfret.pitch
+cable rootfret.pitch -> drift.in
+cable drift.out -> bedsp.voct
+cable drift.out -> tonesp.voct
+cable rootfret.pitch -> chord.pitch
+cable bedscan.out -> bedsp.position
+cable chord.voice1 -> pad1.voct
+cable chord.voice2 -> pad2.voct
+cable chord.voice3 -> pad3.voct
+cable chord.voice4 -> pad4.voct
+cable pad1.saw -> padflt.in
+cable pad2.saw -> padflt.in
+cable pad3.saw -> padflt.in
+cable pad4.saw -> padflt.in
+cable padsweep.lfo1 -> padflt.cutoff
+cable padflt.out -> out.l
+cable padflt.out -> out.r
+cable padflt.out -> room.in_l
+cable padflt.out -> room.in_r
+cable bedsp.l -> fltl.in
+cable bedsp.r -> fltr.in
+cable tonesp.l -> fltl.in
+cable tonesp.r -> fltr.in
+cable fltl.out -> out.l
+cable fltr.out -> out.r
+cable fltl.out -> room.in_l
+cable fltr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A fltl.cutoff=0.45 fltr.cutoff=0.45 padflt.cutoff=0.2 bedsp.spray=0.3
+scene B fltl.cutoff=0.75 fltr.cutoff=0.75 padflt.cutoff=0.45 bedsp.spray=0.7

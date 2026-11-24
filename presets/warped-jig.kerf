@@ -1,0 +1,75 @@
+kerf 1
+tempo 96
+key C phrygian
+tags crazy fold
+
+module tally1 Tally tempo=0.5 swing=0.1 divide=0.5
+module mix    Router level1=0.75 level2=0.6 level3=0.5 level4=0.7 level5=0.6 level6=0 send=0.3
+module room   Kiln   size=0.5 heat=0.6 bloom=0.3 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Nine against seven" colour #c94a3d level=0.9
+  module loops  Ruler    hits_a=0.444 steps_a=0.533 hits_b=0.571 steps_b=0.4 hits_c=0.5 steps_c=0.667 hits_d=0 rotate=0 chance=0.8
+  module kick   Mortise  engine=0 pitch=0.3 punch=0.6 decay=0.35 tone=0.3
+  module snare  Mortise  engine=0.25 pitch=0.4 punch=0.5 decay=0.25 tone=0.6
+  module hat    Mortise  engine=0.5 pitch=0.65 punch=0.4 decay=0.06 tone=0.7
+
+part warp "Warped lead" colour #d1a233 level=0.8
+  module wseq   Dovetail steps_a=0.53 steps_b=0.33 interlock=0.7 chance=0.8 glide=0.2 range=0.3
+  module wfret  Fret     root=0 scale=0.857 octave=0.5
+  module wlathe Lathe    tune=0.5 table=0.5 turn=0.5 warp=0.7
+  module wras   Rasp     drive=0.6 fold=0.8 bias=0.5 mix=1
+  module wflt   Plane    cutoff=0.55 res=0.4 mode=0 drive=0.1
+  module wenv   Bevel    attack=0 decay=0.3 sustain=0.35 release=0.25 curve=0.4
+  module wamp   Clamp    level=0 response=0.3
+  module spin   Spokeshave rate=0.75 spread=0.6 shape=0.33 phase=0.4
+  module jig    Jig      m1=0.3 m2=0.5 m3=0.5 m4=0.5
+
+part floor "Wobble floor" colour #3d63c9 level=0.8
+  module fseq   Dovetail steps_a=0.27 steps_b=0.2 interlock=0.9 chance=0.9 glide=0.2 range=0.1
+  module ffret  Fret     root=0 scale=0.857 octave=0.25
+  module fosc   Chisel   tune=0.5 shape=0.2 pw=0.5
+  module fenv   Bevel    attack=0.01 decay=0.4 sustain=0.5 release=0.3 curve=0.4
+  module famp   Clamp    level=0 response=0.1
+  module fwob   Burl     rate=0.6 smooth=0.3 bias=0.5
+
+cable tally1.clock -> loops.clock
+cable loops.a -> kick.trig
+cable loops.b -> snare.trig
+cable loops.c -> hat.trig
+cable kick.out -> mix.in1
+cable snare.out -> mix.in2
+cable hat.out -> mix.in3
+
+cable tally1.clock -> wseq.clock
+cable wseq.pitch -> wfret.pitch
+cable wfret.pitch -> wlathe.voct
+cable spin.lfo1 -> wlathe.turn
+cable wlathe.out -> wras.in
+cable jig.m1 -> wras.drive
+cable wras.out -> wflt.in
+cable spin.lfo2 -> wflt.cutoff
+cable wseq.gate -> wenv.gate
+cable wflt.out -> wamp.in
+cable wenv.env -> wamp.cv
+cable wamp.out -> mix.in4
+
+cable tally1.clock -> fseq.clock
+cable fseq.pitch -> ffret.pitch
+cable ffret.pitch -> fosc.voct
+cable fwob.drift -> fosc.fm
+cable tally1.clock -> fwob.trig
+cable fseq.gate -> fenv.gate
+cable fosc.sine -> famp.in
+cable fenv.env -> famp.cv
+cable famp.out -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A jig.m1=0.3 wlathe.warp=0.4 wras.fold=0.5 wseq.chance=0.6 spin.rate=0.5
+scene B jig.m1=0.8 wlathe.warp=1 wras.fold=1 wseq.chance=0.95 spin.rate=0.9

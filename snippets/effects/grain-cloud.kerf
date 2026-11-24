@@ -1,0 +1,10 @@
+# title: Grain cloud
+# about: Scatters whatever you feed it into a cloud of short grains, wet only. Good on a pad or a mallet.
+# feed: cloud_grains.in
+# port: cloud_grains.freeze (gate): hold the current buffer while the gate is high.
+# port: cloud_grains.l, cloud_grains.r (audio): the cloud, already cabled to out.
+part cloud "Grain cloud" colour #d1a233
+  module cloud_grains Shavings size=0.4 density=0.6 spray=0.4 pitch=0.5
+
+cable cloud_grains.l -> out.l
+cable cloud_grains.r -> out.r

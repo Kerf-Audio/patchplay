@@ -1,0 +1,13 @@
+{
+  "name": "patchplay",
+  "short_name": "patchplay",
+  "description": "A modular synth you can read, in your browser.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1b1a17",
+  "theme_color": "#1b1a17",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

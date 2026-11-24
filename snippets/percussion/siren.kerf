@@ -1,0 +1,13 @@
+# title: Dub siren
+# about: A siren that dives from a high pitch twice a bar and rings out through a long release.
+# port: siren_rhythm.a (gate): when the siren fires.
+# port: siren_voice.lfo (cv): the pitch LFO, 0 to 10 V. Patch it elsewhere to dive other things.
+# port: siren_voice.out (audio): the siren, already cabled to out.
+part siren "Dub siren" colour #c94a3d level=0.6
+  module siren_rhythm Ruler hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+  module siren_voice Siren pitch=0.45 range=0.5 rate=0.45 sync=0 shape=0 wave=0.33 release=0.75 cutoff=0.8 resonance=0.2 drive=0.2
+
+cable clock.clock -> siren_rhythm.clock
+cable siren_rhythm.a -> siren_voice.gate
+cable siren_voice.out -> out.l
+cable siren_voice.out -> out.r

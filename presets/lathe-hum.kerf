@@ -1,0 +1,57 @@
+kerf 1
+tempo 54
+key A minor
+tags abstract drone
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.3 level2=0.45 level3=0.4 level4=0 level5=0 level6=0 send=0.4
+module room   Kiln   size=0.8 heat=0.5 bloom=0.5 mix=1
+module out    Finish volume=0.65 glue=0.3 ceiling=0.8
+
+part hums "Lathe hums" colour #7a4fb5 level=0.9
+  module pseq   Dovetail steps_a=0.07 steps_b=0.13 interlock=0.2 chance=0.9 glide=0.7 range=0.1
+  module pfret  Fret     root=0.75 scale=0.429 octave=0.375
+  module hum1   Lathe    tune=0.5 table=0.2 turn=0.3 warp=0.1
+  module hum2   Lathe    tune=0.62 table=0.7 turn=0.5 warp=0.3
+  module ring   Splice   mode=0.667 amount=0.55 coarse=0.4 fine=0.5 mix=1 level=1
+  module flt    Plane    cutoff=0.72 res=0.3 mode=0 drive=0.1
+  module fltr   Plane    cutoff=0.45 res=0.25 mode=0.33 drive=0
+  module fold   Rasp     drive=0.45 fold=0.5 bias=0.5 mix=0.7
+  module follow Level    attack=0.5 release=0.8 gain=0.8
+  module drift  Warp     amount=0.1 speed=0.1 rough=0.05 chaos=0.05
+
+part motion "Motion" colour #d1a233 level=0.8
+  module jig    Jig      m1=0.2 m2=0.6 m3=0.5 m4=0.5
+  module echo   Bandsaw  time=0.75 feedback=0.55 wear=0.5 mix=0.4
+
+cable tally1.bar -> pseq.clock
+cable pseq.pitch -> pfret.pitch
+cable jig.m1 -> hum1.turn
+cable jig.m2 -> hum2.turn
+cable hum1.out -> mix.in1
+cable hum1.out -> follow.in
+cable follow.env -> flt.cutoff
+cable tally1.clock -> echo.clock
+cable echo.l -> mix.in3
+cable echo.r -> mix.in3
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable pfret.pitch -> drift.in
+cable drift.out -> hum1.voct
+cable drift.out -> hum2.voct
+cable hum1.out -> ring.carrier
+cable hum2.out -> ring.mod
+cable ring.out -> fold.in
+cable fold.out -> flt.in
+cable hum2.out -> fltr.in
+cable flt.out -> mix.in2
+cable fltr.out -> mix.in2
+cable flt.out -> echo.in
+cable follow.env -> fltr.cutoff
+scene A jig.m1=0.2 jig.m2=0.6 hum1.table=0.2 hum2.table=0.7 flt.cutoff=0.3 echo.feedback=0.45
+scene B jig.m1=0.8 jig.m2=0.2 hum1.table=0.6 hum2.table=0.3 flt.cutoff=0.6 echo.feedback=0.7

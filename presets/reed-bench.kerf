@@ -1,0 +1,88 @@
+kerf 1
+tempo 74
+key E minor
+tags reggae dub melodica
+
+module clock Tally tempo=0.5 swing=0.1 divide=0
+module mix Router level1=0.75 level2=0.6 level3=0.8 level4=0.55 level5=0.5 level6=0.45 send=0.35
+module room Kiln size=0.3 heat=0.5 bloom=0.1 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module drumrl Ruler hits_a=0.0625 hits_b=0 hits_c=0.5 hits_d=0.0625 steps_a=1 steps_b=1 steps_c=1 steps_d=1 rotate=0.5 chance=1
+  module kick Mortise engine=0 pitch=0.3 punch=0.5 decay=0.45 tone=0.35
+  module rim Mortise engine=0.25 pitch=0.75 punch=0.7 decay=0.12 tone=0.7
+
+part bass "Bass" colour #3d63c9 level=0.9
+  module bassrl Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=0.4667 steps_c=0.4667 steps_d=0.4667 rotate=0.0 chance=1
+  module basstr Tread step1=0.2333 step2=0.2333 step3=0.275 step4=0.2583 step5=0.2333 step6=0.2917 step7=0.275 step8=0.2583 length=1.0 glide=0.06 rate=0.5 direction=0
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassenv Bevel attack=0.0 decay=0.5 sustain=0.5 release=0.35 curve=0.4
+  module bassamp Clamp level=0 response=0.1
+
+part skank "Skank" colour #d1a233 level=0.55
+
+part fx "Echo and tape" colour #3da3a3
+  module echo Dado time=0.4286 sync=1 feedback=0.55 tone=0.45 thin=0.25 wobble=0.3 drive=0.25 mix=1
+  module ret Plane cutoff=0.55 res=0.3 mode=0 drive=0.1
+
+part lead "Melodica" colour #7a4fb5 level=0.8
+  module leadrl Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 rotate=0 chance=1
+  module leadtr Tread step1=0.6333 step2=0.6167 step3=0.5917 step4=0.6333 step5=0.6167 step6=0.5917 step7=0.575 step8=0.5583 length=1.0 glide=0.12 direction=0.67
+  module leadosc Chisel tune=0.5 fine=0.5 shape=0.3 pw=0.5 fm=0.08
+  module vib Rocker rate=0.5 sync=0 shape=0 depth=0.3 offset=0.5
+  module leadflt Plane cutoff=0.62 res=0.3 mode=0.15 drive=0.15
+  module leadenv Bevel attack=0.04 decay=0.5 sustain=0.5 release=0.45 curve=0.4
+  module leadamp Clamp level=0 response=0.2
+
+part comp "Organ chop" colour #d1a233 level=0.6
+  module comprl Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125 chance=1
+  module comptr Tread step1=0.5333 step2=0.5167 length=0.1429 glide=0
+  module compply Ply layers=0.5 detune=0.15 width=0.6 tone=0.35
+  module compenv Bevel attack=0 decay=0.14 sustain=0 release=0.12 curve=0.35
+  module compamp Clamp level=0 response=0.5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.clock -> drumrl.clock
+cable drumrl.a -> kick.trig
+cable drumrl.a -> rim.trig
+cable kick.out -> mix.in1
+cable rim.out -> mix.in2
+cable rim.out -> echo.in_l
+cable clock.div4 -> bassrl.clock
+cable clock.div4 -> basstr.clock
+cable basstr.cv -> bassosc.voct
+cable bassrl.a -> bassenv.gate
+cable bassosc.sine -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in3
+cable echo.l -> ret.in
+cable echo.r -> ret.in
+cable ret.out -> mix.in6
+cable clock.div4 -> leadrl.clock
+cable clock.div4 -> leadtr.clock
+cable leadtr.cv -> leadosc.voct
+cable vib.out -> leadosc.fm
+cable leadosc.square -> leadflt.in
+cable leadflt.out -> leadamp.in
+cable leadrl.a -> leadenv.gate
+cable leadenv.env -> leadamp.cv
+cable leadamp.out -> mix.in5
+cable leadamp.out -> echo.in_l
+cable clock.clock -> comprl.clock
+cable clock.bar -> comptr.clock
+cable comptr.cv -> compply.voct
+cable comprl.a -> compenv.gate
+cable compply.l -> compamp.in
+cable compply.r -> compamp.in
+cable compenv.env -> compamp.cv
+cable compamp.out -> mix.in4
+cable compamp.out -> echo.in_l
+
+scene A leadflt.cutoff=0.5 ret.cutoff=0.45
+scene B leadflt.cutoff=0.75 ret.cutoff=0.7

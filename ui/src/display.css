@@ -1,0 +1,127 @@
+/* patchplay: the display. Rack, modules, knobs, jacks, cables, waveform. Flat, themed by tokens (day light, night dark). */
+#bench-scroll, #catalogue { background: var(--screen); color: var(--screen-ink); box-shadow: var(--well-shadow); }
+#catalogue .intro, #catalogue h2 small, #bench .empty { color: var(--screen-muted); }
+#bench .empty b { color: var(--screen-ink); font-weight: 500; }
+#bench { position: relative; padding: 16px 16px 32px; min-width: max-content; }
+#cables { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 1; }
+#cables path { fill: none; stroke-width: 2.2; stroke-linecap: round; opacity: .9; pointer-events: stroke; cursor: pointer; transition: stroke-width .12s, opacity .12s; }
+#cables path.shadow { stroke: #000; stroke-width: 4.5; opacity: var(--cable-shadow); pointer-events: none; transform: translate(0, 2px); }
+#cables path.sheen { stroke: #fff; stroke-width: .7; opacity: var(--cable-sheen); pointer-events: none; transform: translate(0, -.6px); }
+#cables path:hover, #cables path.hot { stroke-width: 3.6; opacity: 1; }
+#cables path.faint { opacity: .12; }
+#cables path.faint + .sheen { opacity: 0; }
+#cables path.temp { stroke-dasharray: 2 6; pointer-events: none; opacity: .9; }
+
+.part-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 16px; }
+.part-label { width: 104px; flex: none; border-radius: var(--r); padding: 14px 10px 10px 12px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; background: var(--screen-2); color: var(--screen-ink); border: 1px solid var(--screen-line); box-shadow: var(--card-shadow); }
+.part-label::before { content: ""; position: absolute; left: 12px; top: 0; width: 24px; height: 4px; background: var(--part); border-radius: 0 0 3px 3px; }
+.part-name { display: flex; flex-direction: column; gap: 1px; }
+.part-name b { font-size: 13px; font-weight: 500; letter-spacing: .06em; }
+.part-name .count { font-size: 11px; color: var(--screen-muted); }
+.part-label .tools { display: flex; gap: 4px; flex-wrap: wrap; }
+.part-label .tools button { width: 26px; height: 26px; display: grid; place-items: center; padding: 0; border: 1px solid var(--screen-line); background: var(--screen-3); border-radius: var(--r-sm); color: var(--screen-muted); }
+.part-label .tools button:hover { color: var(--screen-ink); border-color: var(--screen-edge); }
+.part-label .tools button:active { background: var(--screen-sunk); }
+.part-label .tools button.on { background: var(--screen-ink); color: var(--screen-2); border-color: var(--screen-ink); }
+.part-row.muted .mod { filter: grayscale(.8) opacity(.5); }
+
+/* module panel: a card with a soft outline and a small colour tab */
+.mod { width: max(calc(var(--w) * var(--hp)), 128px); background: var(--screen-2); color: var(--screen-ink); border: 1px solid var(--screen-line); border-radius: var(--r); display: flex; flex-direction: column; position: relative; padding: 0 7px 8px; box-shadow: var(--card-shadow); }
+.mod::before { content: ""; position: absolute; left: 10px; top: -1px; width: 24px; height: 4px; background: var(--part); border-radius: 0 0 3px 3px; }
+.mod.dim { opacity: .28; }
+.mod.focus { box-shadow: var(--lift-shadow); }
+.mod.locked { background: repeating-linear-gradient(135deg, transparent 0 7px, var(--hatch) 7px 8px), var(--screen-2); }
+.mod-head { display: flex; align-items: center; gap: 2px; margin-top: 12px; }
+.mod-head, .mod-sub { position: relative; z-index: 2; background: var(--screen-2); }
+.mod-head b { font-size: 12px; font-weight: 500; letter-spacing: .06em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mod-head .lockbtn { border: 0; background: none; padding: 1px; width: 16px; height: 18px; color: var(--screen-muted); opacity: .75; display: grid; place-items: center; border-radius: var(--r-sm); }
+.mod-head .lockbtn:hover { background: var(--wash); color: var(--screen-ink); }
+.mod-head .lockbtn.on, .mod:hover .lockbtn { opacity: 1; }
+.mod-head .lockbtn.on { color: var(--hot); }
+.mod-head .lockbtn .ico { width: 12px; height: 12px; }
+.screw { display: none; }
+.mod-sub { font-size: var(--fs-xs); color: var(--screen-muted); margin: var(--sp-1) 0 var(--sp-2); padding-bottom: 6px; border-bottom: 1px solid var(--screen-line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* encoders: 1 blue, 2 green, 3 white, 4 orange, then they cycle. A thin value arc on a faint track round a flat neutral cap with a pointer in the encoder colour; white gets a hairline outline so it reads on the light day panel. */
+.knobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 8px 4px; justify-items: center; }
+.knobs > .knob { --enc: var(--enc-1); }
+.knobs > .knob:nth-child(4n + 2) { --enc: var(--enc-2); }
+.knobs > .knob:nth-child(4n + 3) { --enc: var(--enc-3); }
+.knobs > .knob:nth-child(4n) { --enc: var(--enc-4); }
+.knob { display: flex; flex-direction: column; align-items: center; width: 44px; cursor: ns-resize; user-select: none; position: relative; z-index: 2; outline: none; touch-action: none; }
+.knob .ring { width: 40px; height: 40px; display: block; overflow: visible; }
+.knob .track { fill: none; stroke: var(--track); stroke-width: 2; stroke-linecap: round; }
+.knob .val { fill: none; stroke: var(--enc, var(--enc-1)); stroke-width: 2; stroke-linecap: round; }
+.knob .val[stroke-dasharray^="0.00"] { opacity: 0; }
+.knobs > .knob:nth-child(4n + 3) .val { filter: drop-shadow(0 0 .6px var(--screen-ink)); }
+.knob .cap { position: absolute; top: 7px; left: 9px; width: 26px; height: 26px; border-radius: 50%; pointer-events: none; background: var(--cap);
+  box-shadow: 0 0 0 1px var(--cap-edge); transition: box-shadow var(--ease); }
+.knob .ptr { position: absolute; inset: 0; transform: rotate(var(--a, -135deg)); }
+.knob .ptr::before { content: ""; position: absolute; left: 12.25px; top: 3px; width: 1.5px; height: 8px; border-radius: 1px; background: var(--enc, var(--enc-1)); }
+.knob:hover .cap { box-shadow: 0 0 0 1px var(--enc, var(--enc-1)); }
+.knob:focus-visible .ring { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
+.knob label { font-size: var(--fs-xs); color: var(--screen-muted); margin-top: var(--sp-1); white-space: nowrap; pointer-events: none; }
+.knob.locked::after { content: ""; position: absolute; top: -2px; right: 1px; width: 11px; height: 11px; background: var(--screen-ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='7' width='10' height='7.5' rx='1.8'/%3E%3Cpath d='M5.3 7V5.2a2.7 2.7 0 0 1 5.4 0V7' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='7' width='10' height='7.5' rx='1.8'/%3E%3Cpath d='M5.3 7V5.2a2.7 2.7 0 0 1 5.4 0V7' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.knob.locked .val { stroke: #8d9097; }
+.knob.locked .ptr::before { background: #8d9097; }
+
+.steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; margin: 0 0 7px; }
+.steps span { height: 7px; border-radius: 2px; background: var(--track); }
+.steps span.on { background: var(--part); }
+.steps span.now { outline: 1.5px solid var(--screen-ink); }
+.mod.sampler { width: max(calc(var(--w) * var(--hp)), 340px); }
+.mod.drop-hover { box-shadow: 0 0 0 2px var(--accent), 0 8px 22px #ff5a1f44; background: color-mix(in srgb, var(--accent) 10%, var(--screen-2)); }
+.sample { margin-bottom: 8px; }
+.wave { height: 76px; border-radius: var(--r-sm); background: var(--wave-bg); border: 1px solid var(--screen-line); overflow: hidden; display: grid; }
+.wave svg { width: 100%; height: 100%; display: block; }
+.wave-wait { align-self: center; justify-self: center; font-size: 10px; color: var(--screen-muted); }
+.wave .wv-peaks { fill: none; stroke: var(--screen-ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.wave .wv-zero { fill: none; stroke: var(--wave-zero); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.wave .wv-marks { fill: none; stroke: var(--hot); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+.wave .wv-sel { fill: var(--enc-1); fill-opacity: .3; }
+.wave .wv-spray { fill: var(--enc-1); fill-opacity: .3; }
+.wave .wv-pos { fill: none; stroke: var(--hot); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.sample-row { display: flex; align-items: center; gap: 6px; margin-top: 5px; font-size: 11px; min-width: 0; }
+.sample-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--screen-muted); }
+.sample-choose, .sample-clear { border: 1px solid var(--screen-line); background: var(--screen-3); border-radius: var(--r-sm); font: inherit; font-size: 11px; padding: 2px 7px; color: var(--screen-ink); cursor: pointer; text-transform: lowercase; }
+.sample-choose:hover, .sample-clear:hover { border-color: var(--screen-edge); }
+.sample-clear { padding: 0 6px; font-size: 14px; line-height: 1.3; }
+.sample-warn { margin-top: 4px; font-size: 10px; color: var(--clock); line-height: 1.3; }
+.meter { display: flex; gap: 3px; height: 50px; margin: 2px 0 7px; justify-content: center; }
+.meter span { width: 9px; background: var(--track); border-radius: 2px; position: relative; overflow: hidden; }
+.meter span i { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(var(--enc-4), var(--gate) 25%, var(--enc-2) 45%); transition: height .08s; }
+
+/* Inlay's piano roll: a keyboard strip beside a 16 by 12 grid of cells. */
+.mod.roll-mod { width: max(calc(var(--w) * var(--hp)), 340px); }
+.roll-block { margin: 2px 0 6px; }
+.roll { display: flex; gap: 0; background: var(--screen-sunk); border: 1px solid var(--screen-line); border-radius: 4px; overflow: hidden; }
+.roll-keys { display: grid; grid-template-rows: repeat(12, 14px); width: 30px; flex: none; background: var(--screen-2); border-right: 1px solid var(--screen-line); }
+.rk { display: flex; align-items: center; justify-content: flex-end; padding-right: 3px; font: 600 8px/1 var(--mono, ui-monospace, monospace); color: var(--screen-muted); border-bottom: 1px solid var(--screen-line); }
+.rk.black { width: 68%; margin-left: 32%; justify-content: center; padding: 0; background: #131417; color: #d8d6ce; box-shadow: inset 0 0 0 1px #5a5d64; border-radius: 0 2px 2px 0; border-bottom-color: transparent; }
+.rk:last-child { border-bottom: 0; }
+.roll-grid { display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(12, 14px); flex: 1; min-width: 0; touch-action: none; user-select: none; }
+.rc { all: unset; box-sizing: border-box; display: block; cursor: crosshair; background: var(--screen-sunk); border-right: 1px solid var(--screen-line); border-bottom: 1px solid var(--screen-line); }
+.roll-grid > :nth-child(16n) { border-right: 0; }
+.rc.blk { background: color-mix(in srgb, var(--screen-ink) 9%, var(--screen-sunk)); }
+.rc.beat { border-left: 1px solid color-mix(in srgb, var(--screen-ink) 16%, var(--screen-line)); }
+.rc.out { opacity: .38; }
+.rc:hover { background: color-mix(in srgb, var(--part) 28%, var(--screen-sunk)); }
+.rc.on { background: var(--part); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--screen-ink) 40%, transparent); }
+.rc.on.acc { background: var(--hot); }
+.rc.on.acc::after { content: ''; display: block; width: 4px; height: 4px; margin: 4px auto; border-radius: 50%; background: var(--screen-2); }
+.rc:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; position: relative; z-index: 1; }
+.roll-info { margin-top: 3px; font: 500 9px/1.3 var(--mono, ui-monospace, monospace); color: var(--screen-muted); }
+
+/* jacks: a recessed metal ring round a socket in the signal colour */
+.jacks { margin-top: auto; padding-top: 9px; display: flex; flex-direction: column; gap: 5px; }
+.jackrow { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 4px 0; }
+.jackrow.outs { --label-bg: var(--screen-sunk); background: var(--screen-sunk); border: 1px solid var(--screen-line); border-radius: var(--r); padding: 5px 0 3px; }
+.jack { width: 47px; display: flex; flex-direction: column; align-items: center; cursor: crosshair; }
+.jack .hole { width: 17px; height: 17px; border-radius: 50%; position: relative; z-index: 2; transition: box-shadow var(--ease);
+  background: radial-gradient(circle, var(--k) 0 3.4px, var(--hole) 3.9px 5.6px, #0000 5.9px), var(--metal);
+  box-shadow: 0 0 0 1px #0000003d, inset 0 1px 2px #0000008c, 0 1px 0 var(--hi); }
+.jack:hover .hole, .jack.target .hole { box-shadow: 0 0 0 1px #0000003d, 0 0 0 3px color-mix(in srgb, var(--k) 45%, transparent), 0 0 9px var(--k); }
+.jack label { font-size: var(--fs-xs); letter-spacing: 0; color: var(--screen-muted); margin-top: var(--sp-1); padding: 0 1px; border-radius: 3px; background: var(--label-bg, var(--screen-2)); position: relative; z-index: 2; white-space: nowrap; max-width: 47px; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.k-audio { --k: var(--audio); } .k-cv { --k: var(--cv); } .k-pitch { --k: var(--pitch); } .k-gate { --k: var(--gate); } .k-clock { --k: var(--clock); }

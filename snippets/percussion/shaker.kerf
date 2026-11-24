@@ -1,0 +1,18 @@
+# title: Noise shaker
+# about: Filtered noise chopped into short bursts on every 16th note.
+# port: shaker_rhythm.a (gate): the shaker's trigger.
+# port: shaker_amp.out (audio): the shaker, already cabled to out.
+part shaker "Shaker" colour #3d9c8a level=0.5
+  module shaker_rhythm Ruler hits_a=1 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+  module shaker_noise Sawdust colour=0.8 crackle=0
+  module shaker_filter Plane cutoff=0.8 res=0.2 mode=0.67 drive=0
+  module shaker_env Bevel attack=0 decay=0.12 sustain=0 release=0.08 curve=0.3
+  module shaker_amp Clamp level=0 response=0
+
+cable clock.clock -> shaker_rhythm.clock
+cable shaker_rhythm.a -> shaker_env.gate
+cable shaker_noise.noise -> shaker_filter.in
+cable shaker_filter.out -> shaker_amp.in
+cable shaker_env.env -> shaker_amp.cv
+cable shaker_amp.out -> out.l
+cable shaker_amp.out -> out.r

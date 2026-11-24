@@ -1,0 +1,17 @@
+# title: Tread step filter
+# about: Eight steps of filter movement. A Tread walks them forward, one step per 16th.
+# port: steps_tread.cv (cv): the current step, above and below 0 V.
+# port: steps_tread.step, steps_tread.end (gate): a pulse per step, and one per walk.
+# port: steps_amp.out (audio): the sound, already cabled to out.
+part steps "Tread steps" colour #3d63c9 level=0.4
+  module steps_tread Tread step1=0.5 step2=0.8 step3=0.35 step4=0.9 step5=0.5 step6=0.2 step7=0.7 step8=0.6 length=1 direction=0 glide=0.1 depth=0.8
+  module steps_osc Chisel tune=0.3 shape=0.1 pw=0.5
+  module steps_filter Plane cutoff=0.35 res=0.4 mode=0 drive=0.15
+  module steps_amp Clamp level=0.5 response=0
+
+cable clock.clock -> steps_tread.clock
+cable steps_tread.cv -> steps_filter.cutoff
+cable steps_osc.saw -> steps_filter.in
+cable steps_filter.out -> steps_amp.in
+cable steps_amp.out -> out.l
+cable steps_amp.out -> out.r

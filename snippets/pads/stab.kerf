@@ -1,0 +1,31 @@
+# title: Minor chord stab
+# about: Three saws a minor triad apart, stabbed on a three-over-sixteen rhythm. The root changes every beat.
+# port: chords_seq.pitch (pitch): the chord roots, before Fret snaps them to the scale.
+# port: chords_rhythm.a (gate): the stab rhythm.
+# port: chords_amp.out (audio): the chord, already cabled to out.
+part chords "Chord stab" colour #7a4fb5 level=0.4
+  module chords_rhythm Ruler hits_a=0.1875 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+  module chords_seq Dovetail steps_a=0.2 steps_b=0.2 interlock=0 chance=1 glide=0 range=0.15
+  module chords_scale Fret root=0.75 scale=0.43 octave=0.5
+  module chords_root Chisel tune=0.5 shape=0.2 pw=0.5
+  module chords_third Chisel tune=0.5625 shape=0.2 pw=0.5
+  module chords_fifth Chisel tune=0.646 shape=0.2 pw=0.5
+  module chords_env Bevel attack=0 decay=0.3 sustain=0 release=0.2 curve=0.35
+  module chords_filter Plane cutoff=0.6 res=0.2 mode=0 drive=0
+  module chords_amp Clamp level=0 response=0.4
+
+cable clock.div4 -> chords_seq.clock
+cable clock.clock -> chords_rhythm.clock
+cable chords_seq.pitch -> chords_scale.pitch
+cable chords_scale.pitch -> chords_root.voct
+cable chords_scale.pitch -> chords_third.voct
+cable chords_scale.pitch -> chords_fifth.voct
+cable chords_rhythm.a -> chords_env.gate
+cable chords_root.saw -> chords_filter.in
+cable chords_third.saw -> chords_filter.in
+cable chords_fifth.saw -> chords_filter.in
+cable chords_env.env -> chords_filter.cutoff
+cable chords_filter.out -> chords_amp.in
+cable chords_env.env -> chords_amp.cv
+cable chords_amp.out -> out.l
+cable chords_amp.out -> out.r

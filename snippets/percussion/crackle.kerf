@@ -1,0 +1,14 @@
+# title: Vinyl crackle
+# about: Quiet random crackle over a soft bed of hiss.
+# port: crackle_noise.dust (audio): the raw crackle, for sending through effects.
+# port: crackle_amp.out (audio): the texture, already cabled to out.
+part crackle "Vinyl crackle" colour #3d9c8a level=0.4
+  module crackle_noise Sawdust colour=0.7 crackle=0.35
+  module crackle_filter Plane cutoff=0.75 res=0.1 mode=0 drive=0
+  module crackle_amp Clamp level=0.3 response=0
+
+cable crackle_noise.noise -> crackle_filter.in
+cable crackle_filter.out -> crackle_amp.in
+cable crackle_noise.dust -> crackle_amp.in
+cable crackle_amp.out -> out.l
+cable crackle_amp.out -> out.r

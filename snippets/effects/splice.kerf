@@ -1,0 +1,10 @@
+# title: Splice FM
+# about: Bends a sound's pitch with a built-in sine tuned an octave above it. Gives bell and metal tones.
+# feed: splice_fx.carrier
+# port: splice_fx.mod (audio): patch a second sound here to modulate with it instead of the sine.
+# port: splice_fx.out (audio): the modulated sound, already cabled to out.
+part splice "Splice FM" colour #3d9c8a
+  module splice_fx Splice mode=0 amount=0.5 coarse=0.5 fine=0.5 mix=1 level=0.5
+
+cable splice_fx.out -> out.l
+cable splice_fx.out -> out.r

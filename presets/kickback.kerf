@@ -1,0 +1,65 @@
+kerf 1
+tempo 160
+key F sharp minor
+tags crazy pump
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.85 level2=0.55 level3=0.5 level4=0.55 level5=0.7 level6=0.5 send=0.25
+module room   Kiln   size=0.4 heat=0.6 bloom=0.2 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part kicks "Five and seven" colour #c94a3d level=0.9
+  module kb     Ruler    hits_a=0.6 steps_a=0.267 hits_b=0.571 steps_b=0.4 hits_c=0.4545 steps_c=0.667 hits_d=0.4 steps_d=0.4 rotate=0 chance=0.7
+  module kick   Mortise  engine=0 pitch=0.25 punch=0.8 decay=0.4 tone=0.3
+  module tomlo  Mortise  engine=1 pitch=0.3 punch=0.6 decay=0.4 tone=0.4
+  module tomhi  Mortise  engine=1 pitch=0.55 punch=0.5 decay=0.25 tone=0.6
+  module clap   Mortise  engine=0.75 pitch=0.5 punch=0.5 decay=0.2 tone=0.6
+
+part pad "Pumped pad" colour #7a4fb5 level=0.8
+  module pseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=0.6 chance=0.9 glide=0.1 range=0.2
+  module pfret  Fret     root=0.5 scale=0.429 octave=0.5
+  module pply   Ply      layers=0.8 detune=0.45 width=1 tone=0.5
+  module psq    Vise     squeeze=0.9 speed=0.2 makeup=0.7
+
+part bells "Mallet bells" colour #d1a233 level=0.6
+  module bseq   Dovetail steps_a=0.4 steps_b=0.27 interlock=0.5 chance=0.6 glide=0 range=0.3
+  module bfret  Fret     root=0.5 scale=0.429 octave=0.625
+  module bmal   Mallet   material=0.6 size=0.4 strike=0.7 damp=0.4
+  module becho  Bandsaw  time=0.375 feedback=0.6 wear=0.5 mix=0.4
+
+cable tally1.clock -> kb.clock
+cable kb.a -> kick.trig
+cable kb.b -> tomlo.trig
+cable kb.c -> tomhi.trig
+cable kb.d -> clap.trig
+cable kick.out -> mix.in1
+cable tomlo.out -> mix.in2
+cable tomhi.out -> mix.in2
+cable clap.out -> mix.in3
+
+cable tally1.bar -> pseq.clock
+cable pseq.pitch -> pfret.pitch
+cable pfret.pitch -> pply.voct
+cable pply.l -> psq.in
+cable pply.r -> psq.in
+cable kick.out -> psq.side
+cable psq.out -> mix.in4
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bmal.voct
+cable bseq.gate -> bmal.trig
+cable bmal.out -> becho.in
+cable tally1.clock -> becho.clock
+cable becho.l -> mix.in5
+cable becho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A kb.chance=0.7 psq.squeeze=0.9 bseq.chance=0.4 becho.feedback=0.5 pply.detune=0.3
+scene B kb.chance=1 psq.squeeze=0.5 bseq.chance=0.9 becho.feedback=0.8 pply.detune=0.8

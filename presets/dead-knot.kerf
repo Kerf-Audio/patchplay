@@ -1,0 +1,41 @@
+kerf 1
+tempo 48
+key A minor
+tags ominous granular drone
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module room Kiln size=1 heat=0.6 bloom=0.85 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part low "Low grains" colour #5a4a7a level=1
+  module lowsp Splinter position=0.1 spray=0.12 size=1 density=0.55 pitch=0.0 scatter=0.02 reverse=0.6 shape=0.1 spread=0.9 level=1 hold=0
+  module lowscan Rocker rate=0.03 sync=0 shape=0 depth=0.2 offset=0.45
+
+part tritone "Tritone grains" colour #b5527a level=0.8
+  module trisp Splinter position=0.12 spray=0.15 size=0.95 density=0.5 pitch=0.125 scatter=0.02 reverse=0.7 shape=0.1 spread=1 level=1 hold=0
+  module triwarp Warp amount=0.08 speed=0.1 rough=0.1 chaos=0.2
+  module triscan Rocker rate=0.025 sync=0 shape=0 depth=0.2 offset=0.45 phase=0.3
+
+part dark "Dark filter" colour #8a8f98 level=1
+  module fltl Plane cutoff=0.24 res=0.3 mode=0 drive=0.05
+  module fltr Plane cutoff=0.24 res=0.3 mode=0 drive=0.05
+  module creep Spokeshave rate=0.02 spread=0.6 shape=0 phase=0.25 depth=0.4
+
+cable lowscan.out -> lowsp.position
+cable triscan.out -> trisp.position
+cable triwarp.out -> trisp.voct
+cable lowsp.l -> fltl.in
+cable lowsp.r -> fltr.in
+cable trisp.l -> fltl.in
+cable trisp.r -> fltr.in
+cable creep.lfo1 -> fltl.cutoff
+cable creep.lfo2 -> fltr.cutoff
+cable fltl.out -> out.l
+cable fltr.out -> out.r
+cable fltl.out -> room.in_l
+cable fltr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A fltl.cutoff=0.14 fltr.cutoff=0.14 trisp.reverse=0.5
+scene B fltl.cutoff=0.4 fltr.cutoff=0.4 trisp.reverse=1

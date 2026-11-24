@@ -1,0 +1,16 @@
+[package]
+name = "kerf-modules"
+description = "The module catalogue: one file per module, holding its descriptor and DSP."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+kerf-core.workspace = true
+kerf-dsp.workspace = true
+
+[lints]
+workspace = true

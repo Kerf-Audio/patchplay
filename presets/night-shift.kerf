@@ -1,0 +1,96 @@
+kerf 1
+tempo 132
+key A minor
+tags techno four-four
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.75 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.7 heat=0.5 bloom=0.4 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.3 tone=0.5
+  module r_clap Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module clap Mortise engine=0.75 pitch=0.55 punch=0.5 decay=0.28 tone=0.5
+  module r_ohat Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module ohat Mortise engine=0.5 pitch=0.5 punch=0.5 decay=0.4 tone=0.7
+  module r_chat Ruler hits_a=0 hits_b=1 hits_c=0 hits_d=0 steps_b=1 chance=0.7
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.04 tone=0.65
+  module r_tom Ruler hits_a=0 hits_b=0.1875 hits_c=0 hits_d=0 steps_b=1 rotate=0.3125 chance=0.4
+  module tom Mortise engine=1 pitch=0.4 punch=0.5 decay=0.3 tone=0.5
+  module duck Bevel attack=0 decay=0.3 sustain=0 release=0.3 curve=0.3
+
+part bass "Rumble" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=1 steps_b=0.1333 interlock=1 chance=1 glide=0 range=0.05
+  module bassfret Fret root=0.75 scale=0.43 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.2 sustain=0.1 release=0.1 curve=0.4
+  module bassflt Plane cutoff=0.3 res=0.35 mode=0 drive=0.3
+  module bassamp Clamp level=0 response=0.1
+  module bassduck Clamp level=0 response=0
+
+part stab "Stab" colour #d1a233 level=0.4
+  module stabseq Dovetail steps_a=1 steps_b=0.2667 interlock=0.5 chance=0.6 glide=0 range=0.3
+  module stabfret Fret root=0.75 scale=0.43 octave=0.5
+  module stabosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module stabenv Bevel attack=0 decay=0.1 sustain=0 release=0.2 curve=0.4
+  module stabflt Plane cutoff=0.5 res=0.4 mode=0 drive=0.15
+  module stabamp Clamp level=0 response=0.5
+  module stabecho Bandsaw time=0.375 feedback=0.55 wear=0.35 mix=1
+
+part mac "Macros" colour #b5654f
+  module macjig Jig m1=0.12 m2=0.5 m3=0.5 m4=0.5
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_clap.clock
+cable r_clap.a -> clap.trig
+cable clap.out -> mix.in4
+cable clock.clock -> r_ohat.clock
+cable r_ohat.a -> ohat.trig
+cable ohat.out -> mix.in3
+cable clock.clock -> r_chat.clock
+cable r_chat.b -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_tom.clock
+cable r_tom.b -> tom.trig
+cable tom.out -> mix.in4
+cable r_kick.a -> duck.gate
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.saw -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> bassduck.in
+cable duck.inverted -> bassduck.cv
+cable bassduck.out -> mix.in2
+
+cable clock.clock -> stabseq.clock
+cable stabseq.pitch -> stabfret.pitch
+cable stabfret.pitch -> stabosc.voct
+cable stabseq.gate -> stabenv.gate
+cable stabosc.saw -> stabflt.in
+cable stabflt.out -> stabamp.in
+cable stabenv.env -> stabamp.cv
+cable stabamp.out -> mix.in5
+cable clock.clock -> stabecho.clock
+cable stabamp.out -> stabecho.in
+cable stabecho.l -> mix.in5
+cable stabecho.r -> mix.in5
+
+cable macjig.m1 -> bassflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bassflt.cutoff=0.18 stabflt.cutoff=0.38 macjig.m1=0.02
+scene B bassflt.cutoff=0.45 stabflt.cutoff=0.65 macjig.m1=0.24

@@ -1,0 +1,85 @@
+kerf 1
+tempo 132
+key C# phrygian
+tags glitch idm
+
+module clock Tally tempo=0.5 swing=0.05 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.2308 hits_b=0 hits_c=0 hits_d=0 steps_a=0.8
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.22 tone=0.5
+  module r_snare Ruler hits_a=0.2727 hits_b=0 hits_c=0 hits_d=0 steps_a=0.6667 rotate=0.1818
+  module snare Mortise engine=0.25 pitch=0.55 punch=0.5 decay=0.15 tone=0.5
+  module r_chat Ruler hits_a=0.7333 hits_b=0 hits_c=0 hits_d=0 steps_a=0.9333
+  module chat Mortise engine=0.5 pitch=0.75 punch=0.5 decay=0.03 tone=0.65
+  module r_tick Ruler hits_a=0 hits_b=0.4444 hits_c=0 hits_d=0 steps_b=0.5333 rotate=0.1111 chance=0.7
+  module tick Mortise engine=0.5 pitch=0.8 punch=0.5 decay=0.03 tone=0.8
+
+part tex "Fizz" colour #3da3a3 level=0.4
+  module texsrc Sawdust colour=0.8 crackle=0.7
+  module texflt Plane cutoff=0.6 res=0.35 mode=0.67 drive=0.1
+  module texamp Clamp level=0 response=0.4
+  module texrhy Ruler hits_a=0.4375 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.1875
+  module texenv Bevel attack=0.02 decay=0.3 sustain=0 release=0.25 curve=0.35
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module jolt Chatter energy=0.7 tension=0.6 damping=0.3 rate=0.5 depth=0.7
+
+part bass "Stutter" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=0.2667 steps_b=0.4 interlock=0.5 chance=0.8 glide=0 range=0.3
+  module bassfret Fret root=0.0833 scale=0.86 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.15 sustain=0.1 release=0.2 curve=0.4
+  module bassflt Plane cutoff=0.38 res=0.3 mode=0 drive=0.1
+  module bassamp Clamp level=0 response=0.1
+
+part gr "Crumb" colour #8a8f98 level=0.5
+  module grg Shavings size=0.15 density=0.8 spray=0.6 pitch=0.55
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_snare.clock
+cable r_snare.a -> snare.trig
+cable snare.out -> mix.in4
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_tick.clock
+cable r_tick.b -> tick.trig
+cable tick.out -> mix.in3
+
+cable texsrc.dust -> texflt.in
+cable texflt.out -> texamp.in
+cable clock.clock -> texrhy.clock
+cable texrhy.a -> texenv.gate
+cable texenv.env -> texamp.cv
+cable texamp.out -> mix.in6
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.square -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in2
+
+cable bassamp.out -> grg.in
+cable grg.l -> mix.in5
+cable grg.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable r_tick.b -> jolt.kick
+cable jolt.position -> texflt.cutoff
+cable jolt.velocity -> bassflt.cutoff
+scene A texflt.cutoff=0.48 bassflt.cutoff=0.26 grg.spray=0.45
+scene B texflt.cutoff=0.75 bassflt.cutoff=0.53 grg.spray=0.8

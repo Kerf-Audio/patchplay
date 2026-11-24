@@ -1,0 +1,52 @@
+kerf 1
+tempo 138
+key C minor
+style foundry seed 1
+tags four-four techno
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.75 level2=0.4 level3=0.35 level4=0.3 level5=0.4
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.25 steps_a=1 hits_b=0.7 steps_b=0.4 hits_c=0.4 steps_c=0.27 hits_d=0 chance=0.75
+  module ruler2 Ruler   hits_a=0.125 steps_a=0.467 hits_b=0 hits_c=0 hits_d=0 rotate=0.5
+  module kick   Mortise engine=0 pitch=0.35 punch=0.65 decay=0.25 tone=0.4
+  module hat    Mortise engine=0.5 pitch=0.5 punch=0.5 decay=0.15 tone=0.6
+  module tom    Mortise engine=1 pitch=0.7 punch=0.6 decay=0.25 tone=0.5
+  module clap   Mortise engine=0.75 pitch=0.5 punch=0.6 decay=0.35 tone=0.45
+  module duck   Bevel   attack=0 decay=0.5 sustain=0 release=0.5 curve=0.3
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=1 chance=0.8 glide=0 range=0.1
+  module bosc  Chisel   tune=0.25 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.35 sustain=0 release=0.3 curve=0.3
+  module bflt  Plane    cutoff=0.35 res=0.45 mode=0 drive=0.5
+  module bamp  Clamp    level=0 response=0.1
+  module bduck Clamp    level=0 response=0
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler1.a -> duck.gate
+cable ruler1.b -> hat.trig
+cable ruler1.c -> tom.trig
+cable ruler2.a -> clap.trig
+cable kick.out -> mix.in1
+cable hat.out -> mix.in3
+cable tom.out -> mix.in4
+cable clap.out -> mix.in5
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bduck.in
+cable duck.inverted -> bduck.cv
+cable bduck.out -> mix.in2
+
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r

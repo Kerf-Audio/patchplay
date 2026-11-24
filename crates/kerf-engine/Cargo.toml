@@ -1,0 +1,28 @@
+[package]
+name = "kerf-engine"
+description = "Compiles a patch into a processing graph and renders it."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+default = ["files"]
+# Reading sample files from disk (symphonia decoders). Off for the wasm build, where the host
+# hands over decoded audio through `samples::provide`.
+files = ["dep:symphonia"]
+
+[dependencies]
+kerf-core.workspace = true
+kerf-dsp.workspace = true
+kerf-modules.workspace = true
+symphonia = { version = "0.6.1", optional = true, default-features = false, features = ["wav", "aiff", "pcm", "flac", "mp3", "ogg", "vorbis", "id3v2"] }
+thiserror.workspace = true
+
+[dev-dependencies]
+kerf-session.workspace = true
+
+[lints]
+workspace = true

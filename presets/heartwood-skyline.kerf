@@ -1,0 +1,145 @@
+kerf 1
+tempo 84
+key D minor
+tags synthwave cinematic
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module mix Router level1=0.8 level2=0.6 level3=0.7 level4=0.6 level5=0.9 level6=0.4 send=0.45
+module room Kiln size=0.95 heat=0.5 bloom=0.6 mix=1
+module out Finish volume=0.45 glue=0.35 ceiling=0.8
+
+part harm "Chords" colour #7a4fb5
+  module chordr Inlay length=0.2 transpose=0.5 octave=0.25 gate=0.95 glide=0 step1=0.12 step2=0.44 step3=0.24 step4=0.04 step5=0 step6=0 step7=0 step8=0 step9=0 step10=0 step11=0 step12=0 step13=0 step14=0 step15=0 step16=0
+  module chordt Tread step1=0.4231 step2=0.3462 step3=0.3462 step4=0.3462 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 glide=0 rate=0.5 direction=0
+  module chord Mitre chord=0.1538 inversion=0 spread=0.67 root=0.75
+
+part pad "Strings" colour #3da3a3 level=0.6
+  module padfl Plane cutoff=0.4 res=0.2 mode=0 drive=0
+  module padfr Plane cutoff=0.4 res=0.2 mode=0 drive=0
+  module padw0 Warp amount=0.12 speed=0.15 rough=0.1 chaos=0.1
+  module padp0 Ply layers=0.9 detune=0.45 width=1 tone=0.45
+  module padw1 Warp amount=0.12 speed=0.18 rough=0.1 chaos=0.1
+  module padp1 Ply layers=0.9 detune=0.45 width=1 tone=0.45
+  module padw2 Warp amount=0.12 speed=0.21 rough=0.1 chaos=0.1
+  module padp2 Ply layers=0.9 detune=0.45 width=1 tone=0.45
+  module padw3 Warp amount=0.12 speed=0.24 rough=0.1 chaos=0.1
+  module padp3 Ply layers=0.9 detune=0.45 width=1 tone=0.45
+  module padrock Rocker rate=0.03 depth=0.3 offset=0.5
+
+part sub "Drone" colour #3d63c9 level=1
+  module subo Chisel tune=0.25 fine=0.5 shape=0 pw=0.5
+  module suba Clamp level=0.6 response=0.1
+
+part lead "Brass lead" colour #d1a233 level=0.55
+  module leadinl Inlay length=1 transpose=0.5 octave=0.75 gate=0.9 glide=0.4 step1=0.4 step2=0.4 step3=0.24 step4=0.4 step5=0.44 step6=0.44 step7=0.4 step8=0.24 step9=0.4 step10=0.4 step11=0.04 step12=0.4 step13=0.32 step14=0.32 step15=0.2 step16=0.32
+  module vib Rocker rate=0.4 depth=0.014 offset=0.5
+  module leadw Warp amount=0.06 speed=0.12 rough=0.1 chaos=0.1
+  module leado Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module leado2 Chisel tune=0.5 fine=0.54 shape=0.2 pw=0.5
+  module leadp Plane cutoff=0.42 res=0.2 mode=0 drive=0.1
+  module leade Bevel attack=0.25 decay=0.5 sustain=0.7 release=0.6 curve=0.5
+  module leada Clamp level=0 response=0.2
+  module leadecho Dado time=0.43 sync=1 feedback=0.5 tone=0.45 thin=0.3 wobble=0.3 drive=0.1 mix=1
+  module leadechoh Plane cutoff=0.2 res=0 mode=0.67 drive=0
+
+part bell "FM bells" colour #c94a3d level=0.7
+  module bellinl Inlay length=1 transpose=0.5 octave=0.75 gate=0.4 glide=0 step1=0 step2=0.12 step3=0 step4=0.4 step5=0.24 step6=0 step7=0.12 step8=0 step9=0 step10=0.04 step11=0 step12=0.4 step13=0.2 step14=0 step15=0.32 step16=0
+  module bello Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bells Splice mode=0 amount=0.1 coarse=0.76 fine=0.5 mix=1 level=0.5
+  module bellp Plane cutoff=0.75 res=0.1 mode=0 drive=0.05
+  module belle Bevel attack=0 decay=0.6 sustain=0.1 release=0.7 curve=0.5
+  module bellx Bevel attack=0 decay=0.5 sustain=0.2 release=0.5 curve=0.4 depth=0.6
+  module bella Clamp level=0 response=0.3
+  module bellecho Dado time=0.57 sync=1 feedback=0.55 tone=0.5 thin=0.3 wobble=0.2 drive=0.1 mix=1
+  module bellechoh Plane cutoff=0.2 res=0 mode=0.67 drive=0
+
+part perc "Timpani" colour #c94a3d level=0.75
+  module r_tom Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0 chance=1
+  module tom Mortise engine=1 pitch=0.2 punch=0.5 decay=0.6 tone=0.4
+  module tomk Kiln size=0.95 heat=0.5 bloom=0.1 mix=1
+  module tome Bevel attack=0 decay=0.5 sustain=1 release=0.62 curve=0.8
+  module tomcl Clamp level=0 response=0
+  module tomcr Clamp level=0 response=0
+
+part air "Rain radio" colour #7a4fb5 level=1
+  module air Static tune=0.35 width=0.4 hiss=0.3 crackle=0.1 whistle=0.1 fade=0.5 ghost=0.5 level=0.8
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.bar -> chordr.clock
+cable clock.bar -> chordt.clock
+cable chordr.pitch -> chord.pitch
+cable chordt.cv -> chord.chord
+cable chordr.gate -> chord.gate
+cable chord.voice1 -> padw0.in
+cable padw0.out -> padp0.voct
+cable padp0.l -> padfl.in
+cable padp0.r -> padfr.in
+cable chord.voice2 -> padw1.in
+cable padw1.out -> padp1.voct
+cable padp1.l -> padfl.in
+cable padp1.r -> padfr.in
+cable chord.voice3 -> padw2.in
+cable padw2.out -> padp2.voct
+cable padp2.l -> padfl.in
+cable padp2.r -> padfr.in
+cable chord.voice4 -> padw3.in
+cable padw3.out -> padp3.voct
+cable padp3.l -> padfl.in
+cable padp3.r -> padfr.in
+cable padrock.out -> padfl.cutoff
+cable padrock.out -> padfr.cutoff
+cable padfl.out -> out.l
+cable padfr.out -> out.r
+cable padfl.out -> room.in_l
+cable padfr.out -> room.in_r
+cable chordr.pitch -> subo.voct
+cable subo.sine -> suba.in
+cable suba.out -> mix.in2
+cable clock.div4 -> leadinl.clock
+cable vib.out -> leadinl.transpose
+cable leadinl.pitch -> leadw.in
+cable leadw.out -> leado.voct
+cable leadw.out -> leado2.voct
+cable leadinl.gate -> leade.gate
+cable leado.saw -> leadp.in
+cable leado2.saw -> leadp.in
+cable leade.env -> leadp.cutoff
+cable leadp.out -> leada.in
+cable leade.env -> leada.cv
+cable leada.out -> mix.in4
+cable leada.out -> leadecho.in_l
+cable leadecho.l -> leadechoh.in
+cable leadecho.r -> leadechoh.in
+cable leadechoh.out -> mix.in4
+cable clock.div4 -> bellinl.clock
+cable bellinl.pitch -> bello.voct
+cable bello.sine -> bells.carrier
+cable bells.out -> bellp.in
+cable bellp.out -> bella.in
+cable bellinl.gate -> belle.gate
+cable bellinl.gate -> bellx.gate
+cable belle.env -> bella.cv
+cable bellx.env -> bells.amount
+cable bella.out -> mix.in5
+cable bella.out -> bellecho.in_l
+cable bellecho.l -> bellechoh.in
+cable bellecho.r -> bellechoh.in
+cable bellechoh.out -> mix.in5
+cable clock.clock -> r_tom.clock
+cable r_tom.a -> tom.trig
+cable r_tom.a -> tome.gate
+cable tom.out -> mix.in1
+cable tom.out -> tomk.in_l
+cable tom.out -> tomk.in_r
+cable tomk.l -> tomcl.in
+cable tomk.r -> tomcr.in
+cable tome.env -> tomcl.cv
+cable tome.env -> tomcr.cv
+cable tomcl.out -> out.l
+cable tomcr.out -> out.r
+cable air.out -> mix.in6

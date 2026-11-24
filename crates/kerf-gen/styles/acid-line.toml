@@ -1,0 +1,343 @@
+# Acid Line: a squelchy, resonant bass line over a straight kick, with
+# polymetric hats and a clap on 2 and 4. Modelled on presets/first-cut.kerf.
+#
+# Rhythm rule: the kick is Ruler lane A at 16 steps and never thins; every
+# other lane gets its own shorter length (none is 16, none repeats) and a
+# chance below 1, so the loops phase against the kick.
+
+name = "acid-line"
+title = "Acid Line"
+summary = "A resonant 303-style bass line over a straight kick, polymetric hats and a clap on 2 and 4."
+tempo = [126, 136]
+keys = ["C minor", "D minor", "E minor", "F minor", "G minor", "A minor"]
+
+[[modules]]
+id = "tally1"
+kind = "Tally"
+[modules.params]
+tempo = 0.5
+swing = [0.0, 0.25]
+divide = 0.5
+
+[[modules]]
+id = "mix"
+kind = "Router"
+[modules.params]
+level1 = [0.34, 0.44]
+level2 = [0.4, 0.5]
+level3 = [0.2, 0.3]
+level4 = [0.28, 0.38]
+level5 = [0.18, 0.28]
+
+[[modules]]
+id = "out"
+kind = "Finish"
+[modules.params]
+volume = 0.7
+glue = [0.25, 0.45]
+ceiling = 0.8
+
+[[cables]]
+from = "mix.mix_l"
+to = "out.l"
+
+[[cables]]
+from = "mix.mix_r"
+to = "out.r"
+
+[[parts]]
+id = "bass"
+name = "Bass"
+colour = "#3d63c9"
+
+[[parts.modules]]
+id = "seq1"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [6, 12] }
+steps_b = { steps = [3, 5] }
+interlock = [0.6, 1.0]
+chance = [0.65, 0.9]
+glide = [0.1, 0.35]
+range = [0.3, 0.5]
+
+[[parts.modules]]
+id = "osc1"
+kind = "Chisel"
+[parts.modules.params]
+tune = { octave = [-2, -1] }
+shape = 0
+pw = 0.5
+
+[[parts.modules]]
+id = "env1"
+kind = "Bevel"
+[parts.modules.params]
+attack = 0
+decay = [0.35, 0.5]
+sustain = 0
+release = [0.2, 0.3]
+curve = [0.25, 0.45]
+
+[[parts.modules]]
+id = "flt1"
+kind = "Plane"
+[parts.modules.params]
+cutoff = [0.22, 0.4]
+res = [0.6, 0.88]
+mode = 0
+drive = [0.3, 0.6]
+
+[[parts.modules]]
+id = "amp1"
+kind = "Clamp"
+[parts.modules.params]
+level = 0
+response = [0.1, 0.2]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "seq1.clock"
+
+[[parts.cables]]
+from = "seq1.pitch"
+to = "osc1.voct"
+
+[[parts.cables]]
+from = "seq1.gate"
+to = "env1.gate"
+
+[[parts.cables]]
+from = ["osc1.saw", "osc1.square"]
+to = "flt1.in"
+
+[[parts.cables]]
+from = "osc1.sub"
+to = "flt1.in"
+chance = 0.4
+
+[[parts.cables]]
+from = "env1.env"
+to = "flt1.cutoff"
+
+[[parts.cables]]
+from = "flt1.out"
+to = "amp1.in"
+
+[[parts.cables]]
+from = "env1.env"
+to = "amp1.cv"
+
+[[parts.cables]]
+from = "amp1.out"
+to = "mix.in1"
+
+# A second layout: a slower second envelope opens the filter further.
+[[parts.alt]]
+weight = 0.6
+
+[[parts.alt.modules]]
+id = "seq1"
+kind = "Dovetail"
+[parts.alt.modules.params]
+steps_a = { steps = [6, 12] }
+steps_b = { steps = [3, 5] }
+interlock = [0.6, 1.0]
+chance = [0.65, 0.9]
+glide = [0.1, 0.35]
+range = [0.3, 0.5]
+
+[[parts.alt.modules]]
+id = "osc1"
+kind = "Chisel"
+[parts.alt.modules.params]
+tune = { octave = [-2, -1] }
+shape = 0
+pw = 0.5
+
+[[parts.alt.modules]]
+id = "env1"
+kind = "Bevel"
+[parts.alt.modules.params]
+attack = 0
+decay = [0.3, 0.45]
+sustain = 0
+release = [0.2, 0.3]
+curve = [0.25, 0.45]
+
+[[parts.alt.modules]]
+id = "env2"
+kind = "Bevel"
+[parts.alt.modules.params]
+attack = [0.0, 0.1]
+decay = [0.5, 0.7]
+sustain = 0
+release = [0.3, 0.5]
+curve = 0.5
+
+[[parts.alt.modules]]
+id = "flt1"
+kind = "Plane"
+[parts.alt.modules.params]
+cutoff = [0.18, 0.32]
+res = [0.6, 0.85]
+mode = 0
+drive = [0.3, 0.6]
+
+[[parts.alt.modules]]
+id = "amp1"
+kind = "Clamp"
+[parts.alt.modules.params]
+level = 0
+response = [0.1, 0.2]
+
+[[parts.alt.cables]]
+from = "tally1.clock"
+to = "seq1.clock"
+
+[[parts.alt.cables]]
+from = "seq1.pitch"
+to = "osc1.voct"
+
+[[parts.alt.cables]]
+from = "seq1.gate"
+to = "env1.gate"
+
+[[parts.alt.cables]]
+from = "seq1.gate"
+to = "env2.gate"
+
+[[parts.alt.cables]]
+from = ["osc1.saw", "osc1.square"]
+to = "flt1.in"
+
+[[parts.alt.cables]]
+from = "env1.env"
+to = "flt1.cutoff"
+
+[[parts.alt.cables]]
+from = "env2.env"
+to = "flt1.cutoff"
+
+[[parts.alt.cables]]
+from = "flt1.out"
+to = "amp1.in"
+
+[[parts.alt.cables]]
+from = "env1.env"
+to = "amp1.cv"
+
+[[parts.alt.cables]]
+from = "amp1.out"
+to = "mix.in1"
+
+[[parts]]
+id = "drums"
+name = "Drums"
+colour = "#c94a3d"
+
+# Kick on lane A, hats on lane B, a percussion voice on lane C.
+[[parts.modules]]
+id = "ruler1"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0.25
+steps_a = 1
+hits_b = [0.5, 0.75]
+steps_b = { steps = [6, 9] }
+hits_c = [0.3, 0.5]
+steps_c = { steps = [3, 5] }
+hits_d = 0
+chance = [0.6, 0.85]
+
+# The clap: one hit in eight, rotated onto beats 2 and 4.
+[[parts.modules]]
+id = "ruler2"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0.125
+steps_a = 0.467
+hits_b = 0
+hits_c = 0
+hits_d = 0
+rotate = 0.5
+
+[[parts.modules]]
+id = "kick"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0
+pitch = [0.28, 0.42]
+punch = [0.55, 0.75]
+decay = [0.2, 0.32]
+tone = [0.3, 0.5]
+
+[[parts.modules]]
+id = "hat"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0.5
+pitch = [0.4, 0.6]
+punch = 0.5
+decay = [0.1, 0.2]
+tone = [0.5, 0.7]
+
+[[parts.modules]]
+id = "perc"
+kind = "Mortise"
+[parts.modules.params]
+engine = { pick = [0.25, 1.0] }
+pitch = [0.55, 0.8]
+punch = [0.5, 0.7]
+decay = [0.15, 0.3]
+tone = [0.4, 0.6]
+
+[[parts.modules]]
+id = "clap"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0.75
+pitch = 0.5
+punch = [0.5, 0.7]
+decay = [0.3, 0.4]
+tone = [0.4, 0.5]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler1.clock"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler2.clock"
+
+[[parts.cables]]
+from = "ruler1.a"
+to = "kick.trig"
+
+[[parts.cables]]
+from = "ruler1.b"
+to = "hat.trig"
+
+[[parts.cables]]
+from = "ruler1.c"
+to = "perc.trig"
+
+[[parts.cables]]
+from = "ruler2.a"
+to = "clap.trig"
+
+[[parts.cables]]
+from = "kick.out"
+to = "mix.in2"
+
+[[parts.cables]]
+from = "hat.out"
+to = "mix.in3"
+
+[[parts.cables]]
+from = "perc.out"
+to = "mix.in4"
+
+[[parts.cables]]
+from = "clap.out"
+to = "mix.in5"

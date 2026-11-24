@@ -1,0 +1,50 @@
+kerf 1
+tempo 76
+key A minor
+tags abstract granular shimmer
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module room Kiln size=0.85 heat=0.35 bloom=0.6 mix=1
+module out Finish volume=0.55 glue=0.3 ceiling=0.8
+
+part roots "Roots" colour #8a8f98 level=1
+  module roottr Tread step1=0.475 step2=0.4583 step3=0.4417 step4=0.4333 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 direction=0 glide=0.3
+  module rootfret Fret root=0.75 scale=0.43 octave=0.5
+
+part leaf "Octave grains" colour #b5527a level=1
+  module leafsp Splinter position=0.385 spray=0.08 size=0.7 density=0.7 pitch=0.8125 scatter=0 reverse=0.1 shape=0.2 spread=1 level=0.9 hold=0
+  module leafscan Rocker rate=0.08 sync=0 shape=0 depth=0.12 offset=0.5
+
+part foil "High foil" colour #d1a233 level=0.6
+  module foilsp Splinter position=0.755 spray=0.1 size=0.6 density=0.65 pitch=0.8125 scatter=0.02 reverse=0.2 shape=0.2 spread=1 level=0.9 hold=0
+  module foilwarp Warp amount=0.05 speed=0.2 rough=0.1 chaos=0.2
+
+part shim "Shimmer echo" colour #3da3a3
+  module shimdado Dado time=0.4286 sync=1 feedback=0.72 tone=0.6 thin=0.3 wobble=0.3 drive=0.1 mix=1
+  module shimflt Plane cutoff=0.75 res=0.15 mode=0 drive=0
+
+cable clock.bar -> roottr.clock
+cable roottr.cv -> rootfret.pitch
+cable rootfret.pitch -> leafsp.voct
+cable rootfret.pitch -> foilwarp.in
+cable foilwarp.out -> foilsp.voct
+cable leafscan.out -> leafsp.position
+cable leafsp.l -> out.l
+cable leafsp.r -> out.r
+cable foilsp.l -> out.l
+cable foilsp.r -> out.r
+cable leafsp.l -> shimdado.in_l
+cable leafsp.r -> shimdado.in_r
+cable foilsp.l -> shimdado.in_l
+cable foilsp.r -> shimdado.in_r
+cable shimdado.l -> shimflt.in
+cable shimdado.r -> shimflt.in
+cable shimflt.out -> out.l
+cable shimflt.out -> out.r
+cable shimflt.out -> room.in_l
+cable shimflt.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A shimdado.feedback=0.6 shimflt.cutoff=0.65 leafsp.spray=0.05
+scene B shimdado.feedback=0.82 shimflt.cutoff=0.85 leafsp.spray=0.3

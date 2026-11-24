@@ -1,0 +1,91 @@
+kerf 1
+tempo 66
+key C major
+tags reggae dub lovers
+
+module clock Tally tempo=0.5 swing=0.1 divide=0
+module mix Router level1=0.7 level2=0.45 level3=0.8 level4=0.55 level5=0.55 level6=0.4 send=0.4
+module room Kiln size=0.45 heat=0.4 bloom=0.2 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module drumrl Ruler hits_a=0.0625 hits_b=0 hits_c=0.5 hits_d=0.0625 steps_a=1 steps_b=1 steps_c=1 steps_d=0.4 rotate=0.5 chance=1
+  module kick Mortise engine=0 pitch=0.3 punch=0.4 decay=0.5 tone=0.3
+  module rim Mortise engine=0.25 pitch=0.65 punch=0.7 decay=0.15 tone=0.5
+
+part bass "Bass" colour #3d63c9 level=0.9
+  module bassrl Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=0.4667 steps_c=0.4667 steps_d=0.4667 rotate=0.0 chance=1
+  module basstr Tread step1=0.3 step2=0.3 step3=0.3583 step4=0.3 step5=0.3417 step6=0.3417 step7=0.3833 step8=0.3583 length=1.0 glide=0.1 rate=0.5 direction=0
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassenv Bevel attack=0.0 decay=0.5 sustain=0.55 release=0.4 curve=0.4
+  module bassamp Clamp level=0 response=0.1
+
+part skank "Skank" colour #d1a233 level=0.8
+  module skrl Ruler hits_a=0.25 hits_b=0.125 hits_c=0 hits_d=0 steps_a=1 steps_b=1 rotate=0.125 chance=0.6
+  module chordtr Tread step1=0.4 step2=0.4417 step3=0.4417 step4=0.4 step5=0.4 step6=0.4 step7=0.4 step8=0.4 length=0.4286 glide=0
+  module chord Mitre chord=0.4615 inversion=0 spread=0.34 root=0.75
+  module skosc1 Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.4
+  module skosc2 Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.55
+  module skflt Plane cutoff=0.4 res=0.15 mode=0 drive=0.1
+  module skenv Bevel attack=0 decay=0.14 sustain=0 release=0.12 curve=0.35
+  module skamp Clamp level=0 response=0.5
+
+part fx "Echo and tape" colour #3da3a3
+  module echo Dado time=0.5714 sync=1 feedback=0.5 tone=0.45 thin=0.25 wobble=0.25 drive=0.15 mix=1
+  module ret Plane cutoff=0.5 res=0.2 mode=0 drive=0.1
+
+part bubble "Organ bubble" colour #7ab55a level=0.5
+  module rung Rung pattern=0.25 octaves=0 rate=0.75 length=0.35 swing=0.35 ratchet=0
+  module bubosc Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bubenv Bevel attack=0 decay=0.1 sustain=0.1 release=0.08 curve=0.35
+  module bubamp Clamp level=0 response=0.4
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.clock -> drumrl.clock
+cable drumrl.a -> kick.trig
+cable drumrl.a -> rim.trig
+cable kick.out -> mix.in1
+cable rim.out -> mix.in2
+cable rim.out -> echo.in_l
+cable clock.div4 -> bassrl.clock
+cable clock.div4 -> basstr.clock
+cable basstr.cv -> bassosc.voct
+cable bassrl.a -> bassenv.gate
+cable bassosc.sine -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in3
+cable clock.clock -> skrl.clock
+cable clock.bar -> chordtr.clock
+cable chordtr.cv -> chord.pitch
+cable skrl.a -> chord.gate
+cable skrl.a -> skenv.gate
+cable chord.voice2 -> skosc1.voct
+cable skosc1.square -> skflt.in
+cable chord.voice4 -> skosc2.voct
+cable skosc2.square -> skflt.in
+cable skflt.out -> skamp.in
+cable skenv.env -> skamp.cv
+cable skamp.out -> mix.in4
+cable skamp.out -> echo.in_l
+cable skenv.env -> skflt.cutoff
+cable echo.l -> ret.in
+cable echo.r -> ret.in
+cable ret.out -> mix.in6
+cable clock.div4 -> rung.clock
+cable chord.voice1 -> rung.voice1
+cable chord.voice2 -> rung.voice2
+cable chord.voice3 -> rung.voice3
+cable rung.pitch -> bubosc.voct
+cable bubosc.square -> bubamp.in
+cable rung.gate -> bubenv.gate
+cable bubenv.env -> bubamp.cv
+cable bubamp.out -> mix.in5
+cable bubamp.out -> echo.in_l
+
+scene A skflt.cutoff=0.32 ret.cutoff=0.4
+scene B skflt.cutoff=0.55 ret.cutoff=0.65

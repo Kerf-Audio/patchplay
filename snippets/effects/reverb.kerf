@@ -1,0 +1,9 @@
+# title: Reverb
+# about: A large, dark room, wet only. Send sounds into it and keep their own cables to out for the dry signal.
+# feed: room_verb.in_l, room_verb.in_r
+# port: room_verb.l, room_verb.r (audio): the room, already cabled to out. For a mono source, feed in_l alone.
+part room "Reverb" colour #d1a233
+  module room_verb Kiln size=0.7 heat=0.5 bloom=0.3 mix=1
+
+cable room_verb.l -> out.l
+cable room_verb.r -> out.r

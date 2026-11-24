@@ -1,0 +1,38 @@
+kerf 1
+tempo 70
+key A minor
+tags abstract granular scan
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module room Kiln size=0.8 heat=0.5 bloom=0.5 mix=1
+module out Finish volume=0.75 glue=0.3 ceiling=0.8
+
+part scan "Scan" colour #b5527a level=1
+  module scansp Splinter position=0.5 spray=0.03 size=0.8 density=0.8 pitch=0.5 scatter=0 reverse=0 shape=0.15 spread=0.8 level=0.9 hold=0
+  module scanrk Rocker rate=0.1 sync=0 shape=0.25 depth=0.9 offset=0.5
+
+part under "Underscan" colour #7a4fb5 level=0.6
+  module undersp Splinter position=0.5 spray=0.2 size=0.95 density=0.55 pitch=0.25 scatter=0 reverse=0.5 shape=0.1 spread=1 level=0.9 hold=0
+
+part tone "Filters" colour #8a8f98 level=1
+  module fltl Plane cutoff=0.7 res=0.2 mode=0 drive=0
+  module fltr Plane cutoff=0.7 res=0.2 mode=0 drive=0
+  module breath Rocker rate=0.15 sync=0 shape=0 depth=0.3 offset=0.5
+
+cable scanrk.out -> scansp.position
+cable scanrk.inverted -> undersp.position
+cable scansp.l -> fltl.in
+cable scansp.r -> fltr.in
+cable undersp.l -> fltl.in
+cable undersp.r -> fltr.in
+cable breath.out -> fltl.cutoff
+cable breath.inverted -> fltr.cutoff
+cable fltl.out -> out.l
+cable fltr.out -> out.r
+cable fltl.out -> room.in_l
+cable fltr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A scansp.spray=0.02 undersp.spray=0.1
+scene B scansp.spray=0.15 undersp.spray=0.4

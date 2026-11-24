@@ -1,0 +1,91 @@
+kerf 1
+tempo 127
+key G minor
+tags four-four acid
+
+module tally1 Tally tempo=0.5 swing=0.08 divide=0.5
+module mix    Router level1=0.85 level2=0.65 level3=0.4 level4=0.55 level5=0.5 level6=0.85 send=0.25
+module room   Kiln   size=0.5 heat=0.55 bloom=0.25 mix=1
+module out    Finish volume=0.7 glue=0.45 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat     Ruler   hits_a=0.25 steps_a=1 hits_b=0.75 steps_b=1 hits_c=0 hits_d=0 chance=0.5
+  module backbeat Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25 chance=1
+  module offbeat  Ruler   hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.125 chance=1
+  module kick     Mortise engine=0 pitch=0.38 punch=0.7 decay=0.3 tone=0.4
+  module clap     Mortise engine=0.75 pitch=0.5 punch=0.6 decay=0.35 tone=0.5
+  module ohat     Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.3 tone=0.7
+  module duck     Bevel   attack=0 decay=0.4 sustain=0 release=0.4 curve=0.3
+
+part fizz "Sawdust hats" colour #8a6b4a
+  module dust   Sawdust colour=0.8 crackle=0.2
+  module dflt   Plane   cutoff=0.75 res=0.2 mode=0.667 drive=0
+  module denv   Bevel   attack=0 decay=0.3 sustain=0.3 release=0.3 curve=0.2
+  module damp   Clamp   level=0 response=0
+
+part acid "Acid line" colour #3d63c9 level=0.8
+  module aseq  Dovetail steps_a=0.47 steps_b=0.33 interlock=0.4 chance=0.9 glide=0.25 range=0.25
+  module afret Fret     root=0.583 scale=0.857 octave=0.25
+  module aosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module aenv  Bevel    attack=0 decay=0.28 sustain=0 release=0.2 curve=0.3
+  module awob  Burl     rate=0.3 smooth=0.8 bias=0.55
+  module aflt  Plane    cutoff=0.3 res=0.7 mode=0 drive=0.45
+  module abite Rasp     drive=0.45 fold=0.05 bias=0.5 mix=0.5
+  module aamp  Clamp    level=0 response=0.1
+  module aduck Clamp    level=0 response=0.0
+
+part ping "Mallet hook" colour #3d9c8a level=0.7
+  module pseq   Dovetail steps_a=0.8 steps_b=0.53 interlock=0.8 chance=0.55 glide=0 range=0.3
+  module pfret  Fret     root=0.583 scale=0.857 octave=0.625
+  module pmal   Mallet   material=0.45 size=0.4 strike=0.5 damp=0.5
+  module pecho  Bandsaw  time=0.375 feedback=0.5 wear=0.4 mix=0.45
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> backbeat.clock
+cable tally1.clock -> offbeat.clock
+cable beat.a -> kick.trig
+cable beat.a -> duck.gate
+cable backbeat.a -> clap.trig
+cable offbeat.a -> ohat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable ohat.out -> mix.in3
+
+cable beat.b -> denv.gate
+cable dust.noise -> dflt.in
+cable dflt.out -> damp.in
+cable denv.env -> damp.cv
+cable damp.out -> mix.in6
+
+cable tally1.clock -> aseq.clock
+cable aseq.pitch -> afret.pitch
+cable afret.pitch -> aosc.voct
+cable aseq.gate -> aenv.gate
+cable aosc.saw -> aflt.in
+cable aenv.env -> aflt.cutoff
+cable awob.drift -> aflt.cutoff
+cable aflt.out -> abite.in
+cable abite.out -> aamp.in
+cable aenv.env -> aamp.cv
+cable aamp.out -> aduck.in
+cable duck.inverted -> aduck.cv
+cable aduck.out -> mix.in2
+
+cable tally1.clock -> pseq.clock
+cable pseq.pitch -> pfret.pitch
+cable pfret.pitch -> pmal.voct
+cable pseq.gate -> pmal.trig
+cable pmal.out -> pecho.in
+cable tally1.clock -> pecho.clock
+cable pecho.l -> mix.in5
+cable pecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A aflt.cutoff=0.25 aflt.res=0.6 awob.rate=0.2 pseq.chance=0.4 abite.drive=0.35 dflt.cutoff=0.7
+scene B aflt.cutoff=0.55 aflt.res=0.85 awob.rate=0.6 pseq.chance=0.8 abite.drive=0.7 dflt.cutoff=0.9

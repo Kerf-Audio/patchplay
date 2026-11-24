@@ -1,0 +1,83 @@
+kerf 1
+tempo 88
+key C phrygian
+tags ominous industrial dark
+
+module clock Tally tempo=0.5 swing=0 divide=0
+module mix Router level1=0.85 level2=0.6 level3=0.75 level4=0.55 level5=0.5 level6=0.45 send=0.3
+module room Kiln size=0.4 heat=0.7 bloom=0.1 mix=1
+module out Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Machines" colour #c94a3d level=0.9
+  module drumrl Ruler hits_a=0.25 hits_b=0.375 hits_c=0.4 hits_d=0.1 steps_a=1 steps_b=0.4667 steps_c=0.3333 steps_d=0.6 rotate=0 chance=0.8
+  module kick Mortise engine=0 pitch=0.2 punch=0.9 decay=0.4 tone=0.4
+  module tom Mortise engine=1 pitch=0.15 punch=0.8 decay=0.5 tone=0.3
+  module snare Mortise engine=0.25 pitch=0.35 punch=0.9 decay=0.3 tone=0.4
+  module drumgrit Rasp drive=0.6 fold=0.3 bias=0.5 mix=0.7
+
+part bass "Pulse" colour #3d63c9 level=0.7
+  module bassrl Ruler hits_a=0.75 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=1 rotate=0 chance=1
+  module basstr Tread step1=0.3 step2=0.3 step3=0.3 step4=0.3083 step5=0.3 step6=0.3 step7=0.3417 step8=0.3083 length=1.0 glide=0.05
+  module basswarp Warp amount=0.06 speed=0.5 rough=0.8 chaos=0.8
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0.1 pw=0.5
+  module bassfold Rasp drive=0.55 fold=0.45 bias=0.5 mix=0.8
+  module bassflt Plane cutoff=0.38 res=0.4 mode=0 drive=0.2
+  module bassenv Bevel attack=0 decay=0.3 sustain=0.35 release=0.15 curve=0.35
+  module bassamp Clamp level=0 response=0.3
+
+part clang "Clangs" colour #d1a233 level=0.5
+  module clangrl Ruler hits_a=0 hits_b=0.0909 hits_c=0.1818 hits_d=0 steps_a=1 steps_b=0.6667 steps_c=0.8 rotate=0 chance=0.7
+  module clang Mallet material=0.88 size=0.35 strike=0.8 damp=0.4
+  module clangfm Splice mode=0 amount=0.6 coarse=0.7 fine=0.35 mix=0.7 level=0.5
+
+part grit "Static burst" colour #3da3a3 level=0.6
+  module noise Sawdust colour=0.7 crackle=0.5
+  module noiseenv Bevel attack=0 decay=0.2 sustain=0 release=0.1 curve=0.3
+  module noiseamp Clamp level=0 response=0.5
+  module noiseflt Plane cutoff=0.6 res=0.4 mode=0.67 drive=0.3
+
+part agit "Agitation" colour #b5527a level=1
+  module shake Chatter energy=0.7 tension=0.7 damping=0.3 rate=0.2 depth=1
+
+cable clock.clock -> drumrl.clock
+cable drumrl.a -> kick.trig
+cable drumrl.b -> tom.trig
+cable drumrl.c -> snare.trig
+cable kick.out -> mix.in1
+cable tom.out -> drumgrit.in
+cable snare.out -> drumgrit.in
+cable drumgrit.out -> mix.in2
+cable drumrl.a -> shake.kick
+cable shake.position -> bassflt.cutoff
+cable shake.velocity -> noiseflt.cutoff
+cable clock.div4 -> bassrl.clock
+cable clock.div4 -> basstr.clock
+cable basstr.cv -> basswarp.in
+cable basswarp.out -> bassosc.voct
+cable bassosc.saw -> bassfold.in
+cable bassfold.out -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassrl.a -> bassenv.gate
+cable bassenv.env -> bassamp.cv
+cable bassenv.env -> bassflt.cutoff
+cable bassamp.out -> mix.in3
+cable clock.clock -> clangrl.clock
+cable clangrl.b -> clang.trig
+cable clangrl.c -> noiseenv.gate
+cable basstr.cv -> clang.voct
+cable clang.out -> clangfm.carrier
+cable clangfm.out -> mix.in4
+cable clangfm.out -> mix.in6
+cable noise.noise -> noiseflt.in
+cable noiseflt.out -> noiseamp.in
+cable noiseenv.env -> noiseamp.cv
+cable noiseamp.out -> mix.in5
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bassflt.cutoff=0.3 drumgrit.drive=0.4 clangfm.amount=0.3
+scene B bassflt.cutoff=0.6 drumgrit.drive=0.85 clangfm.amount=0.9

@@ -1,0 +1,87 @@
+kerf 1
+tempo 130
+key E minor
+tags four-four techno detroit
+
+module tally1 Tally tempo=0.5 swing=0.08 divide=0.5
+module mix    Router level1=0.85 level2=0.8 level3=0.4 level4=0.5 level5=0.5 level6=0.5 send=0.15
+module room   Kiln   size=0.45 heat=0.55 bloom=0.2 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0 chance=1
+  module snap   Ruler   hits_a=0.125 steps_a=1 hits_b=0.25 steps_b=0.867 hits_c=0 hits_d=0 rotate=0.25 chance=0.4
+  module hats   Ruler   hits_a=0.25 steps_a=1 hits_b=0.5 steps_b=1 hits_c=0 hits_d=0 rotate=0.125 chance=0.5
+  module kick   Mortise engine=0 pitch=0.3 punch=0.8 decay=0.3 tone=0.35
+  module clap   Mortise engine=0.75 pitch=0.45 punch=0.7 decay=0.3 tone=0.5
+  module hat    Mortise engine=0.5 pitch=0.62 punch=0.4 decay=0.15 tone=0.7
+
+part bass "Driving bass" colour #3d63c9 level=0.85
+  module bseq     Dovetail steps_a=1 steps_b=0.8 interlock=0.3 chance=0.92 glide=0.1 range=0.2
+  module bfret    Fret     root=0.333 scale=0.143 octave=0.25
+  module bosc     Chisel   tune=0.5 shape=0 pw=0.45
+  module bdrive   Rasp     drive=0.3 fold=0.1 bias=0.55 mix=0.7
+  module benv     Bevel    attack=0 decay=0.25 sustain=0.15 release=0.15 curve=0.3
+  module bflt     Plane    cutoff=0.3 res=0.35 mode=0 drive=0.3
+  module bamp     Clamp    level=0 response=0.1
+  module rock     Rocker   rate=0.4 sync=0.5 shape=0 depth=0.35 offset=0.5 phase=0
+  module squeeze  Vise     squeeze=0.7 speed=0.7 makeup=0.35
+
+part stab "Mono stab" colour #d1a233 level=0.6
+  module stseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=1 chance=0.75 glide=0 range=0.25
+  module stfret Fret     root=0.333 scale=0.143 octave=0.5
+  module stosc  Chisel   tune=0.5 shape=0 pw=0.4
+  module stenv  Bevel    attack=0 decay=0.2 sustain=0 release=0.2 curve=0.3
+  module stflt  Plane    cutoff=0.45 res=0.3 mode=0 drive=0.2
+  module stamp  Clamp    level=0 response=0.1
+  module tread  Tread    step1=0.5 step2=0.8 step3=0.3 step4=0.7 step5=0.2 step6=0.9 step7=0.4 step8=0.6 length=1 direction=0.667 glide=0.3 depth=0.3
+  module stecho Dado     time=0.43 sync=1 feedback=0.55 tone=0.4 thin=0.35 wobble=0.3 drive=0.25 mix=0.5
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> snap.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable snap.a -> clap.trig
+cable hats.a -> hat.trig
+cable hats.b -> hat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable hat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bdrive.in
+cable bdrive.out -> bflt.in
+cable benv.env -> bflt.cutoff
+cable rock.out -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.clock -> stseq.clock
+cable tally1.clock -> tread.clock
+cable stseq.pitch -> stfret.pitch
+cable stfret.pitch -> stosc.voct
+cable stseq.gate -> stenv.gate
+cable stosc.square -> stflt.in
+cable stenv.env -> stflt.cutoff
+cable tread.cv -> stflt.cutoff
+cable stflt.out -> stamp.in
+cable stenv.env -> stamp.cv
+cable stamp.out -> stecho.in_l
+cable stecho.l -> mix.in5
+cable stecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bflt.cutoff=0.25 rock.depth=0.2 stflt.res=0.2 stecho.feedback=0.4
+scene B bflt.cutoff=0.45 rock.depth=0.6 stflt.res=0.5 stecho.feedback=0.65

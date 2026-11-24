@@ -1,0 +1,15 @@
+# title: Ducking on the beat
+# about: Pulls a sound down on every beat and lets it swell back, so it sits around a four-on-the-floor kick. Move the source's cable from out to duck_amp.in.
+# feed: duck_amp.in
+# port: duck_env.inverted (cv): the duck shape, for ducking other things too.
+# port: duck_amp.out (audio): the ducked sound, already cabled to out.
+part duck "Ducking" colour #d1a233
+  module duck_rhythm Ruler hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+  module duck_env Bevel attack=0 decay=0.4 sustain=0 release=0.4 curve=0.3
+  module duck_amp Clamp level=0 response=0
+
+cable clock.clock -> duck_rhythm.clock
+cable duck_rhythm.a -> duck_env.gate
+cable duck_env.inverted -> duck_amp.cv
+cable duck_amp.out -> out.l
+cable duck_amp.out -> out.r

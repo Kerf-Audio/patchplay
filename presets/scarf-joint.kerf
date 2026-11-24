@@ -1,0 +1,97 @@
+kerf 1
+tempo 124
+key D minor
+tags four-four bleep bass dark
+
+module tally1 Tally tempo=0.5 swing=0.04 divide=0.5
+module mix    Router level1=0.8 level2=0.9 level3=0.3 level4=0.5 level5=0.6 level6=0.35 send=0.25
+module room   Kiln   size=0.8 heat=0.65 bloom=0.45 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Warehouse drums" colour #c94a3d level=0.85
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0.1 steps_b=0.867 hits_c=0 hits_d=0 chance=0.3
+  module snap   Ruler   hits_a=0.0625 steps_a=1 hits_b=0.2 steps_b=0.4 hits_c=0 hits_d=0 rotate=0.5 chance=0.35
+  module hats   Ruler   hits_a=0.125 steps_a=1 hits_b=0.25 steps_b=0.73 hits_c=0 hits_d=0 rotate=0.125 chance=0.5
+  module kick   Mortise engine=0 pitch=0.27 punch=0.65 decay=0.4 tone=0.25
+  module clap   Mortise engine=0.75 pitch=0.4 punch=0.7 decay=0.15 tone=0.5
+  module hat    Mortise engine=0.5 pitch=0.6 punch=0.5 decay=0.04 tone=0.7
+
+part sub "Sub" colour #3d63c9 level=0.95
+  module bseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=1 chance=0.9 glide=0.3 range=0.1
+  module bfret  Fret     root=0.1667 scale=0.429 octave=0.25
+  module bosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module benv   Bevel    attack=0.01 decay=0.45 sustain=0.5 release=0.25 curve=0.45
+  module bamp   Clamp    level=0 response=0.05
+  module squeeze Vise    squeeze=0.65 speed=0.6 makeup=0.4
+
+part stabs "Detuned stabs" colour #d1a233 level=0.65
+  module srhy   Ruler    hits_a=0.1875 steps_a=1 hits_b=0 hits_c=0 hits_d=0 chance=1
+  module sseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=0 chance=1 glide=0 range=0.12
+  module sfret  Fret     root=0.1667 scale=0.429 octave=0.5
+  module smit   Mitre    chord=0.077 inversion=0 spread=0 root=0.1667
+  module s1     Chisel   tune=0.5 fine=0.45 shape=0 pw=0.5
+  module s2     Chisel   tune=0.5 fine=0.56 shape=0 pw=0.5
+  module s3     Chisel   tune=0.5 fine=0.5 shape=0 pw=0.5
+  module senv   Bevel    attack=0 decay=0.3 sustain=0 release=0.25 curve=0.35 depth=0.6
+  module sflt   Plane    cutoff=0.36 res=0.25 mode=0 drive=0.25
+  module samp   Clamp    level=0 response=0.1
+  module secho  Dado     time=0.43 sync=1 feedback=0.68 tone=0.3 thin=0.4 wobble=0.4 drive=0.3 mix=0.5
+  module drift  Rocker   rate=0.2 sync=0.1 shape=0 depth=0.5 offset=0.5 phase=0
+
+part air "Static room" colour #3d9c8a level=0.4
+  module stat   Static   tune=0.3 width=0.5 hiss=0.2 crackle=0.3 whistle=0.1 fade=0.5 ghost=0.3 level=0.4
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> snap.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable beat.b -> kick.trig
+cable snap.a -> clap.trig
+cable snap.b -> clap.trig
+cable hats.a -> hat.trig
+cable hats.b -> hat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable hat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.sine -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.clock -> srhy.clock
+cable tally1.div4 -> sseq.clock
+cable sseq.pitch -> sfret.pitch
+cable sfret.pitch -> smit.pitch
+cable srhy.a -> smit.gate
+cable smit.voice1 -> s1.voct
+cable smit.voice2 -> s2.voct
+cable smit.voice3 -> s3.voct
+cable smit.gate -> senv.gate
+cable s1.saw -> sflt.in
+cable s2.saw -> sflt.in
+cable s3.saw -> sflt.in
+cable senv.env -> sflt.cutoff
+cable drift.out -> sflt.cutoff
+cable sflt.out -> samp.in
+cable senv.env -> samp.cv
+cable samp.out -> secho.in_l
+cable secho.l -> mix.in5
+cable secho.r -> mix.in5
+
+cable stat.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A sflt.cutoff=0.28 drift.depth=0.3 secho.feedback=0.55 stat.crackle=0.15
+scene B sflt.cutoff=0.5 drift.depth=0.8 secho.feedback=0.8 stat.crackle=0.5

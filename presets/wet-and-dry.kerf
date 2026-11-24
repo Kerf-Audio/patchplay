@@ -1,0 +1,67 @@
+kerf 1
+tempo 72
+key A minor
+tags reggae granular dub
+
+module clock Tally tempo=0.5 swing=0.15 divide=0
+module mix Router level1=0.7 level2=0.45 level3=0.65 level4=0.5 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.45 heat=0.55 bloom=0.2 mix=1
+module out Finish volume=0.55 glue=0.4 ceiling=0.8
+
+part smear "Granular smear" colour #b5527a level=1
+  module smearrl Ruler hits_a=0.125 hits_b=0.0625 hits_c=0 hits_d=0 steps_a=1 steps_b=1 rotate=0.25 chance=0.7
+  module smearsp Splinter position=0.4 spray=0.3 size=0.55 density=0.55 pitch=0.4 scatter=0.1 reverse=0.3 shape=0.2 spread=0.8 level=0.9 hold=0
+  module smearscan Rocker rate=0.1 sync=0 shape=0.2 depth=0.5 offset=0.5
+  module smearflt Plane cutoff=0.55 res=0.25 mode=0 drive=0.1
+
+part fx "Dub echo" colour #3da3a3
+  module echo Dado time=0.7143 sync=1 feedback=0.72 tone=0.4 thin=0.3 wobble=0.4 drive=0.3 mix=1
+  module wob Rocker rate=0.08 sync=0 shape=0 depth=0.25 offset=0.5
+
+part drums "Drums" colour #c94a3d level=0.7
+  module kickrl Ruler hits_a=0.0625 hits_b=0.125 hits_c=0 hits_d=0 steps_a=1 steps_b=1 rotate=0.5 chance=0.5
+  module kick Mortise engine=0 pitch=0.3 punch=0.5 decay=0.45 tone=0.35
+  module hat Mortise engine=0.5 pitch=0.55 punch=0.4 decay=0.1 tone=0.65
+
+part bass "Bass" colour #3d63c9 level=0.8
+  module bassrl Ruler hits_a=0.375 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 chance=1
+  module basstr Tread step1=0.275 step2=0.275 step3=0.275 step4=0.3 step5=0.3 step6=0.3 step7=0.3333 step8=0.3167 length=1 glide=0.05 direction=0
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassenv Bevel attack=0 decay=0.55 sustain=0.6 release=0.35 curve=0.4
+  module bassamp Clamp level=0 response=0.1
+
+cable clock.clock -> smearrl.clock
+cable smearrl.a -> smearsp.trig
+cable smearscan.out -> smearsp.position
+cable smearsp.l -> smearflt.in
+cable smearsp.r -> smearflt.in
+cable smearflt.out -> out.l
+cable smearflt.out -> out.r
+cable smearflt.out -> echo.in_l
+cable smearflt.out -> echo.in_r
+cable wob.out -> echo.time
+cable echo.l -> out.l
+cable echo.r -> out.r
+cable echo.l -> room.in_l
+cable echo.r -> room.in_r
+cable clock.clock -> kickrl.clock
+cable kickrl.a -> kick.trig
+cable kickrl.b -> hat.trig
+cable kick.out -> mix.in1
+cable hat.out -> mix.in2
+cable clock.div4 -> bassrl.clock
+cable clock.div4 -> basstr.clock
+cable basstr.cv -> bassosc.voct
+cable bassrl.a -> bassenv.gate
+cable bassosc.sine -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in3
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A smearflt.cutoff=0.4 echo.feedback=0.6 smearsp.density=0.4
+scene B smearflt.cutoff=0.7 echo.feedback=0.82 smearsp.density=0.8

@@ -1,0 +1,85 @@
+kerf 1
+tempo 127
+key F minor
+tags four-four techno detroit
+
+module tally1 Tally tempo=0.5 swing=0.03 divide=0.5
+module mix    Router level1=0.85 level2=0.75 level3=0.35 level4=0.5 level5=0.5 level6=0.3 send=0.3
+module room   Kiln   size=0.8 heat=0.6 bloom=0.5 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Sparse drums" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0.2 steps_b=0.4 hits_c=0 hits_d=0 chance=0.3
+  module hats   Ruler   hits_a=0.125 steps_a=1 hits_b=0.3 steps_b=0.73 hits_c=0 hits_d=0 rotate=0.125 chance=0.5
+  module kick   Mortise engine=0 pitch=0.28 punch=0.7 decay=0.4 tone=0.3
+  module rim    Mortise engine=0.25 pitch=0.7 punch=0.8 decay=0.06 tone=0.7
+  module hat    Mortise engine=0.5 pitch=0.55 punch=0.4 decay=0.12 tone=0.6
+
+part drone "Sub drone" colour #3d63c9 level=0.85
+  module bseq   Dovetail steps_a=0.13 steps_b=0.4 interlock=0.5 chance=0.8 glide=0.5 range=0.15
+  module bwarp  Warp     amount=0.15 speed=0.25 rough=0.2 chaos=0.2
+  module bfret  Fret     root=0.4167 scale=0.429 octave=0.25
+  module bosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module benv   Bevel    attack=0.02 decay=0.5 sustain=0.4 release=0.4 curve=0.5
+  module bflt   Plane    cutoff=0.25 res=0.35 mode=0 drive=0.3
+  module bamp   Clamp    level=0 response=0.05
+  module chat   Chatter  energy=0.4 tension=0.3 damping=0.45 rate=0.2 depth=0.6
+  module squeeze Vise    squeeze=0.7 speed=0.7 makeup=0.35
+
+part haze "Radio haze" colour #3d9c8a level=0.5
+  module stat   Static   tune=0.35 width=0.5 hiss=0.3 crackle=0.2 whistle=0.15 fade=0.5 ghost=0.4 level=0.4
+  module shflt  Plane    cutoff=0.5 res=0.2 mode=0.33 drive=0.1
+  module slow   Rocker   rate=0.1 sync=0.7 shape=0 depth=0.6 offset=0.5 phase=0
+
+part bells "Dark mallets" colour #d1a233 level=0.55
+  module mseq   Dovetail steps_a=0.33 steps_b=0.27 interlock=0.8 chance=0.4 glide=0 range=0.3
+  module mfret  Fret     root=0.4167 scale=0.429 octave=0.5
+  module mal    Mallet   material=0.4 size=0.65 strike=0.5 damp=0.55
+  module mecho  Dado     time=0.43 sync=1 feedback=0.62 tone=0.3 thin=0.3 wobble=0.4 drive=0.25 mix=0.5
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable beat.b -> rim.trig
+cable hats.a -> hat.trig
+cable hats.b -> hat.trig
+cable kick.out -> mix.in1
+cable rim.out -> mix.in4
+cable hat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bwarp.in
+cable bwarp.out -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable chat.position -> bflt.cutoff
+cable beat.a -> chat.kick
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable stat.out -> shflt.in
+cable slow.out -> shflt.cutoff
+cable shflt.out -> mix.in6
+
+cable tally1.clock -> mseq.clock
+cable mseq.pitch -> mfret.pitch
+cable mfret.pitch -> mal.voct
+cable mseq.gate -> mal.trig
+cable mal.out -> mecho.in_l
+cable mecho.l -> mix.in5
+cable mecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bflt.cutoff=0.2 slow.depth=0.3 mseq.chance=0.25 mecho.feedback=0.5
+scene B bflt.cutoff=0.4 slow.depth=0.8 mseq.chance=0.6 mecho.feedback=0.75

@@ -1,0 +1,15 @@
+# title: Noise wash
+# about: Band-passed noise swept slowly up and down by an LFO, for a breathing background.
+# port: wash_sweep.lfo1 (cv): the slow sweep, free to patch elsewhere.
+# port: wash_amp.out (audio): the wash, already cabled to out.
+part wash "Noise wash" colour #3d9c8a level=0.4
+  module wash_noise Sawdust colour=0.4 crackle=0
+  module wash_sweep Spokeshave rate=0.08 spread=0.5 shape=0 phase=0.25
+  module wash_filter Plane cutoff=0.4 res=0.55 mode=0.33 drive=0.1
+  module wash_amp Clamp level=0.5 response=0
+
+cable wash_noise.noise -> wash_filter.in
+cable wash_sweep.lfo1 -> wash_filter.cutoff
+cable wash_filter.out -> wash_amp.in
+cable wash_amp.out -> out.l
+cable wash_amp.out -> out.r

@@ -1,0 +1,27 @@
+kerf 1
+tempo 128
+key C minor
+style acid-line seed 1
+tags four-four acid
+
+module tally1 Tally tempo=0.5 swing=0.12 divide=0.5
+module mix    Router level1=0.36
+module out    Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part bass "Bass" colour #3d63c9
+  module seq1 Dovetail steps_a=0.47 steps_b=0.33 interlock=0.85 chance=0.8 glide=0.2 range=0.4
+  module osc1 Chisel   tune=0 shape=0 pw=0.5
+  module env1 Bevel    attack=0 decay=0.45 sustain=0 release=0.25 curve=0.35
+  module flt1 Plane    cutoff=0.32 res=0.8 mode=0 drive=0.45
+  module amp1 Clamp    level=0 response=0.15
+
+cable tally1.clock -> seq1.clock
+cable seq1.pitch -> osc1.voct
+cable seq1.gate -> env1.gate
+cable osc1.saw -> flt1.in
+cable env1.env -> flt1.cutoff
+cable flt1.out -> amp1.in
+cable env1.env -> amp1.cv
+cable amp1.out -> mix.in1
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r

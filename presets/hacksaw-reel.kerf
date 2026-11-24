@@ -1,0 +1,69 @@
+kerf 1
+tempo 150
+key A phrygian
+tags crazy odd-meter
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.8 level2=0.6 level3=0.5 level4=0.65 level5=0.55 level6=0 send=0.25
+module room   Kiln   size=0.4 heat=0.6 bloom=0.2 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part reel "Seven-step reel" colour #c94a3d level=0.9
+  module reel1  Ruler    hits_a=0.571 steps_a=0.4 hits_b=0.357 steps_b=0.867 hits_c=0.43 steps_c=0.4 hits_d=0 rotate=0.14 chance=0.7
+  module kick   Mortise  engine=0 pitch=0.35 punch=0.6 decay=0.3 tone=0.4
+  module snare  Mortise  engine=0.25 pitch=0.5 punch=0.5 decay=0.2 tone=0.65
+  module hat    Mortise  engine=0.5 pitch=0.6 punch=0.4 decay=0.06 tone=0.7
+
+part lead "Folded lead" colour #d1a233 level=0.8
+  module lseq   Dovetail steps_a=0.4 steps_b=0.2 interlock=0.9 chance=0.85 glide=0.05 range=0.25
+  module lfret  Fret     root=0.75 scale=0.857 octave=0.5
+  module losc   Chisel   tune=0.5 shape=0.3 pw=0.5 fm=0.2
+  module lras   Rasp     drive=0.8 fold=0.8 bias=0.5 mix=1
+  module lflt   Plane    cutoff=0.5 res=0.45 mode=0 drive=0
+  module fastb  Burl     rate=0.85 smooth=0.15 bias=0.5
+  module zip    Spokeshave rate=0.8 spread=0.7 shape=0.67 phase=0.5
+  module lenv   Bevel    attack=0 decay=0.2 sustain=0.4 release=0.15 curve=0.3
+  module lamp   Clamp    level=0 response=0.25
+
+part stab "Mallet stabs" colour #3d9c8a level=0.6
+  module smal   Mallet   material=0.5 size=0.35 strike=0.8 damp=0.6
+  module secho  Bandsaw  time=0.375 feedback=0.6 wear=0.5 mix=0.4
+
+cable tally1.clock -> reel1.clock
+cable reel1.a -> kick.trig
+cable reel1.b -> snare.trig
+cable reel1.c -> hat.trig
+cable kick.out -> mix.in1
+cable snare.out -> mix.in2
+cable hat.out -> mix.in3
+
+cable tally1.clock -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> losc.voct
+cable fastb.stepped -> losc.fm
+cable tally1.clock -> fastb.trig
+cable lseq.gate -> lenv.gate
+cable losc.saw -> lras.in
+cable zip.lfo1 -> lras.drive
+cable lras.out -> lflt.in
+cable zip.lfo2 -> lflt.cutoff
+cable lflt.out -> lamp.in
+cable lenv.env -> lamp.cv
+cable lamp.out -> mix.in4
+
+cable reel1.c -> smal.trig
+cable lfret.pitch -> smal.voct
+cable smal.out -> secho.in
+cable tally1.clock -> secho.clock
+cable secho.l -> mix.in5
+cable secho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A reel1.chance=0.7 lras.fold=0.5 lflt.cutoff=0.4 fastb.smooth=0.3 secho.feedback=0.5
+scene B reel1.chance=0.3 lras.fold=1 lflt.cutoff=0.7 fastb.smooth=0.05 secho.feedback=0.8

@@ -1,0 +1,100 @@
+kerf 1
+tempo 108
+key A minor
+tags synthwave disco
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.65 heat=0.5 bloom=0.4 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.25 tone=0.5
+  module r_clap Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module clap Mortise engine=0.75 pitch=0.55 punch=0.5 decay=0.28 tone=0.5
+  module r_ohat Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module ohat Mortise engine=0.5 pitch=0.5 punch=0.5 decay=0.4 tone=0.7
+  module r_chat Ruler hits_a=0 hits_b=1 hits_c=0 hits_d=0 steps_b=1 chance=0.7
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.04 tone=0.65
+
+part bass "Octaves" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=1 steps_b=0.0667 interlock=0 chance=1 glide=0 range=0.1
+  module bassfret Fret root=0.75 scale=0.43 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.15 sustain=0 release=0.2 curve=0.4
+  module bassflt Plane cutoff=0.4 res=0.3 mode=0 drive=0.2
+  module bassamp Clamp level=0 response=0.1
+
+part pad "Haze" colour #7a4fb5 level=0.5
+  module padseq Dovetail steps_a=0.4667 steps_b=0.0667 interlock=0 chance=1 glide=0.1 range=0.3
+  module padfret Fret root=0.75 scale=0.43 octave=0.5
+  module padply Ply layers=1 detune=0.4 width=1 tone=0.45
+  module padflt Plane cutoff=0.45 res=0.15 mode=0 drive=0
+  module paddrift Spokeshave rate=0.12 spread=0.5 shape=0 phase=0.25
+
+part lead "Sync" colour #d1a233 level=0.4
+  module leadseq Dovetail steps_a=0.4667 steps_b=0.2667 interlock=0.5 chance=0.8 glide=0.15 range=0.3
+  module leadfret Fret root=0.75 scale=0.43 octave=0.625
+  module leadosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module leadenv Bevel attack=0 decay=0.3 sustain=0.2 release=0.3 curve=0.4
+  module leadflt Plane cutoff=0.55 res=0.35 mode=0 drive=0.1
+  module leadamp Clamp level=0 response=0.5
+  module leadecho Bandsaw time=0.375 feedback=0.5 wear=0.35 mix=1
+  module vib Warp amount=0.15 speed=0.5 rough=0.3 chaos=0.2
+  module lrock Rocker rate=0.3 shape=0.1 depth=0.5 offset=0.5
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_clap.clock
+cable r_clap.a -> clap.trig
+cable clap.out -> mix.in4
+cable clock.clock -> r_ohat.clock
+cable r_ohat.a -> ohat.trig
+cable ohat.out -> mix.in3
+cable clock.clock -> r_chat.clock
+cable r_chat.b -> chat.trig
+cable chat.out -> mix.in3
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.saw -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in2
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padply.voct
+cable padply.l -> padflt.in
+cable padply.r -> padflt.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable padflt.out -> mix.in6
+
+cable clock.clock -> leadseq.clock
+cable leadseq.pitch -> leadfret.pitch
+cable leadfret.pitch -> vib.in
+cable vib.out -> leadosc.voct
+cable leadseq.gate -> leadenv.gate
+cable leadosc.saw -> leadflt.in
+cable leadflt.out -> leadamp.in
+cable leadenv.env -> leadamp.cv
+cable leadamp.out -> mix.in5
+cable clock.clock -> leadecho.clock
+cable leadamp.out -> leadecho.in
+cable leadecho.l -> mix.in5
+cable leadecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable lrock.out -> leadflt.cutoff
+scene A bassflt.cutoff=0.28 padflt.cutoff=0.3 leadflt.cutoff=0.43
+scene B bassflt.cutoff=0.55 padflt.cutoff=0.65 leadflt.cutoff=0.7

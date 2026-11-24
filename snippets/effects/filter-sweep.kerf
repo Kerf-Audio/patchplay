@@ -1,0 +1,12 @@
+# title: Filter sweep
+# about: A resonant low-pass opened and closed by a slow LFO. Take the source's cable to out away to hear only the filtered sound.
+# feed: sweep_filter.in
+# port: sweep_lfo.lfo1 (cv): the sweep. Raise sweep_lfo's rate param to speed it up.
+# port: sweep_filter.out (audio): the filtered sound, already cabled to out.
+part sweep "Filter sweep" colour #d1a233
+  module sweep_lfo Spokeshave rate=0.1 spread=0.4 shape=0 phase=0.25
+  module sweep_filter Plane cutoff=0.25 res=0.55 mode=0 drive=0.1
+
+cable sweep_lfo.lfo1 -> sweep_filter.cutoff
+cable sweep_filter.out -> out.l
+cable sweep_filter.out -> out.r

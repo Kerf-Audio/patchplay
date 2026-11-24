@@ -1,0 +1,72 @@
+kerf 1
+tempo 112
+key D phrygian
+tags crazy glitch
+
+module tally1 Tally tempo=0.5 swing=0.15 divide=0.5
+module mix    Router level1=0.7 level2=0.7 level3=0.5 level4=0.6 level5=0.6 level6=0 send=0.3
+module room   Kiln   size=0.5 heat=0.5 bloom=0.3 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part cutter "Glitch slicer" colour #c94a3d level=0.9
+  module cut    Ruler    hits_a=0.545 steps_a=0.667 hits_b=0.538 steps_b=0.8 hits_c=0.4 steps_c=0.267 hits_d=0 rotate=0 chance=0.8
+  module slice1 Veneer   slice=0.2 speed=0.5 reverse=0 looped=0
+  module slice2 Veneer   slice=0.6 speed=0.7 reverse=0.7 looped=0
+  module pick1  Burl     rate=0.5 smooth=0 bias=0.5
+  module pick2  Burl     rate=0.5 smooth=0 bias=0.5
+  module feed   Bandsaw  time=0.375 feedback=0.85 wear=0.6 mix=0.5
+
+part tick "Ticks" colour #d1a233 level=0.6
+  module tick   Mortise  engine=0.5 pitch=0.7 punch=0.3 decay=0.05 tone=0.8
+  module thump  Mortise  engine=0 pitch=0.25 punch=0.6 decay=0.35 tone=0.3
+
+part low "Low drone" colour #3d63c9 level=0.7
+  module lseq   Dovetail steps_a=0.4 steps_b=0.27 interlock=0.8 chance=0.6 glide=0.3 range=0.1
+  module lfret  Fret     root=0.1667 scale=0.857 octave=0.25
+  module losc   Lathe    tune=0.5 table=0.4 turn=0.3 warp=0.4
+  module lenv   Bevel    attack=0.02 decay=0.5 sustain=0.5 release=0.4 curve=0.4
+  module lamp   Clamp    level=0 response=0.2
+  module jolt Chatter energy=0.6 tension=0.5 damping=0.3 rate=0.5 depth=0.6
+
+cable tally1.clock -> cut.clock
+cable cut.a -> slice1.trig
+cable cut.a -> pick1.trig
+cable pick1.stepped -> slice1.slice
+cable cut.b -> slice2.trig
+cable cut.b -> pick2.trig
+cable pick2.stepped -> slice2.slice
+cable slice1.l -> mix.in1
+cable slice1.r -> mix.in1
+cable slice2.l -> mix.in2
+cable slice2.r -> mix.in2
+cable slice1.l -> feed.in
+cable slice2.r -> feed.in
+cable tally1.clock -> feed.clock
+cable feed.l -> mix.in3
+cable feed.r -> mix.in3
+
+cable cut.c -> tick.trig
+cable cut.a -> thump.trig
+cable tick.out -> mix.in4
+cable thump.out -> mix.in4
+
+cable tally1.clock -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> losc.voct
+cable lseq.gate -> lenv.gate
+cable losc.out -> lamp.in
+cable lenv.env -> lamp.cv
+cable lamp.out -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable cut.c -> jolt.kick
+cable jolt.position -> feed.time
+cable jolt.velocity -> losc.turn
+scene A cut.chance=0.8 feed.feedback=0.7 slice1.speed=0.5 slice2.speed=0.7 lseq.chance=0.5
+scene B cut.chance=0.4 feed.feedback=0.88 slice1.speed=0.8 slice2.speed=0.35 lseq.chance=0.9

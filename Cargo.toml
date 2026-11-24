@@ -1,0 +1,80 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "xtask"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/Kerf-Audio/patchplay"
+publish = false
+
+[workspace.dependencies]
+kerf-core = { path = "crates/kerf-core" }
+kerf-modules = { path = "crates/kerf-modules" }
+kerf-dsp = { path = "crates/kerf-dsp" }
+# The feature-gated crates: the desktop members opt in to `files` and `device`; the wasm build does not.
+kerf-engine = { path = "crates/kerf-engine", default-features = false }
+kerf-gen = { path = "crates/kerf-gen" }
+kerf-session = { path = "crates/kerf-session" }
+kerf-audio = { path = "crates/kerf-audio", default-features = false }
+kerf-mcp = { path = "crates/kerf-mcp" }
+kerf-bridge = { path = "crates/kerf-bridge" }
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+ctrlc = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+toml = "0.8"
+cpal = "0.18"
+rtrb = "0.3"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+# The generator renders six seconds of audio to check every patch it makes; unoptimised that is
+# over a second per Random press, optimised a quarter of that.
+[profile.dev.package.kerf-dsp]
+opt-level = 3
+
+[profile.dev.package.kerf-modules]
+opt-level = 3
+
+[profile.dev.package.kerf-engine]
+opt-level = 3
+
+[profile.dev.package.kerf-gen]
+opt-level = 3
+
+[profile.dev.package.kerf-core]
+opt-level = 3
+
+[profile.dev.package.kerf-session]
+opt-level = 3
+
+# The browser build (`scripts/build-web.sh`): small and fast over quick to compile.
+[profile.web]
+inherits = "release"
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+# Speed over size for the sound engine: Random, Evolve and Breed render seconds of audio on the
+# page's main thread to check each patch, and the worklet renders every block live.
+[profile.web.package.kerf-dsp]
+opt-level = 3
+
+[profile.web.package.kerf-modules]
+opt-level = 3
+
+[profile.web.package.kerf-engine]
+opt-level = 3
+
+[profile.web.package.kerf-gen]
+opt-level = 3

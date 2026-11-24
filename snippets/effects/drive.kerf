@@ -1,0 +1,12 @@
+# title: Drive and fold
+# about: Clips and folds the sound, then rolls off the harsh top. Take the source's cable to out away to hear only the driven sound.
+# feed: drive_rasp.in
+# port: drive_rasp.drive (cv): move the drive from an envelope or LFO.
+# port: drive_tone.out (audio): the driven sound, already cabled to out.
+part drive "Drive and fold" colour #d1a233
+  module drive_rasp Rasp drive=0.6 fold=0.25 bias=0.55 mix=1
+  module drive_tone Plane cutoff=0.75 res=0.1 mode=0 drive=0
+
+cable drive_rasp.out -> drive_tone.in
+cable drive_tone.out -> out.l
+cable drive_tone.out -> out.r

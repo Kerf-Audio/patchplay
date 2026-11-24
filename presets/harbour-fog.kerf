@@ -1,0 +1,92 @@
+kerf 1
+tempo 116
+key A minor
+style dub-chamber seed 1
+tags abstract dub
+
+module tally1 Tally tempo=0.5 swing=0.06 divide=0.5
+module mix    Router level1=0.45 level2=0.3 level3=0.45 level4=0.55 level5=0.36 level6=0.33 send=0.3
+module out    Finish volume=0.66 glue=0.45 ceiling=0.8
+
+part drums "Drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.125 steps_a=1 hits_b=0.5 steps_b=0.733 hits_c=0.34 steps_c=0.333 hits_d=0 chance=0.8
+  module ruler2 Ruler   hits_a=0.0625 steps_a=1 hits_b=0.15 steps_b=0.8 hits_c=0 hits_d=0 rotate=0.5 chance=0.5
+  module kick   Mortise engine=0 pitch=0.3 punch=0.5 decay=0.35 tone=0.35
+  module snare  Mortise engine=0.25 pitch=0.45 punch=0.55 decay=0.45 tone=0.4
+  module hat    Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.2 tone=0.55
+  module rim    Mortise engine=1 pitch=0.8 punch=0.7 decay=0.1 tone=0.6
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.2 steps_b=0.33 interlock=0.7 chance=0.75 glide=0.3 range=0.1
+  module bfret Fret     root=0.75 scale=0.143 octave=0.25
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.55 sustain=0.3 release=0.45 curve=0.4
+  module bamp  Clamp    level=0 response=0.1
+
+part stab "Stab pad" colour #7a4fb5
+  module ruler3 Ruler   hits_a=0.125 steps_a=1 hits_b=0.28 steps_b=0.4 hits_c=0 hits_d=0 rotate=0.125 chance=0.55
+  module sseq   Dovetail steps_a=0.4 steps_b=0.2 interlock=0.5 chance=0.65 glide=0 range=0.25
+  module sfret  Fret     root=0.75 scale=0.143 octave=0.375
+  module ply1   Ply      layers=0.55 detune=0.45 width=0.8 tone=0.45
+  module senv   Bevel    attack=0 decay=0.32 sustain=0 release=0.3 curve=0.35
+  module samp   Clamp    level=0 response=0.45
+
+part texture "Texture" colour #3d9c8a
+  module sand  Sawdust   colour=0.4 crackle=0.35
+  module sweep Spokeshave rate=0.12 spread=0.6 shape=0.1 phase=0.3
+  module nflt  Plane     cutoff=0.4 res=0.55 mode=0.33 drive=0.1
+  module namp  Clamp     level=0.4 response=0
+
+part space "Space" colour #d1a233
+  module delay Dado       time=0.43 sync=1 feedback=0.7 tone=0.4 thin=0.3 wobble=0.4 drive=0.25 mix=1
+  module room  Kiln      size=0.85 heat=0.55 bloom=0.6 mix=1
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler1.b -> hat.trig
+cable ruler1.c -> rim.trig
+cable ruler2.a -> snare.trig
+cable ruler2.b -> snare.trig
+cable kick.out -> mix.in1
+cable hat.out -> mix.in2
+cable snare.out -> mix.in3
+
+cable tally1.div4 -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.sine -> bamp.in
+cable bosc.sub -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> mix.in5
+
+cable tally1.clock -> ruler3.clock
+cable tally1.clock -> sseq.clock
+cable sseq.pitch -> sfret.pitch
+cable sfret.pitch -> ply1.voct
+cable ruler3.a -> senv.gate
+cable ruler3.b -> senv.gate
+cable ply1.l -> samp.in
+cable ply1.r -> samp.in
+cable senv.env -> samp.cv
+cable samp.out -> mix.in4
+
+cable sand.noise -> nflt.in
+cable sweep.lfo2 -> nflt.cutoff
+cable nflt.out -> namp.in
+cable sand.dust -> namp.in
+cable namp.out -> mix.in6
+
+cable samp.out -> delay.in_l
+cable snare.out -> delay.in_r
+cable rim.out -> delay.in_l
+cable delay.l -> room.in_l
+cable delay.r -> room.in_r
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r

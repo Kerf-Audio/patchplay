@@ -1,0 +1,80 @@
+kerf 1
+tempo 124
+key D minor pentatonic
+tags minimal techno
+
+module clock Tally tempo=0.5 swing=0.12 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.5 level4=0.5 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.25 tone=0.5
+  module r_chat Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.1 tone=0.65
+  module r_tick Ruler hits_a=0 hits_b=0.4375 hits_c=0 hits_d=0 steps_b=1 chance=0.6
+  module tick Mortise engine=0.5 pitch=0.75 punch=0.5 decay=0.03 tone=0.65
+  module r_clap Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module clap Mortise engine=0.75 pitch=0.55 punch=0.5 decay=0.25 tone=0.5
+  module r_rim Ruler hits_a=0 hits_b=0.125 hits_c=0 hits_d=0 steps_b=1 rotate=0.75 chance=0.4
+  module rim Mortise engine=0.75 pitch=0.8 punch=0.5 decay=0.1 tone=0.5
+
+part bass "Pulse" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=1 steps_b=0.2667 interlock=0.5 chance=0.8 glide=0.05 range=0.2
+  module bassfret Fret root=0.1667 scale=0.14 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.25 sustain=0.25 release=0.2 curve=0.4
+  module bassflt Plane cutoff=0.33 res=0.3 mode=0 drive=0.2
+  module bassamp Clamp level=0 response=0.1
+
+part mal "Knock" colour #3da36b level=0.7
+  module malseq Dovetail steps_a=0.6667 steps_b=0.4 interlock=0.3 chance=0.6 glide=0 range=0.4
+  module malfret Fret root=0.1667 scale=0.14 octave=0.5
+  module malmal Mallet material=0.15 size=0.35 strike=0.6 damp=0.55
+  module malecho Bandsaw time=0.375 feedback=0.5 wear=0.4 mix=1
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_tick.clock
+cable r_tick.b -> tick.trig
+cable tick.out -> mix.in3
+cable clock.clock -> r_clap.clock
+cable r_clap.a -> clap.trig
+cable clap.out -> mix.in4
+cable clock.clock -> r_rim.clock
+cable r_rim.b -> rim.trig
+cable rim.out -> mix.in4
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.square -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in2
+
+cable clock.clock -> malseq.clock
+cable malseq.pitch -> malfret.pitch
+cable malfret.pitch -> malmal.voct
+cable malseq.gate -> malmal.trig
+cable malmal.out -> mix.in5
+cable clock.clock -> malecho.clock
+cable malmal.out -> malecho.in
+cable malecho.l -> mix.in5
+cable malecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bassflt.cutoff=0.21 malmal.damp=0.4
+scene B bassflt.cutoff=0.48 malmal.damp=0.75

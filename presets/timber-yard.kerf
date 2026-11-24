@@ -1,0 +1,73 @@
+kerf 1
+tempo 70
+key C major pentatonic
+tags ambient wash
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.55 level6=0.65 send=0.5
+module room Kiln size=0.9 heat=0.35 bloom=0.6 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+part pad "Glass swells" colour #7a4fb5 level=0.4
+  module padseq Dovetail steps_a=0.2 steps_b=0.0667 interlock=0 chance=0.9 glide=0.1 range=0.6
+  module padfret Fret root=0 scale=0 octave=0.5
+  module padmitre Mitre chord=0.77 inversion=0.33 spread=0.33 root=0
+  module padl1 Lathe tune=0.62 table=0.12 turn=0.3 warp=0.1
+  module padl2 Lathe tune=0.62 table=0.12 turn=0.45 warp=0.15
+  module padl3 Lathe tune=0.62 table=0.12 turn=0.6 warp=0.1
+  module padl4 Lathe tune=0.62 table=0.12 turn=0.75 warp=0.2
+  module padflt Plane cutoff=0.62 res=0.18 mode=0 drive=0
+  module padfltr Plane cutoff=0.62 res=0.18 mode=0 drive=0
+  module padtread Tread step1=0.3 step2=0.7 step3=0.45 step4=0.85 step5=0.55 step6=0.35 step7=0.75 step8=0.5 length=0.5 direction=0.67 glide=0.9 depth=0.4
+  module padrock Rocker rate=0.18 shape=0.1 depth=0.6 offset=0.5
+part mal "Chimes" colour #3da36b level=0.7
+  module malseq Dovetail steps_a=1 steps_b=0.4 interlock=0.3 chance=0.5 glide=0 range=0.5
+  module malfret Fret root=0 scale=0 octave=0.625
+  module malmal Mallet material=0.6 size=0.3 strike=0.4 damp=0.65
+  module malecho Bandsaw time=0.375 feedback=0.6 wear=0.4 mix=1
+part tex "Wind" colour #3da3a3 level=0.3
+  module texsrc Sawdust colour=0.6 crackle=0.05
+  module texflt Plane cutoff=0.5 res=0.2 mode=0 drive=0.1
+  module texamp Clamp level=0.5 response=0.4
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module texlfo Spokeshave rate=0.03 spread=0.5 shape=0 phase=0.25
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padmitre.pitch
+cable padmitre.voice1 -> padl1.voct
+cable padmitre.voice2 -> padl2.voct
+cable padmitre.voice3 -> padl3.voct
+cable padmitre.voice4 -> padl4.voct
+cable padl1.out -> padflt.in
+cable padl3.out -> padflt.in
+cable padl2.out -> padfltr.in
+cable padl4.out -> padfltr.in
+cable clock.div4 -> padtread.clock
+cable padtread.cv -> padflt.cutoff
+cable padrock.out -> padfltr.cutoff
+cable padrock.inverted -> padl2.turn
+cable padtread.cv -> padl4.turn
+cable padflt.out -> out.l
+cable padfltr.out -> out.r
+cable padflt.out -> room.in_l
+cable padfltr.out -> room.in_r
+cable clock.div4 -> malseq.clock
+cable malseq.pitch -> malfret.pitch
+cable malfret.pitch -> malmal.voct
+cable malseq.gate -> malmal.trig
+cable malmal.out -> mix.in5
+cable clock.clock -> malecho.clock
+cable malmal.out -> malecho.in
+cable malecho.l -> mix.in5
+cable malecho.r -> mix.in5
+cable texsrc.noise -> texflt.in
+cable texflt.out -> texamp.in
+cable texamp.out -> mix.in6
+cable texburl.drift -> texflt.cutoff
+cable texlfo.lfo1 -> texflt.cutoff
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+scene A padflt.cutoff=0.5 padfltr.cutoff=0.5 malmal.damp=0.5 texflt.cutoff=0.38
+scene B padflt.cutoff=0.75 padfltr.cutoff=0.75 malmal.damp=0.85 texflt.cutoff=0.65

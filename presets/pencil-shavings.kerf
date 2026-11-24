@@ -1,0 +1,51 @@
+kerf 1
+tempo 90
+key E minor pentatonic
+tags granular texture
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.7 level6=0.6 send=0.4
+module room Kiln size=0.8 heat=0.5 bloom=0.5 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part mal "Marimba" colour #3da36b level=0.7
+  module malseq Dovetail steps_a=1 steps_b=0.2667 interlock=0.3 chance=0.8 glide=0 range=0.6
+  module malfret Fret root=0.3333 scale=0.14 octave=0.5
+  module malmal Mallet material=0.2 size=0.5 strike=0.5 damp=0.45
+
+part gr "Clouds" colour #8a8f98 level=0.8
+  module grg Shavings size=0.35 density=0.7 spray=0.5 pitch=0.55
+  module grfr Ruler hits_a=0.0625 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+
+part drone "Floor" colour #7a4fb5 level=0.4
+  module droneflt Plane cutoff=0.35 res=0.2 mode=0 drive=0.1
+  module dronelfo Spokeshave rate=0.05 spread=0.6 shape=0 phase=0.25
+  module droneo0 Chisel tune=0.25 fine=0.5 shape=0.4 pw=0.5
+  module droneo1 Chisel tune=0.5 fine=0.49 shape=0.4 pw=0.5
+
+cable clock.clock -> malseq.clock
+cable malseq.pitch -> malfret.pitch
+cable malfret.pitch -> malmal.voct
+cable malseq.gate -> malmal.trig
+cable malmal.out -> mix.in5
+
+cable malmal.out -> grg.in
+cable clock.clock -> grfr.clock
+cable grfr.a -> grg.freeze
+cable grg.l -> mix.in6
+cable grg.r -> mix.in6
+
+cable droneo0.sine -> droneflt.in
+cable droneo1.sine -> droneflt.in
+cable dronelfo.lfo1 -> droneflt.cutoff
+cable droneflt.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A malmal.damp=0.3 grg.spray=0.35 droneflt.cutoff=0.23
+scene B malmal.damp=0.65 grg.spray=0.7 droneflt.cutoff=0.53

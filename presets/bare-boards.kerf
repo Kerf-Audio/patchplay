@@ -1,0 +1,81 @@
+kerf 1
+tempo 122
+key C dorian
+tags four-four minimal
+
+module tally1 Tally tempo=0.5 swing=0.1 divide=0.5
+module mix    Router level1=0.85 level2=0.95 level3=0.4 level4=0.55 level5=0.5 level6=0.45 send=0.3
+module room   Kiln   size=0.45 heat=0.55 bloom=0.2 mix=1
+module out    Finish volume=0.7 glue=0.35 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0.45 steps_b=0.4 hits_c=0 hits_d=0 chance=0.5
+  module rim    Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25 chance=1
+  module hats   Ruler   hits_a=0.25 steps_a=1 hits_b=0.25 steps_b=0.6 hits_c=0 hits_d=0 rotate=0.125 chance=0.4
+  module kick   Mortise engine=0 pitch=0.3 punch=0.55 decay=0.3 tone=0.3
+  module chat   Mortise engine=0.5 pitch=0.6 punch=0.4 decay=0.06 tone=0.6
+  module tick   Mortise engine=0.5 pitch=0.75 punch=0.3 decay=0.04 tone=0.8
+  module clave  Mallet  material=0.1 size=0.25 strike=0.7 damp=0.75
+  module pick   Burl    rate=0.5 smooth=0.2 bias=0.5
+  module hit    Level   attack=0.05 release=0.4 gain=0.6
+
+part sub "Sub" colour #3d63c9
+  module sseq  Dovetail steps_a=0.07 steps_b=0.2 interlock=1 chance=1 glide=0.2 range=0.05
+  module sfret Fret     root=0 scale=0.571 octave=0.25
+  module sosc  Lathe    tune=0.5 table=0.05 turn=0.15 warp=0
+  module senv  Bevel    attack=0.02 decay=0.5 sustain=0.5 release=0.3 curve=0.5
+  module samp  Clamp    level=0 response=0.1
+  module sduck Clamp    level=0 response=0
+  module sdip  Bevel    attack=0 decay=0.3 sustain=0 release=0.3 curve=0.3
+
+part hook "Two-note hook" colour #d1a233 level=0.7
+  module hseq  Dovetail steps_a=0.47 steps_b=0.2 interlock=0.9 chance=0.55 glide=0 range=0.12
+  module hfret Fret     root=0 scale=0.571 octave=0.5
+  module hmal  Mallet   material=0.5 size=0.4 strike=0.55 damp=0.45
+  module hecho Bandsaw  time=0.375 feedback=0.55 wear=0.4 mix=0.5
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> rim.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable beat.a -> sdip.gate
+cable beat.b -> pick.trig
+cable hats.b -> tick.trig
+cable rim.a -> clave.trig
+cable hats.a -> chat.trig
+cable pick.drift -> sosc.turn
+cable kick.out -> hit.in
+cable kick.out -> mix.in1
+cable chat.out -> mix.in3
+cable tick.out -> mix.in3
+cable clave.out -> mix.in4
+
+cable tally1.clock -> sseq.clock
+cable sseq.pitch -> sfret.pitch
+cable sfret.pitch -> sosc.voct
+cable hit.env -> sosc.turn
+cable sseq.gate -> senv.gate
+cable sosc.out -> samp.in
+cable senv.env -> samp.cv
+cable samp.out -> sduck.in
+cable sdip.inverted -> sduck.cv
+cable sduck.out -> mix.in2
+
+cable tally1.clock -> hseq.clock
+cable hseq.pitch -> hfret.pitch
+cable hfret.pitch -> hmal.voct
+cable hseq.gate -> hmal.trig
+cable hmal.out -> hecho.in
+cable tally1.clock -> hecho.clock
+cable hecho.l -> mix.in5
+cable hecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A hats.chance=0.25 hseq.chance=0.4 hecho.feedback=0.45 sosc.turn=0.1 hmal.material=0.4
+scene B hats.chance=0.6 hseq.chance=0.8 hecho.feedback=0.7 sosc.turn=0.4 hmal.material=0.7

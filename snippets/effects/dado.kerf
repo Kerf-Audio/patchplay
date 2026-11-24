@@ -1,0 +1,11 @@
+# title: Dado dub echo
+# about: A dub echo whose repeats get duller and thinner. Each one comes back a little more worn. Wet only.
+# feed: dado_echo.in_l
+# port: dado_echo.throw (gate): when patched, sound enters the echoes only while this is high.
+# port: dado_echo.time (cv): move the echo time; sweeps make the repeats dive and climb.
+# port: dado_echo.l, dado_echo.r (audio): the echoes, already cabled to out.
+part dado "Dado echo" colour #d1a233
+  module dado_echo Dado time=0.68 sync=0 feedback=0.6 tone=0.45 thin=0.25 wobble=0.3 drive=0.25 mix=1
+
+cable dado_echo.l -> out.l
+cable dado_echo.r -> out.r

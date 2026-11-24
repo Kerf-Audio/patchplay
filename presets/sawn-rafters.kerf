@@ -1,0 +1,92 @@
+kerf 1
+tempo 76
+key A dorian
+tags wash ambient dub
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.55 level6=0.65 send=0.5
+module room Kiln size=0.95 heat=0.4 bloom=0.6 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part pad "Wash" colour #7a4fb5 level=0.42
+  module padseq Dovetail steps_a=0.0667 steps_b=0.0667 interlock=0 chance=0.8 glide=0.1 range=0.5
+  module padfret Fret root=0.75 scale=0.57 octave=0.5
+  module padmitre Mitre chord=0.69 inversion=0.33 spread=0.33 root=0.75
+  module padc1 Chisel tune=0.5 fine=0.5 shape=0.3 pw=0.5
+  module padc2 Chisel tune=0.5 fine=0.51 shape=0.3 pw=0.5
+  module padc3 Chisel tune=0.5 fine=0.49 shape=0.3 pw=0.5
+  module padc4 Chisel tune=0.5 fine=0.5 shape=0.3 pw=0.5
+  module padflt Plane cutoff=0.42 res=0.5 mode=0.33 drive=0.1
+  module padfltr Plane cutoff=0.46 res=0.5 mode=0.33 drive=0.1
+  module padrock Rocker rate=0.3 shape=0.12 depth=0.7 offset=0.5
+  module paddub Dado time=0.55 sync=0 feedback=0.7 tone=0.4 thin=0.35 wobble=0.35 drive=0.3 mix=0.7
+  module padthrow Ruler hits_a=0.1 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+
+part chord "Echo chord" colour #d1a233 level=0.5
+  module chordseq Dovetail steps_a=0.2 steps_b=0.1333 interlock=0.3 chance=0.6 glide=0.4 range=0.25
+  module chordfret Fret root=0.75 scale=0.57 octave=0.5
+  module chordosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module chordenv Bevel attack=0 decay=0.4 sustain=0.2 release=0.3 curve=0.4
+  module chordflt Plane cutoff=0.5 res=0.2 mode=0 drive=0.15
+  module chordamp Clamp level=0 response=0.5
+  module chordecho Bandsaw time=0.5 feedback=0.75 wear=0.35 mix=1
+
+part tex "Surf" colour #3da3a3 level=0.35
+  module texsrc Sawdust colour=0.4 crackle=0.05
+  module texflt Plane cutoff=0.4 res=0.15 mode=0 drive=0.1
+  module texamp Clamp level=0.5 response=0.4
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module texlfo Spokeshave rate=0.05 spread=0.5 shape=0 phase=0.25
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+
+cable clock.div4 -> chordseq.clock
+cable chordseq.pitch -> chordfret.pitch
+cable chordfret.pitch -> chordosc.voct
+cable chordseq.gate -> chordenv.gate
+cable chordosc.sine -> chordflt.in
+cable chordflt.out -> chordamp.in
+cable chordenv.env -> chordamp.cv
+cable chordamp.out -> mix.in5
+cable clock.clock -> chordecho.clock
+cable chordamp.out -> chordecho.in
+cable chordecho.l -> mix.in5
+cable chordecho.r -> mix.in5
+
+cable texsrc.noise -> texflt.in
+cable texflt.out -> texamp.in
+cable texamp.out -> mix.in6
+cable texburl.drift -> texflt.cutoff
+cable texlfo.lfo1 -> texflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable padfret.pitch -> padmitre.pitch
+cable padmitre.voice1 -> padc1.voct
+cable padmitre.voice2 -> padc2.voct
+cable padmitre.voice3 -> padc3.voct
+cable padmitre.voice4 -> padc4.voct
+cable padc1.saw -> padflt.in
+cable padc3.saw -> padflt.in
+cable padc2.saw -> padfltr.in
+cable padc4.saw -> padfltr.in
+cable padrock.out -> padflt.cutoff
+cable padrock.inverted -> padfltr.cutoff
+cable padflt.out -> out.l
+cable padfltr.out -> out.r
+cable padflt.out -> paddub.in_l
+cable padfltr.out -> paddub.in_r
+cable clock.clock -> padthrow.clock
+cable padthrow.a -> paddub.throw
+cable paddub.l -> room.in_l
+cable paddub.r -> room.in_r
+cable paddub.l -> out.l
+cable paddub.r -> out.r
+scene A padflt.cutoff=0.25 chordflt.cutoff=0.38 texflt.cutoff=0.28
+scene B padflt.cutoff=0.6 chordflt.cutoff=0.65 texflt.cutoff=0.55

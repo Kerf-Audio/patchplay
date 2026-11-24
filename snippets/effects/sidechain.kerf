@@ -1,0 +1,9 @@
+# title: Sidechain compressor
+# about: A compressor that squeezes one sound whenever another is loud, for real pumping. Cable a pad to in and the kick (kick_drum.out) to side, and move the pad's cable from out to this.
+# feed: pump_comp.in, pump_comp.side
+# port: pump_comp.out (audio): the squeezed sound, already cabled to out.
+part pump "Sidechain" colour #d1a233
+  module pump_comp Vise squeeze=0.8 speed=0.6 makeup=0.4
+
+cable pump_comp.out -> out.l
+cable pump_comp.out -> out.r

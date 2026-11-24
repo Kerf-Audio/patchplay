@@ -1,0 +1,12 @@
+# title: Backbeat snare
+# about: A snare on beats 2 and 4.
+# port: snare_rhythm.a (gate): the snare's trigger.
+# port: snare_drum.out (audio): the snare, already cabled to out.
+part snare "Snare" colour #c94a3d level=0.75
+  module snare_rhythm Ruler hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25
+  module snare_drum Mortise engine=0.25 pitch=0.45 punch=0.55 decay=0.4 tone=0.5
+
+cable clock.clock -> snare_rhythm.clock
+cable snare_rhythm.a -> snare_drum.trig
+cable snare_drum.out -> out.l
+cable snare_drum.out -> out.r

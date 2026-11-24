@@ -1,0 +1,171 @@
+kerf 1
+tempo 96
+key B minor
+tags synthwave night drive
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module mix Router level1=0.8 level2=0.8 level3=0.6 level4=0.5 level5=0.6 level6=0.9 send=0.4
+module room Kiln size=0.9 heat=0.5 bloom=0.4 mix=1
+module out Finish volume=0.45 glue=0.4 ceiling=0.8
+
+part harm "Chords" colour #7a4fb5
+  module chordr Inlay length=0.2 transpose=0.5 octave=0.25 gate=0.95 glide=0 step1=0.48 step2=0.4 step3=0.32 step4=0.28 step5=0 step6=0 step7=0 step8=0 step9=0 step10=0 step11=0 step12=0 step13=0 step14=0 step15=0 step16=0
+  module chordt Tread step1=0.4231 step2=0.3462 step3=0.3462 step4=0.3462 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 glide=0 rate=0.5 direction=0
+  module chord Mitre chord=0.1538 inversion=0 spread=0.67 root=0.75
+
+part drums "Drums" colour #c94a3d level=0.75
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0 chance=1
+  module kick Mortise engine=0 pitch=0.36 punch=0.5 decay=0.25 tone=0.4
+  module r_snare Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.5 chance=1
+  module snare Mortise engine=0.25 pitch=0.4 punch=0.6 decay=0.3 tone=0.5
+  module snarek Kiln size=0.95 heat=0.5 bloom=0.05 mix=1
+  module snaree Bevel attack=0 decay=0.5 sustain=1 release=0.62 curve=0.9
+  module snarecl Clamp level=0 response=0
+  module snarecr Clamp level=0 response=0
+  module r_hat Ruler hits_a=0 hits_b=0.5 hits_c=0 hits_d=0 steps_b=1 rotate=0 chance=0.6
+  module hat Mortise engine=0.5 pitch=0.6 punch=0.4 decay=0.04 tone=0.6
+
+part bass "Sub pulse" colour #3d63c9 level=0.65
+  module bassinl Inlay length=0.9333 transpose=0.5 octave=0.25 gate=0.55 glide=0 step1=0.52 step2=0.04 step3=0.04 step4=0.04 step5=0.04 step6=0.04 step7=0.04 step8=0.04 step9=0.52 step10=0.04 step11=0.04 step12=0.04 step13=0.04 step14=0.04 step15=0.04 step16=0.04
+  module basso Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassp Plane cutoff=0.3 res=0.2 mode=0 drive=0.1
+  module basse Bevel attack=0 decay=0.25 sustain=0.6 release=0.1 curve=0.5
+  module bassa Clamp level=0 response=0.1
+  module basshp Plane cutoff=0.06 res=0 mode=0.67 drive=0
+
+part arp "Down arp" colour #3da3a3 level=0.8
+  module arp Rung pattern=0.14 octaves=0.5 rate=0.5 length=0.4 swing=0 ratchet=0.3
+  module arpsw Tread step1=0.3 step2=0.5 step3=0.65 step4=0.4 step5=0.75 step6=0.45 step7=0.6 step8=0.35 length=0.8 glide=0.3 rate=0.5
+  module arpvw Warp amount=0.05 speed=0.2 rough=0.1 chaos=0.1
+  module arpvo Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module arpvp Plane cutoff=0.45 res=0.55 mode=0 drive=0.1
+  module arpve Bevel attack=0 decay=0.2 sustain=0.3 release=0.25 curve=0.5
+  module arpva Clamp level=0 response=0.2
+  module arpecho Dado time=0.57 sync=1 feedback=0.65 tone=0.4 thin=0.3 wobble=0.3 drive=0.1 mix=1
+  module arpechoh Plane cutoff=0.2 res=0 mode=0.67 drive=0
+
+part lead "Slow lead" colour #d1a233 level=0.8
+  module leadinl Inlay length=1 transpose=0.5 octave=0.75 gate=0.9 glide=0.5 step1=0.28 step2=0 step3=0 step4=0.12 step5=0.2 step6=0 step7=0.28 step8=0.4 step9=0.48 step10=0 step11=0 step12=0.4 step13=0.28 step14=0 step15=0.2 step16=0
+  module vib Rocker rate=0.35 depth=0.015 offset=0.5
+  module leadw Warp amount=0.1 speed=0.2 rough=0.1 chaos=0.1
+  module leado Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module leado2 Chisel tune=0.5 fine=0.54 shape=0.2 pw=0.5
+  module leadp Plane cutoff=0.38 res=0.3 mode=0 drive=0.1
+  module leade Bevel attack=0.1 decay=0.4 sustain=0.7 release=0.5 curve=0.5
+  module leada Clamp level=0 response=0.2
+  module leadecho Dado time=0.75 sync=1 feedback=0.6 tone=0.4 thin=0.3 wobble=0.3 drive=0.1 mix=1
+  module leadechoh Plane cutoff=0.2 res=0 mode=0.67 drive=0
+
+part pad "Dark pad" colour #7a4fb5 level=0.5
+  module padfl Plane cutoff=0.3 res=0.25 mode=0 drive=0
+  module padfr Plane cutoff=0.3 res=0.25 mode=0 drive=0
+  module padw0 Warp amount=0.12 speed=0.15 rough=0.1 chaos=0.1
+  module padp0 Ply layers=0.8 detune=0.4 width=1 tone=0.35
+  module padw1 Warp amount=0.12 speed=0.18 rough=0.1 chaos=0.1
+  module padp1 Ply layers=0.8 detune=0.4 width=1 tone=0.35
+  module padw2 Warp amount=0.12 speed=0.21 rough=0.1 chaos=0.1
+  module padp2 Ply layers=0.8 detune=0.4 width=1 tone=0.35
+  module padrock Rocker rate=0.03 depth=0.3 offset=0.5
+
+part radio "Radio" colour #c94a3d level=1
+  module radio Static tune=0.55 width=0.6 hiss=0.25 crackle=0.2 whistle=0.35 fade=0.4 ghost=0.6 level=0.6
+
+part siren "Distant siren" colour #c94a3d level=1
+  module rs Ruler hits_a=0 hits_b=0 hits_c=0.0625 hits_d=0 steps_c=1 rotate=0 chance=0.3
+  module sr Siren pitch=0.5 range=0.45 rate=0.3 sync=0 shape=0 wave=0.5 release=0.6 cutoff=0.45 resonance=0.3 drive=0.05
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.bar -> chordr.clock
+cable clock.bar -> chordt.clock
+cable chordr.pitch -> chord.pitch
+cable chordt.cv -> chord.chord
+cable chordr.gate -> chord.gate
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_snare.clock
+cable r_snare.a -> snare.trig
+cable r_snare.a -> snaree.gate
+cable snare.out -> mix.in3
+cable snare.out -> snarek.in_l
+cable snare.out -> snarek.in_r
+cable snarek.l -> snarecl.in
+cable snarek.r -> snarecr.in
+cable snaree.env -> snarecl.cv
+cable snaree.env -> snarecr.cv
+cable snarecl.out -> out.l
+cable snarecr.out -> out.r
+cable clock.clock -> r_hat.clock
+cable r_hat.b -> hat.trig
+cable hat.out -> mix.in3
+cable clock.clock -> bassinl.clock
+cable chordr.pitch -> bassinl.transpose
+cable bassinl.pitch -> basso.voct
+cable bassinl.gate -> basse.gate
+cable basso.saw -> bassp.in
+cable basse.env -> bassp.cutoff
+cable bassp.out -> bassa.in
+cable basse.env -> bassa.cv
+cable bassa.out -> basshp.in
+cable basshp.out -> mix.in2
+cable chord.voice1 -> arp.voice1
+cable chord.voice2 -> arp.voice2
+cable chord.voice3 -> arp.voice3
+cable chord.voice4 -> arp.voice4
+cable clock.clock -> arpsw.clock
+cable arp.pitch -> arpvw.in
+cable arpvw.out -> arpvo.voct
+cable arp.gate -> arpve.gate
+cable arpvo.saw -> arpvp.in
+cable arpve.env -> arpvp.cutoff
+cable arpsw.cv -> arpvp.cutoff
+cable arpvp.out -> arpva.in
+cable arpve.env -> arpva.cv
+cable arpva.out -> mix.in4
+cable arpva.out -> arpecho.in_l
+cable arpecho.l -> arpechoh.in
+cable arpecho.r -> arpechoh.in
+cable arpechoh.out -> mix.in4
+cable clock.div4 -> leadinl.clock
+cable vib.out -> leadinl.transpose
+cable leadinl.pitch -> leadw.in
+cable leadw.out -> leado.voct
+cable leadw.out -> leado2.voct
+cable leadinl.gate -> leade.gate
+cable leado.saw -> leadp.in
+cable leado2.saw -> leadp.in
+cable leade.env -> leadp.cutoff
+cable leadp.out -> leada.in
+cable leade.env -> leada.cv
+cable leada.out -> mix.in5
+cable leada.out -> leadecho.in_l
+cable leadecho.l -> leadechoh.in
+cable leadecho.r -> leadechoh.in
+cable leadechoh.out -> mix.in5
+cable chord.voice1 -> padw0.in
+cable padw0.out -> padp0.voct
+cable padp0.l -> padfl.in
+cable padp0.r -> padfr.in
+cable chord.voice2 -> padw1.in
+cable padw1.out -> padp1.voct
+cable padp1.l -> padfl.in
+cable padp1.r -> padfr.in
+cable chord.voice3 -> padw2.in
+cable padw2.out -> padp2.voct
+cable padp2.l -> padfl.in
+cable padp2.r -> padfr.in
+cable padrock.out -> padfl.cutoff
+cable padrock.out -> padfr.cutoff
+cable padfl.out -> out.l
+cable padfr.out -> out.r
+cable padfl.out -> room.in_l
+cable padfr.out -> room.in_r
+cable radio.out -> mix.in6
+cable clock.clock -> rs.clock
+cable rs.c -> sr.gate
+cable sr.out -> mix.in6

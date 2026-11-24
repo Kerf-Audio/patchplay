@@ -1,0 +1,16 @@
+# title: Tom polyrhythm
+# about: Two toms on lanes of different lengths, three hits over seven steps against three over nine, so the pattern drifts. Each hit plays four times in five.
+# port: toms_rhythm.b, toms_rhythm.c (gate): the two tom lanes.
+# port: toms_high.out, toms_low.out (audio): both already cabled to out.
+part toms "Toms" colour #3d9c8a level=0.6
+  module toms_rhythm Ruler hits_a=0 steps_a=1 hits_b=0.43 steps_b=0.4 hits_c=0.33 steps_c=0.53 hits_d=0 chance=0.8
+  module toms_high Mortise engine=1 pitch=0.55 punch=0.6 decay=0.25 tone=0.5
+  module toms_low Mortise engine=1 pitch=0.35 punch=0.6 decay=0.35 tone=0.4
+
+cable clock.clock -> toms_rhythm.clock
+cable toms_rhythm.b -> toms_high.trig
+cable toms_rhythm.c -> toms_low.trig
+cable toms_high.out -> out.l
+cable toms_high.out -> out.r
+cable toms_low.out -> out.l
+cable toms_low.out -> out.r

@@ -1,0 +1,487 @@
+# Dub Chamber: a slow one-drop groove, a sine bass, minor chord stabs, a band-
+# passed noise bed, and echoes that fall into a big reverb. Modelled on
+# presets/harbour-fog.kerf.
+#
+# Rhythm rule: kick and snare are Ruler lane A at 16 steps and never thin; the
+# hat, rim and ghost lanes get their own shorter lengths (none is 16, none
+# repeats within a Ruler) and a chance below 1. The bass and stab sequencers
+# loop at different lengths and are clocked at different rates.
+#
+# Key: every pitch goes through a Fret whose root is the patch key and whose
+# scale is a subset of natural minor.
+
+name = "dub-chamber"
+title = "Dub Chamber"
+summary = "A one-drop groove, sine bass, minor chord stabs and a noise bed, with long echoes into a big reverb."
+tempo = [112, 122]
+keys = ["A minor", "C minor", "D minor", "E minor", "G minor"]
+
+[[modules]]
+id = "tally1"
+kind = "Tally"
+[modules.params]
+tempo = 0.5
+swing = [0.0, 0.1]
+divide = 0.5
+
+[[modules]]
+id = "mix"
+kind = "Router"
+[modules.params]
+level1 = [0.4, 0.5]
+level2 = [0.25, 0.35]
+level3 = [0.4, 0.5]
+level4 = [0.5, 0.6]
+level5 = [0.32, 0.42]
+level6 = [0.28, 0.38]
+send = [0.25, 0.35]
+
+[[modules]]
+id = "out"
+kind = "Finish"
+[modules.params]
+volume = [0.62, 0.7]
+glue = [0.35, 0.5]
+ceiling = 0.8
+
+[[cables]]
+from = "mix.mix_l"
+to = "out.l"
+
+[[cables]]
+from = "mix.mix_r"
+to = "out.r"
+
+[[parts]]
+id = "drums"
+name = "Drums"
+colour = "#c94a3d"
+
+[[parts.modules]]
+id = "ruler1"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = { pick = [0.125, 0.125, 0.25] }
+steps_a = 1
+hits_b = [0.4, 0.6]
+steps_b = { steps = [10, 13] }
+hits_c = [0.25, 0.4]
+steps_c = { steps = [3, 6] }
+hits_d = 0
+chance = [0.6, 0.85]
+
+[[parts.modules]]
+id = "ruler2"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0.0625
+steps_a = 1
+hits_b = [0.1, 0.2]
+steps_b = { steps = [11, 14] }
+hits_c = 0
+hits_d = 0
+rotate = 0.5
+chance = [0.4, 0.6]
+
+[[parts.modules]]
+id = "kick"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0
+pitch = [0.26, 0.34]
+punch = [0.45, 0.6]
+decay = [0.3, 0.4]
+tone = [0.3, 0.4]
+
+[[parts.modules]]
+id = "snare"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0.25
+pitch = [0.4, 0.5]
+punch = [0.5, 0.6]
+decay = [0.4, 0.5]
+tone = [0.35, 0.45]
+
+[[parts.modules]]
+id = "hat"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0.5
+pitch = [0.45, 0.55]
+punch = [0.35, 0.45]
+decay = [0.15, 0.25]
+tone = [0.5, 0.6]
+
+[[parts.modules]]
+id = "rim"
+kind = "Mortise"
+[parts.modules.params]
+engine = 1
+pitch = [0.7, 0.85]
+punch = [0.65, 0.75]
+decay = [0.08, 0.14]
+tone = [0.55, 0.65]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler1.clock"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler2.clock"
+
+[[parts.cables]]
+from = "ruler1.a"
+to = "kick.trig"
+
+[[parts.cables]]
+from = "ruler1.b"
+to = "hat.trig"
+
+[[parts.cables]]
+from = "ruler1.c"
+to = "rim.trig"
+
+[[parts.cables]]
+from = "ruler2.a"
+to = "snare.trig"
+
+[[parts.cables]]
+from = "ruler2.b"
+to = "snare.trig"
+
+[[parts.cables]]
+from = "kick.out"
+to = "mix.in1"
+
+[[parts.cables]]
+from = "hat.out"
+to = "mix.in2"
+
+[[parts.cables]]
+from = "snare.out"
+to = "mix.in3"
+
+# The rim only speaks through the echo.
+[[parts.cables]]
+from = "rim.out"
+to = "delay.in"
+
+[[parts.cables]]
+from = "snare.out"
+to = "delay.in"
+chance = 0.7
+
+[[parts]]
+id = "bass"
+name = "Bass"
+colour = "#3d63c9"
+
+[[parts.modules]]
+id = "bseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [3, 6] }
+steps_b = { steps = [7, 10] }
+interlock = [0.6, 0.8]
+chance = [0.65, 0.85]
+glide = [0.2, 0.4]
+range = [0.05, 0.15]
+
+[[parts.modules]]
+id = "bfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.42857] }
+octave = 0.25
+
+[[parts.modules]]
+id = "bosc"
+kind = "Chisel"
+[parts.modules.params]
+tune = 0.5
+shape = 0
+pw = 0.5
+
+[[parts.modules]]
+id = "benv"
+kind = "Bevel"
+[parts.modules.params]
+attack = 0
+decay = [0.5, 0.6]
+sustain = [0.25, 0.35]
+release = [0.4, 0.5]
+curve = [0.3, 0.5]
+
+[[parts.modules]]
+id = "bamp"
+kind = "Clamp"
+[parts.modules.params]
+level = 0
+response = [0.05, 0.15]
+
+[[parts.cables]]
+from = "tally1.div4"
+to = "bseq.clock"
+
+[[parts.cables]]
+from = "bseq.pitch"
+to = "bfret.pitch"
+
+[[parts.cables]]
+from = "bfret.pitch"
+to = "bosc.voct"
+
+[[parts.cables]]
+from = "bseq.gate"
+to = "benv.gate"
+
+[[parts.cables]]
+from = "bosc.sine"
+to = "bamp.in"
+
+[[parts.cables]]
+from = "bosc.sub"
+to = "bamp.in"
+
+[[parts.cables]]
+from = "benv.env"
+to = "bamp.cv"
+
+[[parts.cables]]
+from = "bamp.out"
+to = "mix.in5"
+
+# Chord stabs on the off-beats: a Ruler opens the amp, a Dovetail picks the
+# notes, and a compressor listening to the kick pumps the pad down.
+[[parts]]
+id = "stab"
+name = "Stab pad"
+colour = "#7a4fb5"
+
+[[parts.modules]]
+id = "ruler3"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0.125
+steps_a = 1
+hits_b = [0.2, 0.35]
+steps_b = { steps = [5, 7] }
+hits_c = 0
+hits_d = 0
+rotate = { pick = [0.125, 0.25] }
+chance = [0.45, 0.65]
+
+[[parts.modules]]
+id = "sseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [6, 8] }
+steps_b = { steps = [3, 5] }
+interlock = [0.4, 0.6]
+chance = [0.6, 0.75]
+glide = 0
+range = [0.2, 0.3]
+
+[[parts.modules]]
+id = "sfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.42857] }
+octave = 0.375
+
+[[parts.modules]]
+id = "ply1"
+kind = "Ply"
+[parts.modules.params]
+layers = [0.45, 0.65]
+detune = [0.35, 0.5]
+width = [0.7, 0.9]
+tone = [0.35, 0.5]
+
+[[parts.modules]]
+id = "senv"
+kind = "Bevel"
+[parts.modules.params]
+attack = 0
+decay = [0.28, 0.38]
+sustain = 0
+release = [0.25, 0.35]
+curve = [0.3, 0.4]
+
+[[parts.modules]]
+id = "samp"
+kind = "Clamp"
+[parts.modules.params]
+level = 0
+response = [0.35, 0.55]
+
+[[parts.modules]]
+id = "spump"
+kind = "Vise"
+[parts.modules.params]
+squeeze = [0.4, 0.6]
+speed = [0.4, 0.6]
+makeup = [0.3, 0.4]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler3.clock"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "sseq.clock"
+
+[[parts.cables]]
+from = "sseq.pitch"
+to = "sfret.pitch"
+
+[[parts.cables]]
+from = "sfret.pitch"
+to = "ply1.voct"
+
+[[parts.cables]]
+from = "ruler3.a"
+to = "senv.gate"
+
+[[parts.cables]]
+from = "ruler3.b"
+to = "senv.gate"
+
+[[parts.cables]]
+from = ["ply1.l", "ply1.r"]
+to = "samp.in"
+
+[[parts.cables]]
+from = "senv.env"
+to = "samp.cv"
+
+[[parts.cables]]
+from = "samp.out"
+to = "spump.in"
+
+[[parts.cables]]
+from = "kick.out"
+to = "spump.side"
+
+[[parts.cables]]
+from = "spump.out"
+to = "mix.in4"
+
+[[parts.cables]]
+from = "spump.out"
+to = "delay.in"
+
+[[parts]]
+id = "texture"
+name = "Texture"
+colour = "#3d9c8a"
+chance = 0.75
+
+[[parts.modules]]
+id = "sand"
+kind = "Sawdust"
+[parts.modules.params]
+colour = [0.3, 0.5]
+crackle = [0.25, 0.45]
+
+[[parts.modules]]
+id = "sweep"
+kind = "Spokeshave"
+[parts.modules.params]
+rate = [0.08, 0.16]
+spread = [0.5, 0.7]
+shape = [0.0, 0.2]
+phase = [0.2, 0.4]
+
+[[parts.modules]]
+id = "nflt"
+kind = "Plane"
+[parts.modules.params]
+cutoff = [0.35, 0.45]
+res = [0.45, 0.6]
+mode = 0.33
+drive = [0.05, 0.15]
+
+[[parts.modules]]
+id = "namp"
+kind = "Clamp"
+[parts.modules.params]
+level = [0.3, 0.45]
+response = 0
+
+[[parts.cables]]
+from = "sand.noise"
+to = "nflt.in"
+
+[[parts.cables]]
+from = ["sweep.lfo2", "sweep.lfo3"]
+to = "nflt.cutoff"
+
+[[parts.cables]]
+from = "nflt.out"
+to = "namp.in"
+
+[[parts.cables]]
+from = "sand.dust"
+to = "namp.in"
+
+[[parts.cables]]
+from = "namp.out"
+to = "mix.in6"
+
+# The long echo and the chamber it falls into. The echo is clocked, so its
+# time is a division of the beat; the reverb also takes the mixer's send.
+[[parts]]
+id = "space"
+name = "Space"
+colour = "#d1a233"
+
+[[parts.modules]]
+id = "delay"
+kind = "Bandsaw"
+[parts.modules.params]
+time = { pick = [0.44, 0.56, 0.69] }
+feedback = [0.6, 0.75]
+wear = [0.45, 0.6]
+mix = 1
+
+[[parts.modules]]
+id = "room"
+kind = "Kiln"
+[parts.modules.params]
+size = [0.75, 0.9]
+heat = [0.45, 0.6]
+bloom = [0.5, 0.7]
+mix = 1
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "delay.clock"
+
+[[parts.cables]]
+from = "delay.l"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "delay.r"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "mix.send"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "mix.send"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "room.l"
+to = "out.l"
+
+[[parts.cables]]
+from = "room.r"
+to = "out.r"

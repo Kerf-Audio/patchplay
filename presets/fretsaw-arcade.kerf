@@ -1,0 +1,104 @@
+kerf 1
+tempo 125
+key C minor
+tags synthwave arcade
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module mix Router level1=0.9 level2=0.7 level3=0.5 level4=0.6 level5=0.5 level6=0.95 send=0.12
+module room Kiln size=0.4 heat=0.6 bloom=0.1 mix=1
+module out Finish volume=0.45 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.75
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0 chance=1
+  module kick Mortise engine=0 pitch=0.5 punch=0.8 decay=0.12 tone=0.6
+  module r_snare Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25 chance=1
+  module snare Mortise engine=0.25 pitch=0.6 punch=0.8 decay=0.12 tone=0.9
+  module r_hat Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0 chance=1
+  module hat Mortise engine=0.5 pitch=0.75 punch=0.5 decay=0.03 tone=0.9
+
+part harm "Chords" colour #7a4fb5
+  module chordr Inlay length=0.2 transpose=0.5 octave=0.5 gate=0.95 glide=0 step1=0.04 step2=0.36 step3=0.16 step4=0.44 step5=0 step6=0 step7=0 step8=0 step9=0 step10=0 step11=0 step12=0 step13=0 step14=0 step15=0 step16=0
+  module chordt Tread step1=0.4231 step2=0.3462 step3=0.3462 step4=0.3462 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 glide=0 rate=0.5 direction=0
+  module chord Mitre chord=0.1538 inversion=0 spread=0.34 root=0.75
+
+part bass "Square bass" colour #3d63c9 level=0.85
+  module bast Tread step1=0.3 step2=0.4 step3=0.3 step4=0.4 step5=0.3 step6=0.4 step7=0.325 step8=0.3417 length=1 glide=0 rate=0.5 direction=0
+  module basso Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassp Plane cutoff=0.42 res=0.1 mode=0 drive=0.1
+  module basse Bevel attack=0 decay=0.2 sustain=1 release=0.13 curve=0.5
+  module bassa Clamp level=0 response=0.05
+
+part arp "Chip arp" colour #3da3a3 level=0.9
+  module arp Rung pattern=0 octaves=0.67 length=0.35 swing=0 ratchet=0.1
+  module arpvo Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module arpvp Plane cutoff=0.6 res=0.1 mode=0 drive=0.05
+  module arpve Bevel attack=0 decay=0.15 sustain=0.4 release=0.1 curve=0.4
+  module arpva Clamp level=0 response=0.1
+
+part lead "Lead" colour #d1a233 level=0.9
+  module leadinl Inlay length=1 transpose=0.5 octave=0.75 gate=0.55 glide=0 step1=0.8 step2=0 step3=0.32 step4=0.44 step5=0.52 step6=0 step7=0.44 step8=0.32 step9=0.16 step10=0 step11=0.24 step12=0.32 step13=0.72 step14=0 step15=0.16 step16=0.12
+  module vib Rocker rate=0.55 depth=0.008 offset=0.5
+  module pwm Rocker rate=0.3 depth=0.1 offset=0.5
+  module leado Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module leado2 Chisel tune=0.5 fine=0.52 shape=0.2 pw=0.5
+  module leadp Plane cutoff=0.7 res=0.1 mode=0 drive=0.1
+  module leade Bevel attack=0 decay=0.2 sustain=0.7 release=0.12 curve=0.4
+  module leada Clamp level=0 response=0.1
+
+part fx "Bleeps" colour #c94a3d level=1
+  module r_siren Ruler hits_a=0 hits_b=0 hits_c=0.1875 hits_d=0 steps_c=1 rotate=0.3125 chance=0.35
+  module siren Siren pitch=0.62 range=0.5 rate=0.45 sync=0 shape=0.5 wave=0 release=0.1 cutoff=0.8 resonance=0.2 drive=0.1
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_snare.clock
+cable r_snare.a -> snare.trig
+cable snare.out -> mix.in3
+cable clock.clock -> r_hat.clock
+cable r_hat.a -> hat.trig
+cable hat.out -> mix.in3
+cable clock.bar -> chordr.clock
+cable clock.bar -> chordt.clock
+cable chordr.pitch -> chord.pitch
+cable chordt.cv -> chord.chord
+cable chordr.gate -> chord.gate
+cable clock.clock -> bast.clock
+cable bast.cv -> basso.voct
+cable bast.step -> basse.gate
+cable basso.square -> bassp.in
+cable bassp.out -> bassa.in
+cable basse.env -> bassa.cv
+cable bassa.out -> mix.in2
+cable clock.clock -> arp.clock
+cable chord.voice1 -> arp.voice1
+cable chord.voice2 -> arp.voice2
+cable chord.voice3 -> arp.voice3
+cable chord.voice4 -> arp.voice4
+cable arp.pitch -> arpvo.voct
+cable arp.gate -> arpve.gate
+cable arpvo.square -> arpvp.in
+cable arpvp.out -> arpva.in
+cable arpve.env -> arpva.cv
+cable arpva.out -> mix.in4
+cable clock.clock -> leadinl.clock
+cable vib.out -> leadinl.transpose
+cable leadinl.pitch -> leado.voct
+cable pwm.out -> leado.pw
+cable leadinl.pitch -> leado2.voct
+cable pwm.out -> leado2.pw
+cable leadinl.gate -> leade.gate
+cable leado.square -> leadp.in
+cable leado2.square -> leadp.in
+cable leadp.out -> leada.in
+cable leade.env -> leada.cv
+cable leada.out -> mix.in5
+cable clock.clock -> r_siren.clock
+cable r_siren.c -> siren.gate
+cable siren.out -> mix.in6

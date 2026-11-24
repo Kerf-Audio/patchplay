@@ -1,0 +1,356 @@
+# Slow Grain: a drifting pad, clouds of grains cut from it, and a sparse lead
+# that echoes into a long reverb. Modelled on presets/long-exposure.kerf.
+#
+# Rhythm rule: there are no drums, so no anchor. The pad steps once a bar; the
+# lead steps on the beat with two lane lengths that never match (and a chance
+# below 1), so its phrase phases against the pad. The grain clouds are
+# unclocked and scatter on their own.
+#
+# Key: every pitch goes through a Fret whose root is the patch key and whose
+# scale is a subset of dorian. Grain transposition is an octave or a fifth.
+
+name = "slow-grain"
+title = "Slow Grain"
+summary = "A drifting pad, grain clouds cut from it and a sparse lead, all washed in echo and a long reverb."
+tempo = [60, 80]
+keys = ["D dorian", "E dorian", "G dorian", "A dorian", "C dorian"]
+
+[[modules]]
+id = "tally1"
+kind = "Tally"
+[modules.params]
+tempo = 0.5
+swing = 0
+divide = 0.5
+
+[[modules]]
+id = "mix"
+kind = "Router"
+[modules.params]
+level1 = [0.34, 0.42]
+level2 = [0.3, 0.38]
+level3 = [0.6, 0.7]
+level4 = [0.42, 0.5]
+level5 = [0.42, 0.5]
+level6 = 0
+send = [0.3, 0.4]
+
+[[modules]]
+id = "out"
+kind = "Finish"
+[modules.params]
+volume = [0.64, 0.72]
+glue = [0.25, 0.35]
+ceiling = 0.8
+
+[[cables]]
+from = "mix.mix_l"
+to = "out.l"
+
+[[cables]]
+from = "mix.mix_r"
+to = "out.r"
+
+[[parts]]
+id = "pad"
+name = "Pad"
+colour = "#7a4fb5"
+
+[[parts.modules]]
+id = "pseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [4, 6] }
+steps_b = { steps = [2, 3] }
+interlock = [0.3, 0.5]
+chance = [0.85, 0.95]
+glide = [0.3, 0.45]
+range = [0.25, 0.35]
+
+[[parts.modules]]
+id = "pfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.57143] }
+octave = 0.375
+
+[[parts.modules]]
+id = "ply1"
+kind = "Ply"
+[parts.modules.params]
+layers = [0.7, 0.85]
+detune = [0.35, 0.45]
+width = [0.9, 1.0]
+tone = [0.3, 0.4]
+
+[[parts.modules]]
+id = "lathe1"
+kind = "Lathe"
+[parts.modules.params]
+tune = { pick = [0.5, 0.64583] }
+table = [0.3, 0.5]
+turn = [0.25, 0.4]
+warp = [0.1, 0.2]
+
+[[parts.modules]]
+id = "pflt"
+kind = "Plane"
+[parts.modules.params]
+cutoff = [0.45, 0.55]
+res = [0.2, 0.3]
+mode = 0
+drive = [0.0, 0.1]
+
+[[parts.modules]]
+id = "drift"
+kind = "Burl"
+[parts.modules.params]
+rate = [0.15, 0.25]
+smooth = [0.85, 0.95]
+bias = 0.5
+
+[[parts.modules]]
+id = "sweep"
+kind = "Spokeshave"
+[parts.modules.params]
+rate = [0.2, 0.35]
+spread = [0.4, 0.6]
+shape = 0
+phase = [0.2, 0.3]
+
+[[parts.cables]]
+from = "tally1.bar"
+to = "pseq.clock"
+
+[[parts.cables]]
+from = "pseq.pitch"
+to = "pfret.pitch"
+
+[[parts.cables]]
+from = "pfret.pitch"
+to = "ply1.voct"
+
+[[parts.cables]]
+from = "pfret.pitch"
+to = "lathe1.voct"
+
+[[parts.cables]]
+from = "drift.drift"
+to = "lathe1.turn"
+
+[[parts.cables]]
+from = "lathe1.out"
+to = "pflt.in"
+
+[[parts.cables]]
+from = ["sweep.lfo1", "sweep.lfo2"]
+to = "pflt.cutoff"
+
+[[parts.cables]]
+from = "ply1.l"
+to = "mix.in1"
+
+[[parts.cables]]
+from = "ply1.r"
+to = "mix.in1"
+
+[[parts.cables]]
+from = "pflt.out"
+to = "mix.in2"
+
+# Two grain clouds, one fed from each pad voice, scattered into the reverb.
+[[parts]]
+id = "grain"
+name = "Grain texture"
+colour = "#3d9c8a"
+chance = 0.85
+
+[[parts.modules]]
+id = "cloud"
+kind = "Shavings"
+[parts.modules.params]
+size = [0.45, 0.65]
+density = [0.3, 0.5]
+spray = [0.45, 0.65]
+pitch = { pick = [0.5, 0.75, 0.25] }
+
+[[parts.modules]]
+id = "cloud2"
+kind = "Shavings"
+[parts.modules.params]
+size = [0.6, 0.8]
+density = [0.2, 0.4]
+spray = [0.6, 0.8]
+pitch = { pick = [0.64583, 0.75, 0.5] }
+
+[[parts.cables]]
+from = "ply1.l"
+to = "cloud.in"
+
+[[parts.cables]]
+from = "ply1.r"
+to = "cloud.in"
+
+[[parts.cables]]
+from = "pflt.out"
+to = "cloud2.in"
+
+[[parts.cables]]
+from = "cloud.l"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "cloud.r"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "cloud2.l"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "cloud2.r"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "cloud.l"
+to = "mix.in4"
+
+[[parts.cables]]
+from = "cloud2.r"
+to = "mix.in5"
+
+[[parts]]
+id = "lead"
+name = "Lead"
+colour = "#d1a233"
+chance = 0.8
+
+[[parts.modules]]
+id = "lseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [5, 8] }
+steps_b = { steps = [3, 4] }
+interlock = [0.5, 0.7]
+chance = [0.4, 0.6]
+glide = [0.15, 0.25]
+range = [0.3, 0.45]
+
+[[parts.modules]]
+id = "lfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.57143] }
+octave = 0.5
+
+[[parts.modules]]
+id = "losc"
+kind = "Chisel"
+[parts.modules.params]
+tune = 0.5
+shape = [0.6, 0.9]
+pw = 0.5
+
+[[parts.modules]]
+id = "lenv"
+kind = "Bevel"
+[parts.modules.params]
+attack = [0.2, 0.35]
+decay = [0.5, 0.6]
+sustain = [0.2, 0.3]
+release = [0.6, 0.75]
+curve = 0.6
+
+[[parts.modules]]
+id = "lamp"
+kind = "Clamp"
+[parts.modules.params]
+level = 0
+response = [0.4, 0.6]
+
+[[parts.cables]]
+from = "tally1.div4"
+to = "lseq.clock"
+
+[[parts.cables]]
+from = "lseq.pitch"
+to = "lfret.pitch"
+
+[[parts.cables]]
+from = "lfret.pitch"
+to = "losc.voct"
+
+[[parts.cables]]
+from = "lseq.gate"
+to = "lenv.gate"
+
+[[parts.cables]]
+from = "losc.sine"
+to = "lamp.in"
+
+[[parts.cables]]
+from = "lenv.env"
+to = "lamp.cv"
+
+[[parts.cables]]
+from = "lamp.out"
+to = "mix.in3"
+
+[[parts.cables]]
+from = "lamp.out"
+to = "echo.in"
+
+# A clocked echo (a division of the beat) feeding a cathedral reverb that also
+# takes the mixer's send.
+[[parts]]
+id = "space"
+name = "Space"
+colour = "#c9a23d"
+
+[[parts.modules]]
+id = "echo"
+kind = "Bandsaw"
+[parts.modules.params]
+time = { pick = [0.69, 0.81, 0.94] }
+feedback = [0.5, 0.6]
+wear = [0.45, 0.55]
+mix = [0.45, 0.55]
+
+[[parts.modules]]
+id = "room"
+kind = "Kiln"
+[parts.modules.params]
+size = [0.85, 0.95]
+heat = [0.45, 0.55]
+bloom = [0.6, 0.8]
+mix = 1
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "echo.clock"
+
+[[parts.cables]]
+from = "echo.l"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "echo.r"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "mix.send"
+to = "room.in_l"
+
+[[parts.cables]]
+from = "mix.send"
+to = "room.in_r"
+
+[[parts.cables]]
+from = "room.l"
+to = "out.l"
+
+[[parts.cables]]
+from = "room.r"
+to = "out.r"

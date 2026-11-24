@@ -1,0 +1,61 @@
+kerf 1
+tempo 100
+key A minor
+tags abstract granular lead arpeggio
+
+module clock Tally tempo=0.5 swing=0.08 divide=0.5
+module room Kiln size=0.6 heat=0.5 bloom=0.35 mix=1
+module out Finish volume=0.75 glue=0.3 ceiling=0.8
+
+part roots "Roots" colour #8a8f98 level=1
+  module roottr Tread step1=0.475 step2=0.4417 step3=0.4583 step4=0.4333 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.4286 direction=0 glide=0
+  module rootfret Fret root=0.75 scale=0.43 octave=0.5
+  module chord Mitre chord=0.5385 inversion=0 spread=0.34 root=0.75 snap=0
+  module arp Rung pattern=0.2857 octaves=0.34 rate=0.75 length=0.45 swing=0.1 ratchet=0.15
+
+part lead "Granular lead" colour #b5527a level=1
+  module leadsp Splinter position=0.385 spray=0.03 size=0.5 density=0.9 pitch=0.5625 scatter=0 reverse=0 shape=0.3 spread=0.5 level=0.9 hold=0
+  module leadenv Bevel attack=0.02 decay=0.3 sustain=0.5 release=0.25 curve=0.4
+  module leadampl Clamp level=0 response=0.2
+  module leadampr Clamp level=0 response=0.2
+
+part chords "Chord grains" colour #7a4fb5 level=0.55
+  module rootsp Splinter position=0.385 spray=0.08 size=0.85 density=0.9 pitch=0.3125 scatter=0 reverse=0.1 shape=0.1 spread=1 level=0.9 hold=0
+  module thirdsp Splinter position=0.385 spray=0.08 size=0.85 density=0.9 pitch=0.3125 scatter=0 reverse=0.1 shape=0.1 spread=1 level=0.9 hold=0
+  module chordfl Plane cutoff=0.55 res=0.15 mode=0 drive=0
+  module chordfr Plane cutoff=0.55 res=0.15 mode=0 drive=0
+
+cable clock.bar -> roottr.clock
+cable roottr.cv -> rootfret.pitch
+cable rootfret.pitch -> chord.pitch
+cable chord.voice1 -> arp.voice1
+cable chord.voice2 -> arp.voice2
+cable chord.voice3 -> arp.voice3
+cable chord.voice4 -> arp.voice4
+cable clock.clock -> arp.clock
+cable arp.pitch -> leadsp.voct
+cable arp.gate -> leadsp.gate
+cable arp.gate -> leadenv.gate
+cable leadsp.l -> leadampl.in
+cable leadsp.r -> leadampr.in
+cable leadenv.env -> leadampl.cv
+cable leadenv.env -> leadampr.cv
+cable leadampl.out -> out.l
+cable leadampr.out -> out.r
+cable leadampl.out -> room.in_l
+cable leadampr.out -> room.in_r
+cable chord.voice1 -> rootsp.voct
+cable chord.voice3 -> thirdsp.voct
+cable rootsp.l -> chordfl.in
+cable rootsp.r -> chordfr.in
+cable thirdsp.l -> chordfl.in
+cable thirdsp.r -> chordfr.in
+cable chordfl.out -> out.l
+cable chordfr.out -> out.r
+cable chordfl.out -> room.in_l
+cable chordfr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A leadsp.size=0.4 leadsp.density=0.8 chordfl.cutoff=0.45 chordfr.cutoff=0.45
+scene B leadsp.size=0.65 leadsp.density=1 chordfl.cutoff=0.7 chordfr.cutoff=0.7

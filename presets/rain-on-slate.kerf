@@ -1,0 +1,64 @@
+kerf 1
+tempo 84
+key D minor
+tags texture crackle
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.6 level6=0.55 send=0.4
+module room Kiln size=0.8 heat=0.5 bloom=0.5 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part rain "Rain" colour #3da3a3 level=0.55
+  module rainsrc Sawdust colour=0.7 crackle=0.8
+  module rainflt Plane cutoff=0.65 res=0.15 mode=0.33 drive=0.1
+  module rainamp Clamp level=0.5 response=0.4
+  module rainburl Burl rate=0.2 smooth=0.8 bias=0.5
+
+part hiss "Hiss" colour #3da3a3 level=0.3
+  module hisssrc Sawdust colour=0.5 crackle=0.2
+  module hissflt Plane cutoff=0.55 res=0.2 mode=0.67 drive=0.1
+  module hissamp Clamp level=0 response=0.4
+  module hissrhy Ruler hits_a=0.3125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.125
+  module hissenv Bevel attack=0.02 decay=0.3 sustain=0 release=0.25 curve=0.35
+  module hissburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module radio Static tune=0.42 width=0.5 hiss=0.4 crackle=0.35 whistle=0.2 fade=0.4 ghost=0.3 level=0.7
+
+part mal "Drips" colour #3da36b level=0.7
+  module malseq Dovetail steps_a=0.8 steps_b=0.4 interlock=0.3 chance=0.4 glide=0 range=0.5
+  module malfret Fret root=0.1667 scale=0.43 octave=0.625
+  module malmal Mallet material=0.5 size=0.35 strike=0.4 damp=0.55
+  module malecho Bandsaw time=0.5 feedback=0.55 wear=0.4 mix=1
+
+cable rainsrc.dust -> rainflt.in
+cable rainflt.out -> rainamp.in
+cable rainamp.out -> mix.in6
+cable rainburl.drift -> rainflt.cutoff
+
+cable hisssrc.noise -> hissflt.in
+cable hissflt.out -> hissamp.in
+cable clock.clock -> hissrhy.clock
+cable hissrhy.a -> hissenv.gate
+cable hissenv.env -> hissamp.cv
+cable hissamp.out -> mix.in6
+cable hissburl.drift -> hissflt.cutoff
+
+cable clock.clock -> malseq.clock
+cable malseq.pitch -> malfret.pitch
+cable malfret.pitch -> malmal.voct
+cable malseq.gate -> malmal.trig
+cable malmal.out -> mix.in5
+cable clock.clock -> malecho.clock
+cable malmal.out -> malecho.in
+cable malecho.l -> mix.in5
+cable malecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable radio.out -> mix.in6
+scene A rainflt.cutoff=0.53 hissflt.cutoff=0.43 malmal.damp=0.4
+scene B rainflt.cutoff=0.8 hissflt.cutoff=0.7 malmal.damp=0.75

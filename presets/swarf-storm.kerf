@@ -1,0 +1,63 @@
+kerf 1
+tempo 172
+key B harmonic minor
+tags crazy noise
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.6 level2=0.6 level3=0.55 level4=0.5 level5=0.5 level6=0 send=0.35
+module room   Kiln   size=0.6 heat=0.7 bloom=0.4 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part swarm "Ply swarm" colour #7a4fb5 level=0.8
+  module wseq   Dovetail steps_a=0.8 steps_b=0.6 interlock=0.4 chance=0.7 glide=0.6 range=0.4
+  module wfret  Fret     root=0.9167 scale=1 octave=0.5
+  module wply   Ply      layers=1 detune=1 width=1 tone=0.6
+  module wras   Rasp     drive=0.9 fold=1 bias=0.5 mix=1
+  module wmod   Burl     rate=0.9 smooth=0.1 bias=0.5
+
+part burst "Sawdust bursts" colour #8a6b4a level=0.8
+  module storm  Ruler    hits_a=0.385 steps_a=0.8 hits_b=0.455 steps_b=0.667 hits_c=0 hits_d=0 rotate=0 chance=0.6
+  module dust   Sawdust  colour=0.9 crackle=0.7
+  module benv   Bevel    attack=0 decay=0.25 sustain=0 release=0.2 curve=0.2
+  module bamp   Clamp    level=0 response=0.2
+  module bflt   Plane    cutoff=0.7 res=0.5 mode=0.667 drive=0.2
+
+part scatter "Shred" colour #3d9c8a level=0.8
+  module shred  Shavings size=0.15 density=0.9 spray=0.9 pitch=0.7
+  module sfeed  Bandsaw  time=0.1875 feedback=0.8 wear=0.7 mix=0.5
+
+cable tally1.clock -> wseq.clock
+cable wseq.pitch -> wfret.pitch
+cable wfret.pitch -> wply.voct
+cable wply.l -> wras.in
+cable wmod.stepped -> wras.drive
+cable tally1.clock -> wmod.trig
+cable wras.out -> mix.in1
+cable wply.r -> shred.in
+cable wras.out -> shred.in
+
+cable tally1.clock -> storm.clock
+cable storm.a -> benv.gate
+cable dust.noise -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bflt.in
+cable bflt.out -> mix.in2
+cable dust.dust -> mix.in3
+
+cable shred.l -> sfeed.in
+cable shred.r -> sfeed.in
+cable tally1.clock -> sfeed.clock
+cable sfeed.l -> mix.in4
+cable sfeed.r -> mix.in5
+cable shred.l -> room.in_l
+cable shred.r -> room.in_r
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A wras.drive=0.9 wras.fold=1 wply.detune=1 storm.chance=0.9 shred.density=0.95 sfeed.feedback=0.85
+scene B wras.drive=0.2 wras.fold=0.1 wply.detune=0.2 storm.chance=0.2 shred.density=0.3 sfeed.feedback=0.4

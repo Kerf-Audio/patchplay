@@ -1,0 +1,87 @@
+kerf 1
+tempo 80
+key D major pentatonic
+tags abstract ambient
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.65 level6=0.6 send=0.5
+module room Kiln size=0.9 heat=0.5 bloom=0.55 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part bell "Bells" colour #d1a233 level=0.45
+  module bellseq Dovetail steps_a=0.6667 steps_b=0.4 interlock=0.5 chance=0.6 glide=0.5 range=0.5
+  module bellfret Fret root=0.1667 scale=0 octave=0.625
+  module bellosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bellenv Bevel attack=0 decay=0.5 sustain=0.2 release=0.6 curve=0.4
+  module bellflt Plane cutoff=0.55 res=0.2 mode=0 drive=0.1
+  module bellamp Clamp level=0 response=0.5
+  module bellecho Bandsaw time=0.5 feedback=0.65 wear=0.35 mix=1
+  module bellburl Burl rate=0.25 smooth=0.7 bias=0.5
+
+part pad "Drift" colour #7a4fb5 level=0.8
+  module padseq Dovetail steps_a=0.2667 steps_b=0.0667 interlock=0 chance=0.7 glide=0.1 range=0.3
+  module padfret Fret root=0.1667 scale=0 octave=0.5
+  module padwarp Warp amount=0.2 speed=0.25 rough=0.15 chaos=0.2
+  module padosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module padosc2 Chisel tune=0.5 fine=0.53 shape=0 pw=0.5
+  module padfm Splice mode=0 amount=0.3 coarse=0.6 fine=0.5 mix=1 level=0.5
+  module padfm2 Splice mode=0 amount=0.3 coarse=0.6 fine=0.5 mix=1 level=0.5
+  module padrock Rocker rate=0.3 shape=0.05 depth=0.55 offset=0.5
+  module padflt Plane cutoff=0.5 res=0.15 mode=0 drive=0
+  module padfltr Plane cutoff=0.5 res=0.15 mode=0 drive=0
+  module paddrift Spokeshave rate=0.06 spread=0.5 shape=0 phase=0.25
+
+part tex "Tide" colour #3da3a3 level=0.3
+  module texsrc Sawdust colour=0.3 crackle=0.05
+  module texflt Plane cutoff=0.4 res=0.2 mode=0 drive=0.1
+  module texamp Clamp level=0.5 response=0.4
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module texlfo Spokeshave rate=0.04 spread=0.5 shape=0 phase=0.25
+
+cable clock.x2 -> bellseq.clock
+cable bellseq.pitch -> bellfret.pitch
+cable bellfret.pitch -> bellosc.voct
+cable bellseq.gate -> bellenv.gate
+cable bellosc.sine -> bellflt.in
+cable bellflt.out -> bellamp.in
+cable bellenv.env -> bellamp.cv
+cable bellamp.out -> mix.in5
+cable clock.clock -> bellecho.clock
+cable bellamp.out -> bellecho.in
+cable bellecho.l -> mix.in5
+cable bellecho.r -> mix.in5
+cable bellburl.drift -> bellflt.cutoff
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable paddrift.lfo1 -> padflt.cutoff
+
+cable texsrc.noise -> texflt.in
+cable texflt.out -> texamp.in
+cable texamp.out -> mix.in6
+cable texburl.drift -> texflt.cutoff
+cable texlfo.lfo1 -> texflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable padfret.pitch -> padwarp.in
+cable padwarp.out -> padosc.voct
+cable padwarp.out -> padosc2.voct
+cable padosc.sine -> padfm.carrier
+cable padosc2.sine -> padfm2.carrier
+cable padrock.out -> padfm.amount
+cable padrock.inverted -> padfm2.amount
+cable padfm.out -> padflt.in
+cable padfm2.out -> padfltr.in
+cable paddrift.lfo2 -> padfltr.cutoff
+cable padflt.out -> out.l
+cable padfltr.out -> out.r
+cable padflt.out -> room.in_l
+cable padfltr.out -> room.in_r
+scene A bellflt.cutoff=0.43 padflt.cutoff=0.3 texflt.cutoff=0.28
+scene B bellflt.cutoff=0.7 padflt.cutoff=0.65 texflt.cutoff=0.55

@@ -1,0 +1,3 @@
+# Bundle names for `cargo xtask bundle` (nih-plug's bundler reads this file from the workspace root).
+[kerf-plugin]
+name = "patchplay"

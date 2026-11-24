@@ -1,0 +1,22 @@
+# title: Wavetable lead
+# about: A glassy lead whose timbre turns slowly as an LFO moves through the wavetable.
+# port: wt_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: wt_turn.lfo1 (cv): the slow LFO on the table position. Patch it elsewhere for more movement.
+# port: wt_amp.out (audio): the lead, already cabled to out.
+part wavelead "Wavetable lead" colour #e0802e level=0.6
+  module wt_seq Dovetail steps_a=0.33 steps_b=0.4 interlock=0.5 chance=0.8 glide=0.1 range=0.35
+  module wt_scale Fret root=0.75 scale=0.43 octave=0.625
+  module wt_osc Lathe tune=0.5 table=0.3 turn=0.4 warp=0.2
+  module wt_turn Spokeshave rate=0.05 spread=0.3 shape=0 phase=0.25
+  module wt_env Bevel attack=0.01 decay=0.4 sustain=0.2 release=0.3 curve=0.4
+  module wt_amp Clamp level=0 response=0.15
+
+cable clock.clock -> wt_seq.clock
+cable wt_seq.pitch -> wt_scale.pitch
+cable wt_scale.pitch -> wt_osc.voct
+cable wt_turn.lfo1 -> wt_osc.turn
+cable wt_osc.out -> wt_amp.in
+cable wt_seq.gate -> wt_env.gate
+cable wt_env.env -> wt_amp.cv
+cable wt_amp.out -> out.l
+cable wt_amp.out -> out.r

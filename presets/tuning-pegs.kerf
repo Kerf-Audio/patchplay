@@ -1,0 +1,50 @@
+kerf 1
+tempo 84
+key A minor
+tags abstract granular melodic
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module room Kiln size=0.6 heat=0.5 bloom=0.35 mix=1
+module out Finish volume=0.75 glue=0.3 ceiling=0.8
+
+part line "Melody" colour #3d63c9 level=1
+  module notes Inlay length=1 transpose=0.5 octave=0.5 rate=0.2 gate=0.6 glide=0.05 step1=0.68 step2=0 step3=0.4 step4=0 step5=0.32 step6=0 step7=0.2 step8=0 step9=0.12 step10=0 step11=0.2 step12=0.2 step13=0.04 step14=0 step15=0.4 step16=0
+  module env Bevel attack=0.08 decay=0.4 sustain=0.55 release=0.35 curve=0.45
+
+part pegs "Granular keys" colour #b5527a level=1
+  module keysp Splinter position=0.385 spray=0.03 size=0.5 density=0.9 pitch=0.5625 scatter=0 reverse=0 shape=0.3 spread=0.5 level=0.9 hold=0
+  module keyamp Clamp level=0 response=0.15
+  module keyampr Clamp level=0 response=0.15
+
+part spark "Octave sparkle" colour #d1a233 level=0.5
+  module sparksp Splinter position=0.385 spray=0.05 size=0.4 density=0.8 pitch=0.8125 scatter=0 reverse=0 shape=0.35 spread=1 level=0.8 hold=0
+  module sparkamp Clamp level=0 response=0.3
+  module sparkampr Clamp level=0 response=0.3
+
+cable clock.clock -> notes.clock
+cable notes.pitch -> keysp.voct
+cable notes.pitch -> sparksp.voct
+cable notes.gate -> keysp.gate
+cable notes.gate -> sparksp.gate
+cable notes.gate -> env.gate
+cable keysp.l -> keyamp.in
+cable keysp.r -> keyampr.in
+cable sparksp.l -> sparkamp.in
+cable sparksp.r -> sparkampr.in
+cable env.env -> keyamp.cv
+cable env.env -> keyampr.cv
+cable env.env -> sparkamp.cv
+cable env.env -> sparkampr.cv
+cable keyamp.out -> out.l
+cable keyampr.out -> out.r
+cable sparkamp.out -> out.l
+cable sparkampr.out -> out.r
+cable keyamp.out -> room.in_l
+cable keyampr.out -> room.in_r
+cable sparkamp.out -> room.in_l
+cable sparkampr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A keysp.size=0.4 keysp.density=0.8 sparksp.size=0.3
+scene B keysp.size=0.65 keysp.density=1 sparksp.size=0.55

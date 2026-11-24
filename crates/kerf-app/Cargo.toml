@@ -1,0 +1,43 @@
+[package]
+name = "kerf-app"
+description = "patchplay desktop app: a Tauri shell around the session, plus a dev server for the web UI."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+build = "build.rs"
+
+[lib]
+name = "kerf_app"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kerf-app"
+path = "src/main.rs"
+
+[dependencies]
+kerf-core.workspace = true
+kerf-bridge.workspace = true
+kerf-audio = { workspace = true, features = ["device"] }
+kerf-engine = { workspace = true, features = ["files"] }
+kerf-gen.workspace = true
+kerf-session.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+httparse = "1"
+tauri = "2"
+tauri-plugin-dialog = "2"
+
+[features]
+# Serve the built ui/dist from the binary. Without it Tauri loads the dev
+# server URL, which is blank unless `npm run dev` is running.
+default = ["tauri/custom-protocol"]
+
+[build-dependencies]
+tauri-build = "2"
+
+[lints]
+workspace = true

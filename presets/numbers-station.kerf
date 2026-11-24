@@ -1,0 +1,76 @@
+kerf 1
+tempo 60
+key A minor
+tags ominous radio eerie
+
+module clock Tally tempo=0.5 swing=0 divide=0
+module mix Router level1=0.6 level2=0.7 level3=0.55 level4=0.6 level5=0.5 level6=0.5 send=0.35
+module room Kiln size=0.35 heat=0.5 bloom=0.1 mix=1
+module out Finish volume=0.7 glue=0.35 ceiling=0.8
+
+part radio "Radio" colour #3da3a3 level=0.5
+  module dial Static tune=0.4 width=0.35 hiss=0.5 crackle=0.35 whistle=0.5 fade=0.45 ghost=0.5 level=0.55
+  module dialtr Tread step1=0.4167 step2=0.5833 step3=0.2917 step4=0.75 step5=0.4583 step6=0.6667 step7=0.8333 step8=0.5 length=1.0 glide=0.2 depth=0.25
+  module dialflt Plane cutoff=0.62 res=0.4 mode=0.33 drive=0.2
+  module dialfold Rasp drive=0.35 fold=0.2 bias=0.5 mix=0.6
+
+part beeps "Number tones" colour #d1a233 level=0.6
+  module beeprl Ruler hits_a=0.4375 hits_b=0.5 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=0.2667 rotate=0 chance=0.85
+  module beeptr Tread step1=0.675 step2=0.7 step3=0.6583 step4=0.7167 step5=0.675 step6=0.6417 step7=0.7 step8=0.6583 length=1.0 glide=0 direction=1
+  module beepwarp Warp amount=0.03 speed=0.3 rough=0.5 chaos=0.8
+  module beeposc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module beepenv Bevel attack=0.02 decay=0.3 sustain=0.6 release=0.15 curve=0.4
+  module beepamp Clamp level=0 response=0.05
+  module beepmod Splice mode=0.6667 amount=0.35 coarse=0.3 fine=0.5 mix=0.4 level=0.5
+
+part voices "Voices in the static" colour #b5527a level=0.5
+  module voice Splinter position=0.4 spray=0.15 size=0.5 density=0.35 pitch=0.4 scatter=0.05 reverse=0.2 shape=0.25 spread=0.5 level=0.7 hold=0
+  module voiceflt Plane cutoff=0.55 res=0.45 mode=0.33 drive=0.3
+  module voicelfo Rocker rate=0.09 sync=0 shape=0.05 depth=0.4 offset=0.5
+
+part under "Under hum" colour #5a4a7a level=0.5
+  module hum Chisel tune=0.375 fine=0.5 shape=0 pw=0.5
+  module humamp Clamp level=0.2 response=0
+  module humlfo Rocker rate=0.06 sync=0 shape=0 depth=0.5 offset=0.5
+
+part echo "Short echo" colour #3d63c9 level=0.7
+  module echo Dado time=0.35 sync=0 feedback=0.5 tone=0.4 thin=0.45 wobble=0.4 drive=0.2 mix=1
+
+cable dial.out -> dialflt.in
+cable dialtr.cv -> dial.tune
+cable clock.clock -> dialtr.clock
+cable dialflt.out -> dialfold.in
+cable dialfold.out -> mix.in1
+cable dialfold.out -> echo.in_r
+cable clock.clock -> beeprl.clock
+cable beeprl.a -> beeptr.clock
+cable beeprl.a -> beepenv.gate
+cable beeptr.cv -> beepwarp.in
+cable beepwarp.out -> beeposc.voct
+cable beeposc.sine -> beepamp.in
+cable beepenv.env -> beepamp.cv
+cable beepamp.out -> beepmod.carrier
+cable dial.out -> beepmod.mod
+cable beepmod.out -> mix.in2
+cable beepmod.out -> echo.in_l
+cable beeprl.b -> voice.trig
+cable voice.l -> voiceflt.in
+cable voice.r -> voiceflt.in
+cable voicelfo.out -> voice.position
+cable voicelfo.out -> voiceflt.cutoff
+cable voiceflt.out -> mix.in3
+cable voiceflt.out -> echo.in_l
+cable hum.sine -> humamp.in
+cable humlfo.out -> humamp.cv
+cable humamp.out -> mix.in4
+cable echo.l -> mix.in5
+cable echo.r -> mix.in5
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A dial.tune=0.3 voiceflt.cutoff=0.45 beepmod.amount=0.2
+scene B dial.tune=0.7 voiceflt.cutoff=0.7 beepmod.amount=0.6

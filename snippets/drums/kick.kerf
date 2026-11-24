@@ -1,0 +1,12 @@
+# title: Four-on-the-floor kick
+# about: A kick on every beat, dead straight.
+# port: kick_rhythm.a (gate): the kick's trigger. Other modules can follow it.
+# port: kick_drum.out (audio): the kick, already cabled to out.
+part kick "Kick" colour #c94a3d level=0.9
+  module kick_rhythm Ruler hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+  module kick_drum Mortise engine=0 pitch=0.35 punch=0.7 decay=0.3 tone=0.45
+
+cable clock.clock -> kick_rhythm.clock
+cable kick_rhythm.a -> kick_drum.trig
+cable kick_drum.out -> out.l
+cable kick_drum.out -> out.r

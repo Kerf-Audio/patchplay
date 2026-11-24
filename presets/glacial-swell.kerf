@@ -1,0 +1,79 @@
+kerf 1
+tempo 44
+key F# minor
+tags ominous ambient riser
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module mix Router level1=0.6 level2=0.6 level3=0.7 level4=0.5 level5=0.6 level6=0.5 send=0.6
+module room Kiln size=1 heat=0.45 bloom=1 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part pad "Ice pad" colour #5a4a7a
+  module icetr Tread step1=0.35 step2=0.35 step3=0.325 step4=0.3083 step5=0.3083 step6=0.3083 step7=0.3083 step8=0.3083 length=0.4286 glide=0.9
+  module icewarp Warp amount=0.15 speed=0.1 rough=0.1 chaos=0.2
+  module ice1 Chisel tune=0.5 fine=0.5 shape=0.9 pw=0.5
+  module ice2 Chisel tune=0.5208 fine=0.5 shape=0.9 pw=0.5
+  module iceply Ply layers=0.9 detune=0.6 width=1 tone=0.35
+  module iceflt Plane cutoff=0.28 res=0.3 mode=0 drive=0.1
+  module iceamp Clamp level=0.1 response=0
+  module rise Rocker rate=0.03 sync=0 shape=0.1 depth=0.5 offset=0.5
+
+part snow "Snow" colour #3da3a3 level=0.5
+  module snow Sawdust colour=0.8 crackle=0
+  module snowflt Plane cutoff=0.4 res=0.35 mode=0.33 drive=0
+  module snowamp Clamp level=0 response=0
+  module snowlfo Rocker rate=0.03 sync=0 shape=0.1 depth=0.5 offset=0.5 phase=0.15
+
+part cloud "Grain cloud" colour #b5527a level=0.6
+  module grains Splinter position=0.3 spray=0.3 size=0.8 density=0.3 pitch=0.3 scatter=0.1 reverse=0.5 shape=0.1 spread=1 level=0.6 hold=0
+  module scan Rocker rate=0.04 sync=0 shape=0 depth=0.8 offset=0.5
+  module freeze Shavings size=0.7 density=0.3 spray=0.5 pitch=0.5
+
+part bells "Distant bells" colour #d1a233 level=0.5
+  module bellrl Ruler hits_a=0 hits_b=0.0909 hits_c=0 hits_d=0 steps_a=1 steps_b=0.6667 rotate=0 chance=0.6
+  module belltr Tread step1=0.65 step2=0.6083 step3=0.6333 step4=0.55 step5=0.65 step6=0.5917 step7=0.6083 step8=0.5083 length=1.0 glide=0
+  module bell Mallet material=0.4 size=0.3 strike=0.3 damp=0.9
+
+part agit "Cracks" colour #c94a3d level=1
+  module crack Chatter energy=0.35 tension=0.25 damping=0.2 rate=0.05 depth=0.7
+
+cable clock.bar -> icetr.clock
+cable icetr.cv -> icewarp.in
+cable icewarp.out -> ice1.voct
+cable icewarp.out -> ice2.voct
+cable icewarp.out -> iceply.voct
+cable ice1.saw -> iceflt.in
+cable ice2.saw -> iceflt.in
+cable iceply.l -> iceflt.in
+cable iceply.r -> iceflt.in
+cable rise.out -> iceflt.cutoff
+cable crack.position -> iceflt.cutoff
+cable iceflt.out -> iceamp.in
+cable rise.out -> iceamp.cv
+cable iceamp.out -> mix.in1
+cable iceamp.out -> freeze.in
+cable freeze.l -> mix.in2
+cable freeze.r -> mix.in2
+cable snow.noise -> snowflt.in
+cable snowflt.out -> snowamp.in
+cable snowlfo.out -> snowflt.cutoff
+cable snowlfo.out -> snowamp.cv
+cable snowamp.out -> mix.in3
+cable scan.out -> grains.position
+cable grains.l -> mix.in4
+cable grains.r -> mix.in4
+cable clock.clock -> bellrl.clock
+cable bellrl.b -> belltr.clock
+cable bellrl.b -> bell.trig
+cable belltr.cv -> bell.voct
+cable bell.out -> mix.in5
+cable crack.moving -> freeze.freeze
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A iceflt.cutoff=0.2 snowflt.cutoff=0.3 grains.density=0.2
+scene B iceflt.cutoff=0.45 snowflt.cutoff=0.6 grains.density=0.5

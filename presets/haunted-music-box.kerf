@@ -1,0 +1,58 @@
+kerf 1
+tempo 66
+key E harmonic minor
+tags ominous music-box eerie
+
+module clock Tally tempo=0.5 swing=0.25 divide=0
+module mix Router level1=0.85 level2=0.6 level3=0.5 level4=0.5 level5=0.5 level6=0.5 send=0.55
+module room Kiln size=0.85 heat=0.35 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part box "Music box" colour #d1a233
+  module boxrl Ruler hits_a=0.75 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=1 rotate=0 chance=1
+  module boxtr Tread step1=0.6333 step2=0.6583 step3=0.6917 step4=0.675 step5=0.6583 step6=0.65 step7=0.625 step8=0.6333 length=1.0 glide=0
+  module boxwarp Warp amount=0.22 speed=0.2 rough=0.7 chaos=0.5
+  module boxmal Mallet material=0.33 size=0.25 strike=0.45 damp=0.5
+  module boxring Splice mode=0.6667 amount=0.3 coarse=0.62 fine=0.5 mix=0.25 level=0.5
+
+part drone "Cellar hum" colour #5a4a7a level=0.5
+  module humosc Lathe tune=0.25 table=0.3 turn=0.4 warp=0.3
+  module humlfo Rocker rate=0.07 sync=0 shape=0.1 depth=0.6 offset=0.5
+  module humflt Plane cutoff=0.4 res=0.3 mode=0 drive=0.1
+  module humamp Clamp level=0.25 response=0
+  module humfret Fret root=0.3333 scale=1 octave=0.375
+
+part dust "Dust and radio" colour #3da3a3 level=0.5
+  module dust Static tune=0.55 width=0.5 hiss=0.15 crackle=0.5 whistle=0.1 fade=0.5 ghost=0.4 level=0.5
+  module wob Chatter energy=0.4 tension=0.3 damping=0.25 rate=0.12 depth=0.8
+  module dustflt Plane cutoff=0.7 res=0.2 mode=0.67 drive=0
+
+cable clock.div4 -> boxrl.clock
+cable boxrl.a -> boxtr.clock
+cable boxrl.a -> boxmal.trig
+cable boxtr.cv -> boxwarp.in
+cable boxwarp.out -> boxmal.voct
+cable boxmal.out -> boxring.carrier
+cable boxring.out -> mix.in1
+cable boxring.out -> mix.in5
+cable boxtr.cv -> humfret.pitch
+cable humfret.pitch -> humosc.voct
+cable humlfo.out -> humosc.turn
+cable humosc.out -> humflt.in
+cable humlfo.out -> humflt.cutoff
+cable humflt.out -> humamp.in
+cable humlfo.out -> humamp.cv
+cable humamp.out -> mix.in2
+cable dust.out -> dustflt.in
+cable wob.position -> dustflt.cutoff
+cable dust.crackle -> wob.kick
+cable dustflt.out -> mix.in3
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A boxwarp.amount=0.1 dust.hiss=0.1
+scene B boxwarp.amount=0.4 dust.hiss=0.4

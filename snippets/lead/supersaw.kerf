@@ -1,0 +1,15 @@
+# title: Supersaw lead
+# about: Seven detuned saws spread across the stereo field, opened and closed by the sequencer's gate.
+# port: super_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: super_voice.l, super_voice.r (audio): the lead, already cabled to out.
+part super "Supersaw lead" colour #e0802e level=0.45
+  module super_seq Dovetail steps_a=0.47 steps_b=0.47 interlock=0.5 chance=0.8 glide=0.05 range=0.3
+  module super_scale Fret root=0.75 scale=0.43 octave=0.5
+  module super_voice Ply layers=0.7 detune=0.4 width=0.8 tone=0.55
+
+cable clock.clock -> super_seq.clock
+cable super_seq.pitch -> super_scale.pitch
+cable super_scale.pitch -> super_voice.voct
+cable super_seq.gate -> super_voice.gate
+cable super_voice.l -> out.l
+cable super_voice.r -> out.r

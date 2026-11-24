@@ -1,0 +1,54 @@
+kerf 1
+tempo 60
+key D dorian
+tags drone ambient
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.5 level6=0.7 send=0.4
+module room Kiln size=0.85 heat=0.6 bloom=0.6 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part drone "Hum" colour #7a4fb5 level=0.7
+  module droneflt Plane cutoff=0.3 res=0.3 mode=0 drive=0.25
+  module dronelfo Spokeshave rate=0.05 spread=0.6 shape=0 phase=0.25
+  module dronefreq Warp amount=0.1 speed=0.1 rough=0.05 chaos=0.05
+  module droneo0 Chisel tune=0.125 fine=0.5 shape=0.4 pw=0.5
+  module droneo1 Chisel tune=0.125 fine=0.52 shape=0.4 pw=0.5
+  module droneo2 Chisel tune=0.25 fine=0.5 shape=0.4 pw=0.5
+  module droneo3 Chisel tune=0.375 fine=0.48 shape=0.4 pw=0.5
+  module dronebuzz Static tune=0.15 width=0.1 hiss=0.1 crackle=0 whistle=0.35 fade=0.15 ghost=0.1 level=0.1
+
+part tex "Room" colour #3da3a3 level=0.35
+  module texsrc Sawdust colour=0.3 crackle=0.1
+  module texflt Plane cutoff=0.35 res=0.2 mode=0 drive=0.1
+  module texamp Clamp level=0.5 response=0.4
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module texlfo Spokeshave rate=0.04 spread=0.5 shape=0 phase=0.25
+
+cable dronelfo.lfo1 -> droneflt.cutoff
+cable droneflt.out -> mix.in6
+
+cable texsrc.noise -> texflt.in
+cable texflt.out -> texamp.in
+cable texamp.out -> mix.in6
+cable texburl.drift -> texflt.cutoff
+cable texlfo.lfo1 -> texflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable dronefreq.out -> droneo0.voct
+cable dronefreq.out -> droneo1.voct
+cable dronefreq.out -> droneo2.voct
+cable dronefreq.out -> droneo3.voct
+cable droneo0.saw -> droneflt.in
+cable droneo1.sub -> droneflt.in
+cable droneo2.square -> droneflt.in
+cable droneo3.sine -> droneflt.in
+cable dronebuzz.out -> droneflt.in
+scene A droneflt.cutoff=0.23 texflt.cutoff=0.23
+scene B droneflt.cutoff=0.53 texflt.cutoff=0.5

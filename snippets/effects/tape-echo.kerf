@@ -1,0 +1,11 @@
+# title: Tape echo
+# about: A tape delay locked to the clock, wet only. Feed it from any sound and keep that sound's own cable to out for the dry signal.
+# feed: echo_tape.in
+# port: echo_tape.time (cv): move the delay time; fast moves bend the pitch.
+# port: echo_tape.l, echo_tape.r (audio): the echoes, already cabled to out.
+part echo "Tape echo" colour #d1a233
+  module echo_tape Bandsaw time=0.5 feedback=0.45 wear=0.35 mix=1
+
+cable clock.clock -> echo_tape.clock
+cable echo_tape.l -> out.l
+cable echo_tape.r -> out.r

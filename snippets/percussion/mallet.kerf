@@ -1,0 +1,15 @@
+# title: Wooden mallet
+# about: A struck wooden bar playing a sparse line in A minor.
+# port: mallet_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: mallet_bar.out (audio): the bar, already cabled to out.
+part mallet "Wooden mallet" colour #3d9c8a level=0.6
+  module mallet_seq Dovetail steps_a=0.47 steps_b=0.6 interlock=0.6 chance=0.7 glide=0 range=0.3
+  module mallet_scale Fret root=0.75 scale=0.43 octave=0.5
+  module mallet_bar Mallet material=0.1 size=0.3 strike=0.5 damp=0.5
+
+cable clock.clock -> mallet_seq.clock
+cable mallet_seq.pitch -> mallet_scale.pitch
+cable mallet_scale.pitch -> mallet_bar.voct
+cable mallet_seq.gate -> mallet_bar.trig
+cable mallet_bar.out -> out.l
+cable mallet_bar.out -> out.r

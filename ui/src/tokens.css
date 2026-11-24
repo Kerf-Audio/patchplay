@@ -1,0 +1,263 @@
+/* patchplay: design tokens and base elements.
+   Two themes on :root[data-theme]: day (default, light) and night (fully dark).
+   Surfaces are flat, with soft shadows. Four encoder colours, same in both.
+   Type scale: 10 / 11 / 12 / 13 / 15 / 18. Radii: 6 / 8 / 12. Weights: 400 and 500 only. */
+:root {
+  /* shape, type, motion */
+  --r-sm: 6px;
+  --r: 8px;
+  --r-lg: 12px;
+  --hp: 18px;
+  --ease: .15s ease-out;
+  --accent: #ff5a1f;
+  --accent-ink: #a8380a;
+  --accent-tint: #ffe6d9;
+  --ok: #1d6b4e;
+  --bad: #a63a28;
+  --field: #fdfdfb;
+
+  /* encoder colours: knob 1 blue, 2 green, 3 white, 4 orange, then they cycle. Same in both themes. */
+  --enc-1: #3b7bff;
+  --enc-2: #2ed07e;
+  --enc-3: #f1f1ec;
+  --enc-4: #ff7a1a;
+  --knob-ink: #ecebe6;
+
+  font: 12px/1.4 "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+
+:root, :root[data-theme="day"] {
+  color-scheme: light;
+  /* body */
+  --paper: #ecebe6;
+  --chrome: #f1f0ec;
+  --panel: #f6f5f1;
+  --panel-edge: #d3d1c9;
+  --line: #dcdad2;
+  --well: #dad8d0;
+  --bar-top: #f4f3ef;
+  --bar-bot: #e9e8e3;
+  --ink: #1b1c1e;
+  --muted: #55534d;
+  --ok-bg: #e1efe8;
+  --ok-edge: #b6d6c5;
+  --bad-bg: #f6e3dd;
+  --bad-edge: #e2b8ad;
+  --key-top: #fbfaf7;
+  --key-bot: #e6e4dd;
+  --key-edge: #cfcdc5;
+  --key-hover-top: #ffffff;
+  --key-hover-bot: #ecebe4;
+  --key-down: #dad8d0;
+  --hi: #ffffffb3;
+  --bevel: 0 1px 0 var(--hi) inset, 0 1px 2px #0000001f;
+  --pressed: 0 1px 3px #00000033 inset;
+  --primary: #1b1c1e;
+  --primary-ink: #f4f4f0;
+  --primary-hover: #33353a;
+  --primary-down: #000;
+  --pop-shadow: 0 6px 18px #0003;
+  --flash: #fde9dc;
+  --warn-ink: #7a5200;
+  --metal: conic-gradient(from 30deg, #dedcd5, #8f8d86, #eceae3, #7e7c76, #dedcd5);
+
+  /* display: rack, editor, waveform, catalogue */
+  --screen: #dedcd5;
+  --screen-2: #f8f7f3;
+  --screen-3: #ecebe5;
+  --screen-sunk: #e6e4dd;
+  --screen-line: #d0cdc4;
+  --screen-edge: #8a877e;
+  --screen-ink: #1b1c1e;
+  --screen-muted: #55534d;
+  --lcd: #d9d7cf;
+  --hot: #9c3208;
+  --wash: #0000000d;
+  --track: #d4d2ca;
+  --cap: #2a2c30;
+  --cap-edge: #1b1c1e59;
+  --hole: #26282c;
+  --hatch: #0000000a;
+  --well-shadow: 0 1px 3px #0000001f inset;
+  --card-shadow: 0 1px 2px #0000001a, 0 4px 12px #00000012;
+  --lift-shadow: 0 0 0 1.5px var(--screen-ink), 0 8px 20px #0000002e;
+  --cable-shadow: .12;
+  --cable-sheen: .5;
+  --wave-bg: var(--screen-sunk);
+  --wave-zero: #0000002e;
+  --code: #f4f3ef;
+  --code-gutter: #6f6d66;
+  --code-line: #dcdad2;
+  --code-active: #0000000a;
+  --code-select: #3b7bff40;
+
+  /* jack kinds, dark enough for a light display */
+  --audio: #0a8359;
+  --cv: #3a64d8;
+  --pitch: #8a4fd6;
+  --gate: #9a6900;
+  --clock: #cc3f29;
+
+  /* syntax */
+  --syn-kw: #7a3fc0;
+  --syn-type: #0b7a55;
+  --syn-prop: #2f55c4;
+  --syn-var: #1b1c1e;
+  --syn-num: #8a5a00;
+  --syn-str: #b04a12;
+  --syn-atom: #c23a26;
+  --syn-op: #5d5b55;
+  --syn-cmt: #6b6a64;
+}
+
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --accent-ink: #ff8a55;
+  --accent-tint: #ff5a1f24;
+  --field: #111214;
+  --ok: #4ade9a;
+  --bad: #ff8a78;
+  --paper: #111214;
+  --chrome: #16171a;
+  --panel: #1a1c1f;
+  --panel-edge: #2b2e33;
+  --line: #2a2d32;
+  --well: #0c0d0f;
+  --bar-top: #1c1e21;
+  --bar-bot: #17181b;
+  --ink: #ecebe6;
+  --muted: #9a9ca2;
+  --ok-bg: #12291f;
+  --ok-edge: #1f4a37;
+  --bad-bg: #2e1914;
+  --bad-edge: #5a2c22;
+  --key-top: #24272b;
+  --key-bot: #1d1f23;
+  --key-edge: #363a40;
+  --key-hover-top: #2c2f34;
+  --key-hover-bot: #24272b;
+  --key-down: #18191c;
+  --hi: #ffffff0f;
+  --bevel: 0 1px 0 var(--hi) inset, 0 1px 2px #00000080;
+  --pressed: 0 1px 3px #000000a0 inset;
+  --primary: #d9d8d2;
+  --primary-ink: #141518;
+  --primary-hover: #ecebe6;
+  --primary-down: #bdbcb6;
+  --pop-shadow: 0 8px 24px #000a;
+  --flash: #ff5a1f40;
+  --warn-ink: #fbbf24;
+  --metal: conic-gradient(from 30deg, #5a5d63, #2a2c30, #6a6d73, #25272b, #5a5d63);
+
+  --screen: #0d0e10;
+  --screen-2: #17191c;
+  --screen-3: #1f2226;
+  --screen-sunk: #0c0d0f;
+  --screen-line: #3d4046;
+  --screen-edge: #8d9097;
+  --screen-ink: #ecebe6;
+  --screen-muted: #a2a4aa;
+  --lcd: #0d0e10;
+  --hot: #ff7a1a;
+  --wash: #ffffff1a;
+  --track: #2a2c30;
+  --cap: #3a3d43;
+  --cap-edge: #ffffff2e;
+  --hole: #000;
+  --hatch: #ffffff0d;
+  --well-shadow: 0 3px 12px #000c inset, 0 0 0 1px #000 inset;
+  --card-shadow: none;
+  --lift-shadow: 0 0 0 1.5px var(--screen-ink), 0 6px 16px #000a;
+  --cable-shadow: .6;
+  --cable-sheen: .35;
+  --wave-bg: #08090a;
+  --wave-zero: #ffffff33;
+  --code: #0d0e10;
+  --code-gutter: #8a8d94;
+  --code-line: #2a2c30;
+  --code-active: #ffffff0a;
+  --code-select: #3b7bff55;
+
+  --audio: #34d399;
+  --cv: #6a96ff;
+  --pitch: #c58bff;
+  --gate: #fbbf24;
+  --clock: #ff7a6b;
+
+  --syn-kw: #c58bff;
+  --syn-type: #34d399;
+  --syn-prop: #6a96ff;
+  --syn-var: #ecebe6;
+  --syn-num: #fbbf24;
+  --syn-str: #ff9a63;
+  --syn-atom: #ff7a6b;
+  --syn-op: #a2a4aa;
+  --syn-cmt: #8a8d94;
+}
+
+/* one spacing scale (4/8) and one type scale; values use tabular numerals so they do not jitter */
+:root {
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-5: 24px;
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-lg: 15px;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-variant-numeric: tabular-nums; }
+button { font: inherit; letter-spacing: inherit; color: inherit; cursor: pointer; }
+.hidden { display: none !important; }
+.ico { width: 14px; height: 14px; flex: none; pointer-events: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::placeholder { color: var(--muted); opacity: 1; }
+.display :focus-visible, .ed-host :focus-visible, #bench-scroll :focus-visible { outline-color: var(--screen-ink); }
+h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-sm); font-weight: 500; text-transform: lowercase; letter-spacing: .12em; color: var(--muted); display: flex; align-items: center; gap: var(--sp-2); }
+.hint { color: var(--muted); font-size: var(--fs-sm); }
+h3 .hint { text-transform: none; letter-spacing: .02em; font-size: 11px; margin-left: auto; }
+
+/* everything that is a label is lowercase; module kinds, ids and code stay as written */
+header, nav, .toolbar, .btn, .check, .pill, aside, footer, #tip, #toast, .palette, .page h2, .page .intro,
+.sp-row, .legend, .docs-toc, .part-label, .scene, .ed-bar, .knob label, .jack label,
+.mod-sub, .empty, .code-tools, .node, #explain-text { text-transform: lowercase; }
+.pal-item b, .mod-head b, .node .nlabel, .legend b, .kindtag, #tip .kind, #log, #text, .prompt input, .ed-host, .cm-tooltip, .ed-errors, .ed-hover, .kerf-hover { text-transform: none; }
+.part-name b { text-transform: lowercase; }
+
+/* soft transitions on the things you touch; the theme switch fades colours briefly */
+.btn, nav button, .chip, .scene, .sp-row, .node, .mod, .part-label .tools button, .lockbtn, .jack .hole, .pal-item,
+.docs-toc a, .code-tools button, .sample-choose, .sample-clear, #play {
+  transition: background-color var(--ease), color var(--ease), border-color var(--ease), box-shadow var(--ease), opacity var(--ease), transform .12s ease-out;
+}
+html.theming, html.theming * { transition: background-color .16s ease-out, color .16s ease-out, border-color .16s ease-out, fill .16s ease-out, stroke .16s ease-out, box-shadow .16s ease-out !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+
+/* buttons: secondary (default), primary, ghost and toggle (.on); flat, one pressed state */
+.btn, .toolbar select, .files .btn { height: 32px; border: 1px solid var(--key-edge); border-radius: var(--r); background: var(--key-top); padding: 0 var(--sp-3); font: inherit; letter-spacing: .04em; }
+.toolbar select { padding: 0 var(--sp-2); }
+.btn { display: inline-flex; align-items: center; gap: var(--sp-2); font-weight: 500; }
+.btn:hover { background: var(--key-hover-top); }
+.btn:active { background: var(--key-down); }
+.btn.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+.btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn.primary:active { background: var(--primary-down); }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover { background: var(--key-top); border-color: var(--key-edge); }
+.btn.on { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-tint); }
+.btn.primary.on { background: var(--accent); color: var(--ink); border-color: #c43c0a; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn .ico { width: 14px; height: 14px; }
+.sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+input[type=range] { accent-color: var(--accent); }
+
+/* tooltip: a small floating card */
+#tip { position: fixed; z-index: 50; max-width: 260px; background: var(--screen-2); color: var(--screen-ink); border: 1px solid var(--screen-line); padding: 8px 11px; border-radius: var(--r); font-size: 12px; pointer-events: none; box-shadow: var(--pop-shadow); }
+#tip b { display: block; margin-bottom: 2px; font-weight: 500; }
+#tip .meta { color: var(--screen-muted); font-size: 11px; margin-top: 4px; }
+#tip .kindtag { display: inline-block; padding: 0 6px; border-radius: 999px; border: 1px solid var(--k); color: var(--k); font-size: 10px; margin-left: 4px; }

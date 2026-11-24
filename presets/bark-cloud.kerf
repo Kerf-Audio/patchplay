@@ -1,0 +1,58 @@
+kerf 1
+tempo 66
+key B dorian
+tags granular ambient
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.6 level6=0.65 send=0.45
+module room Kiln size=0.9 heat=0.5 bloom=0.6 mix=1
+module out Finish volume=0.9 glue=0.3 ceiling=0.8
+
+part pad "Pad" colour #7a4fb5 level=1
+  module padseq Dovetail steps_a=0.2 steps_b=0.0667 interlock=0 chance=0.8 glide=0.1 range=0.3
+  module padfret Fret root=0.9167 scale=0.57 octave=0.5
+  module padsplin Splinter position=0.3 spray=0.25 size=0.9 density=0.95 pitch=0.5 scatter=0.05 reverse=0.2 shape=0.1 spread=0.9 level=1 hold=0
+  module padflt Plane cutoff=0.55 res=0.2 mode=0 drive=0
+  module padfltr Plane cutoff=0.55 res=0.2 mode=0 drive=0
+  module padscan Rocker rate=0.2 shape=0.1 depth=0.4 offset=0.5
+  module paddrift Spokeshave rate=0.05 spread=0.5 shape=0 phase=0.25
+
+part gr "Scatter" colour #8a8f98 level=0.7
+  module grg Shavings size=0.5 density=0.6 spray=0.6 pitch=0.7
+  module grfr Ruler hits_a=0.0625 steps_a=1 hits_b=0 hits_c=0 hits_d=0
+
+part gr2 "Low scatter" colour #8a8f98 level=0.5
+  module gr2g Shavings size=0.7 density=0.35 spray=0.4 pitch=0.3
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+
+cable clock.clock -> grfr.clock
+cable grfr.a -> grg.freeze
+cable grg.l -> mix.in6
+cable grg.r -> mix.in6
+
+cable gr2g.l -> mix.in5
+cable gr2g.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable padfret.pitch -> padsplin.voct
+cable padscan.out -> padsplin.position
+cable padsplin.l -> padflt.in
+cable padsplin.r -> padfltr.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable paddrift.lfo2 -> padfltr.cutoff
+cable padflt.out -> out.l
+cable padfltr.out -> out.r
+cable padflt.out -> room.in_l
+cable padfltr.out -> room.in_r
+cable padflt.out -> grg.in
+cable padfltr.out -> gr2g.in
+scene A padflt.cutoff=0.3 grg.spray=0.45 gr2g.spray=0.25
+scene B padflt.cutoff=0.65 grg.spray=0.8 gr2g.spray=0.6

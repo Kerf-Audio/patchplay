@@ -1,0 +1,89 @@
+kerf 1
+tempo 66
+key E minor
+tags reggae dub space
+
+module clock Tally tempo=0.5 swing=0.1 divide=0
+module mix Router level1=0.75 level2=0.6 level3=0.8 level4=0.55 level5=0.5 level6=0.45 send=0.5
+module room Kiln size=0.9 heat=0.5 bloom=0.5 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module drumrl Ruler hits_a=0.0625 hits_b=0 hits_c=0.25 hits_d=0.2857 steps_a=1 steps_b=1 steps_c=1 steps_d=0.4 rotate=0.5 chance=0.4
+  module kick Mortise engine=0 pitch=0.25 punch=0.4 decay=0.55 tone=0.35
+  module rim Mortise engine=0.25 pitch=0.7 punch=0.7 decay=0.18 tone=0.7
+
+part bass "Bass" colour #3d63c9 level=0.9
+  module bassrl Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=0.4667 steps_b=0.4667 steps_c=0.4667 steps_d=0.4667 rotate=0.0 chance=1
+  module basstr Tread step1=0.2333 step2=0.2333 step3=0.2333 step4=0.2583 step5=0.275 step6=0.275 step7=0.2583 step8=0.2917 length=1.0 glide=0.12 rate=0.5 direction=0
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module bassflt Plane cutoff=0.3 res=0.1 mode=0 drive=0.35
+  module bassenv Bevel attack=0.0 decay=0.7 sustain=0.7 release=0.5 curve=0.4
+  module bassamp Clamp level=0 response=0.1
+
+part skank "Skank" colour #d1a233 level=0.8
+  module skrl Ruler hits_a=0.25 hits_b=0.125 hits_c=0 hits_d=0 steps_a=1 steps_b=1 rotate=0.125 chance=0.6
+  module chordtr Tread step1=0.5333 step2=0.5333 step3=0.475 step4=0.475 step5=0.475 step6=0.475 step7=0.475 step8=0.475 length=0.4286 glide=0
+  module chord Mitre chord=0.692 inversion=0 spread=0.34 root=0.75
+  module skosc1 Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.4
+  module skosc2 Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.55
+  module skflt Plane cutoff=0.4 res=0.35 mode=0 drive=0.1
+  module skenv Bevel attack=0 decay=0.2 sustain=0 release=0.12 curve=0.35
+  module skamp Clamp level=0 response=0.5
+
+part fx "Echo and tape" colour #3da3a3
+  module echo Dado time=0.714 sync=1 feedback=0.78 tone=0.4 thin=0.3 wobble=0.45 drive=0.3 mix=1
+  module ret Plane cutoff=0.45 res=0.4 mode=0 drive=0.1
+  module retlfo Rocker rate=0.08 sync=0 shape=0 depth=0.35 offset=0.5
+  module dust Static tune=0.4 width=0.5 hiss=0.3 crackle=0.35 whistle=0.1 fade=0.4 ghost=0.2 level=0.35
+
+part siren "Siren" colour #b5527a level=0.45
+  module siren Siren pitch=0.4 range=0.55 rate=0.3 shape=0 wave=0.75 release=0.7 cutoff=0.5 resonance=0.3 drive=0.1
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable clock.clock -> drumrl.clock
+cable drumrl.a -> kick.trig
+cable drumrl.a -> rim.trig
+cable kick.out -> mix.in1
+cable rim.out -> mix.in2
+cable rim.out -> echo.in_l
+cable clock.div4 -> bassrl.clock
+cable clock.div4 -> basstr.clock
+cable basstr.cv -> bassosc.voct
+cable bassrl.a -> bassenv.gate
+cable bassosc.sine -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in3
+cable clock.clock -> skrl.clock
+cable clock.bar -> chordtr.clock
+cable chordtr.cv -> chord.pitch
+cable skrl.a -> chord.gate
+cable skrl.a -> skenv.gate
+cable chord.voice2 -> skosc1.voct
+cable skosc1.square -> skflt.in
+cable chord.voice4 -> skosc2.voct
+cable skosc2.square -> skflt.in
+cable skflt.out -> skamp.in
+cable skenv.env -> skamp.cv
+cable skamp.out -> mix.in4
+cable skamp.out -> echo.in_l
+cable skenv.env -> skflt.cutoff
+cable echo.l -> ret.in
+cable echo.r -> ret.in
+cable ret.out -> mix.in6
+cable retlfo.out -> ret.cutoff
+cable dust.out -> echo.in_l
+cable skrl.b -> echo.throw
+cable drumrl.d -> siren.gate
+cable siren.out -> mix.in5
+cable siren.out -> echo.in_l
+cable siren.out -> echo.in_r
+
+scene A ret.cutoff=0.3 echo.feedback=0.6 room.size=0.7
+scene B ret.cutoff=0.7 echo.feedback=0.88 room.size=1.0

@@ -1,0 +1,127 @@
+kerf 1
+tempo 106
+key G major
+style tape-keys seed 7
+tags four-four
+
+module tally1 Tally tempo=0.5 swing=0.08 divide=0.5
+module mix    Router level1=0.7 level2=0.4 level3=0.3 level4=0.55 level5=0.55 level6=0 send=0.3
+module room   Kiln   size=0.6 heat=0.35 bloom=0.35 mix=1
+module out    Finish volume=0.68 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.25 steps_a=1 hits_b=0.5 steps_b=1 hits_c=0.4 steps_c=0.667 hits_d=0 chance=0.8
+  module ruler2 Ruler   hits_a=0.125 steps_a=1 hits_b=0.3 steps_b=0.733 hits_c=0 hits_d=0 rotate=0.25 chance=0.55
+  module kick   Mortise engine=0 pitch=0.35 punch=0.6 decay=0.28 tone=0.45
+  module snare  Mortise engine=0.25 pitch=0.5 punch=0.6 decay=0.3 tone=0.55
+  module hat    Mortise engine=0.5 pitch=0.55 punch=0.5 decay=0.12 tone=0.7
+  module perc   Mortise engine=1 pitch=0.75 punch=0.6 decay=0.15 tone=0.6
+  module duck   Bevel   attack=0 decay=0.4 sustain=0 release=0.4 curve=0.3
+  module dbus   Router  level1=0.6 level2=0.45 level3=0.7 level4=0.3 level5=0.4 level6=0
+
+part chop "Sample chop" colour #d1a233
+  module ruler3 Ruler   hits_a=0.15 steps_a=0.667 hits_b=0.3 steps_b=0.4 hits_c=0 hits_d=0 chance=0.6
+  module pick   Burl    rate=0.5 smooth=0.2 bias=0.5
+  module chop   Veneer  slice=0.2 speed=0.55 reverse=0 looped=0
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=1 steps_b=0.4 interlock=0.7 chance=0.8 glide=0.1 range=0.15
+  module bfret Fret     root=0.5833 scale=0.2857 octave=0.375
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.4
+  module benv  Bevel    attack=0 decay=0.35 sustain=0.2 release=0.25 curve=0.35
+  module bflt  Plane    cutoff=0.38 res=0.3 mode=0 drive=0.3
+  module bamp  Clamp    level=0 response=0.2
+  module bduck Clamp    level=0 response=0
+
+part chords "Chords" colour #7a4fb5
+  module cseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=0.5 chance=0.95 glide=0.4 range=0.3
+  module cfret Fret     root=0.5833 scale=0.2857 octave=0.5
+  module ply1  Ply      layers=0.6 detune=0.35 width=0.9 tone=0.4
+
+part arp "Mallet arp" colour #3d9c8a
+  module aseq  Dovetail steps_a=0.47 steps_b=0.33 interlock=0.4 chance=0.6 glide=0 range=0.45
+  module afret Fret     root=0.5833 scale=0.2857 octave=0.5
+  module mal   Mallet   material=0.15 size=0.5 strike=0.5 damp=0.35
+
+part lead "Lead" colour #e0662f
+  module lseq  Dovetail steps_a=0.4 steps_b=0.27 interlock=0.6 chance=0.7 glide=0.2 range=0.4
+  module lfret Fret     root=0.5833 scale=0.2857 octave=0.625
+  module losc  Chisel   tune=0.5 shape=0 pw=0.45
+  module lenv  Bevel    attack=0.02 decay=0.45 sustain=0.3 release=0.4 curve=0.4
+  module lflt  Plane    cutoff=0.5 res=0.35 mode=0 drive=0.15
+  module lamp  Clamp    level=0 response=0.35
+  module echo  Bandsaw  time=0.5 feedback=0.4 wear=0.3 mix=0.35
+
+part motion "Motion" colour #8a8a8a
+  module lfos  Spokeshave rate=0.35 spread=0.5 shape=0.1 phase=0.25
+  module macro Jig        m1=0.35 m2=0.3 m3=0.2 m4=0.5
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler1.a -> duck.gate
+cable ruler1.b -> hat.trig
+cable ruler1.c -> perc.trig
+cable ruler2.a -> snare.trig
+cable ruler2.b -> snare.trig
+cable kick.out -> dbus.in1
+cable snare.out -> dbus.in2
+cable hat.out -> dbus.in3
+cable chop.l -> dbus.in4
+cable chop.r -> dbus.in4
+cable perc.out -> dbus.in5
+cable dbus.mix_l -> mix.in1
+
+cable tally1.clock -> ruler3.clock
+cable ruler3.a -> pick.trig
+cable ruler3.b -> pick.trig
+cable ruler3.a -> chop.trig
+cable ruler3.b -> chop.trig
+cable pick.stepped -> chop.slice
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bduck.in
+cable duck.inverted -> bduck.cv
+cable bduck.out -> mix.in2
+
+cable tally1.bar -> cseq.clock
+cable cseq.pitch -> cfret.pitch
+cable cfret.pitch -> ply1.voct
+cable ply1.l -> mix.in3
+cable ply1.r -> mix.in3
+
+cable tally1.clock -> aseq.clock
+cable aseq.pitch -> afret.pitch
+cable afret.pitch -> mal.voct
+cable aseq.gate -> mal.trig
+cable mal.out -> mix.in5
+
+cable tally1.div4 -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> losc.voct
+cable lseq.gate -> lenv.gate
+cable losc.saw -> lflt.in
+cable lfos.lfo1 -> lflt.cutoff
+cable macro.m1 -> lflt.cutoff
+cable lflt.out -> lamp.in
+cable lenv.env -> lamp.cv
+cable lamp.out -> echo.in
+cable tally1.clock -> echo.clock
+cable echo.l -> mix.in4
+cable echo.r -> mix.in4
+
+cable mix.send -> room.in_l
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A macro.m1=0.2 macro.m2=0.3 lfos.rate=0.25
+scene B macro.m1=0.55 macro.m2=0.7 lfos.rate=0.5

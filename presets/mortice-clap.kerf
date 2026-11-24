@@ -1,0 +1,81 @@
+kerf 1
+tempo 119
+key G minor
+tags four-four bleep bass
+
+module tally1 Tally tempo=0.5 swing=0.07 divide=0.5
+module mix    Router level1=0.8 level2=0.95 level3=0.3 level4=0.6 level5=0.55 level6=0.4 send=0.12
+module room   Kiln   size=0.4 heat=0.6 bloom=0.2 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Clicks and claps" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0.15 steps_b=0.73 hits_c=0 hits_d=0 chance=0.35
+  module snap   Ruler   hits_a=0.125 steps_a=1 hits_b=0.3 steps_b=0.47 hits_c=0.2 steps_c=0.27 hits_d=0 rotate=0.25 chance=0.5
+  module hats   Ruler   hits_a=0.5 steps_a=1 hits_b=0.2 steps_b=0.6 hits_c=0 hits_d=0 chance=0.4
+  module kick   Mortise engine=0 pitch=0.3 punch=0.8 decay=0.3 tone=0.3
+  module clap   Mortise engine=0.75 pitch=0.55 punch=0.85 decay=0.1 tone=0.65
+  module clip   Rasp    drive=0.65 fold=0 bias=0.5 mix=0.75
+  module click  Mortise engine=0.5 pitch=0.85 punch=0.7 decay=0.02 tone=0.9
+  module chaos  Chatter energy=0.5 tension=0.6 damping=0.4 rate=0.3 depth=0.5
+
+part sub "Sub" colour #3d63c9 level=0.9
+  module bseq   Dovetail steps_a=0.2 steps_b=0.27 interlock=0.8 chance=0.85 glide=0.2 range=0.15
+  module bfret  Fret     root=0.583 scale=0.143 octave=0.25
+  module bosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module benv   Bevel    attack=0.01 decay=0.35 sustain=0.5 release=0.2 curve=0.45
+  module bamp   Clamp    level=0 response=0.05
+  module squeeze Vise    squeeze=0.6 speed=0.6 makeup=0.35
+
+part siren "Siren bleeps" colour #d1a233 level=0.5
+  module lrhy   Ruler   hits_a=0.375 steps_a=1 hits_b=0 hits_c=0 hits_d=0 chance=1
+  module lseq   Dovetail steps_a=0.47 steps_b=0.27 interlock=0 chance=1 glide=0 range=0.3
+  module lfret  Fret    root=0.583 scale=0.143 octave=0.625
+  module sir    Siren   pitch=0.5 range=0.12 rate=0.7 sync=0 shape=0 wave=0 release=0.25 cutoff=0.75 resonance=0.35 drive=0.2
+  module lecho  Dado    time=0.43 sync=1 feedback=0.45 tone=0.45 thin=0.35 wobble=0.25 drive=0.15 mix=0.35
+  module wob    Rocker  rate=0.2 sync=0.15 shape=0 depth=0.5 offset=0.5 phase=0
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> snap.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable beat.b -> kick.trig
+cable snap.a -> clap.trig
+cable snap.b -> clap.trig
+cable snap.c -> click.trig
+cable hats.a -> click.trig
+cable hats.b -> click.trig
+cable snap.a -> chaos.kick
+cable kick.out -> mix.in1
+cable clap.out -> clip.in
+cable clip.out -> mix.in4
+cable click.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.sine -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.clock -> lrhy.clock
+cable tally1.clock -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> sir.voct
+cable lrhy.a -> sir.gate
+cable wob.out -> sir.rate
+cable sir.out -> lecho.in_l
+cable lecho.l -> mix.in5
+cable lecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A sir.range=0.05 sir.resonance=0.2 wob.depth=0.3 snap.chance=0.3 clap.decay=0.08
+scene B sir.range=0.3 sir.resonance=0.55 wob.depth=0.8 snap.chance=0.7 clap.decay=0.2

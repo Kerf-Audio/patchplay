@@ -1,0 +1,50 @@
+kerf 1
+tempo 72
+key G dorian
+tags abstract chance
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=1 level2=1 level3=0.8 level4=0.9 level5=0 level6=0 send=0.4
+module room   Kiln   size=0.8 heat=0.5 bloom=0.5 mix=1
+module out    Finish volume=0.8 glue=0.3 ceiling=0.8
+
+part pluck "Chance plucks" colour #3d9c8a level=0.9
+  module kseq   Dovetail steps_a=0.4 steps_b=0.27 interlock=0.7 chance=0.5 glide=0 range=0.3
+  module kfret  Fret     root=0.583 scale=0.571 octave=0.5
+  module ka     Burl     rate=0.3 smooth=0.5 bias=0.5
+  module kb     Burl     rate=0.2 smooth=0.8 bias=0.5
+  module mal1   Mallet   material=0.35 size=0.4 strike=0.5 damp=0.4
+  module mal2   Mallet   material=0.7 size=0.55 strike=0.35 damp=0.25
+  module echo   Bandsaw  time=0.75 feedback=0.5 wear=0.4 mix=0.5
+
+part hum "Lathe hum" colour #7a4fb5 level=1
+  module hum    Lathe    tune=0.4 table=0.4 turn=0.3 warp=0.2
+  module hamp   Clamp    level=0.8 response=0
+
+cable tally1.bar -> kseq.clock
+cable kseq.pitch -> kfret.pitch
+cable kfret.pitch -> mal1.voct
+cable kfret.pitch -> mal2.voct
+cable tally1.bar -> ka.trig
+cable tally1.bar -> kb.trig
+cable ka.coin -> mal1.trig
+cable kb.coin -> mal2.trig
+cable mal1.out -> mix.in1
+cable mal2.out -> mix.in2
+cable mal1.out -> echo.in
+cable mal2.out -> echo.in
+cable tally1.clock -> echo.clock
+cable echo.l -> mix.in3
+cable echo.r -> mix.in3
+cable kb.drift -> hum.turn
+cable hum.out -> hamp.in
+cable hamp.out -> mix.in4
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A ka.smooth=0.5 echo.feedback=0.4 mal1.damp=0.5 hum.table=0.3 kseq.chance=0.4
+scene B ka.smooth=0.2 echo.feedback=0.7 mal1.damp=0.2 hum.table=0.8 kseq.chance=0.8

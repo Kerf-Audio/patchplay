@@ -1,0 +1,143 @@
+name: release
+
+# A tag such as v0.1.0 publishes a GitHub Release with the web build as a zip. The Linux desktop
+# app (a .deb and an AppImage) is built only when run by hand against an existing tag's release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      build_desktop:
+        description: Build the Linux desktop app and attach it to the release
+        type: boolean
+        default: false
+      tag:
+        description: The existing tag whose release gets the desktop app, such as v0.1.0
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  web:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Must match the wasm-bindgen version pinned in crates/kerf-web/Cargo.toml.
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli --version 0.2.130 --locked
+
+      - name: Install binaryen
+        run: sudo apt-get update && sudo apt-get install -y binaryen
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      # Built for the root of a site, like patchplay.kerfaudio.com.
+      - name: Build patchplay
+        run: scripts/build-web.sh
+
+      - name: Zip the web build
+        run: cd ui/dist-web && zip -r "$GITHUB_WORKSPACE/patchplay-web-${GITHUB_REF_NAME}.zip" .
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: patchplay-web-${{ github.ref_name }}.zip
+
+  linux:
+    # Run by hand (Actions, "Run workflow") to add the Linux desktop app to an existing release.
+    if: github.event_name == 'workflow_dispatch' && inputs.build_desktop
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: System libraries
+        run: >
+          sudo apt-get update && sudo apt-get install -y
+          libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          libasound2-dev patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      # `cargo tauri build` builds the UI first (beforeBuildCommand in tauri.conf.json).
+      - run: npm ci
+        working-directory: ui
+
+      - run: cargo install tauri-cli --version "^2" --locked
+
+      - run: cargo tauri build --bundles deb,appimage
+        working-directory: crates/kerf-app
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: |
+            target/release/bundle/deb/*.deb
+            target/release/bundle/appimage/*.AppImage
+
+  plugin:
+    # Run by hand with the desktop app: the CLAP and VST3 plugin for Linux and macOS. The macOS
+    # bundles are ad-hoc signed only, so a host may ask to allow them in Privacy & Security.
+    if: github.event_name == 'workflow_dispatch' && inputs.build_desktop
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            name: linux
+          - os: macos-latest
+            name: macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: System libraries
+        if: runner.os == 'Linux'
+        run: >
+          sudo apt-get update && sudo apt-get install -y
+          libasound2-dev libgl-dev libjack-dev libx11-xcb-dev libxcb1-dev libxcb-dri2-0-dev
+          libxcb-icccm4-dev libxcursor-dev libxkbcommon-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo xtask bundle kerf-plugin --release
+
+      - name: Zip the plugin
+        env:
+          TAG: ${{ inputs.tag }}
+        run: >
+          cd target/bundled &&
+          zip -r "$GITHUB_WORKSPACE/patchplay-plugin-${{ matrix.name }}-$TAG.zip"
+          patchplay.clap patchplay.vst3
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: patchplay-plugin-${{ matrix.name }}-${{ inputs.tag }}.zip

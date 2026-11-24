@@ -1,0 +1,63 @@
+kerf 1
+tempo 62
+key F major
+tags ambient wash drone
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.7 level2=0.7 level3=0.5 level4=0.5 level5=0.55 level6=0.65 send=0.5
+module room Kiln size=0.95 heat=0.5 bloom=0.7 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+part pad "Bloom" colour #7a4fb5 level=0.85
+  module padseq Dovetail steps_a=0.1333 steps_b=0.0667 interlock=0 chance=1 glide=0.5 range=0.4
+  module padfret Fret root=0.4167 scale=0.29 octave=0.375
+  module padwarp Warp amount=0.12 speed=0.15 rough=0.1 chaos=0.1
+  module padply Ply layers=0.55 detune=0.22 width=1 tone=0.2
+  module padflt Plane cutoff=0.4 res=0.12 mode=0 drive=0
+  module padfltr Plane cutoff=0.4 res=0.12 mode=0 drive=0
+  module padampr Clamp level=0.2 response=0.1
+  module padamp Clamp level=0.2 response=0.1
+  module padswell Rocker rate=0.12 sync=0 shape=0 depth=0.8 offset=0.7 phase=0
+  module paddrift Spokeshave rate=0.04 spread=0.5 shape=0 phase=0.25
+part pad2 "Low" colour #7a4fb5 level=0.6
+  module pad2seq Dovetail steps_a=0.0667 steps_b=0.1333 interlock=0 chance=1 glide=0.1 range=0.3
+  module pad2fret Fret root=0.4167 scale=0.29 octave=0.25
+  module pad2ply Ply layers=0.4 detune=0.15 width=0.8 tone=0.15
+  module pad2flt Plane cutoff=0.3 res=0.1 mode=0 drive=0.05
+  module pad2drift Spokeshave rate=0.03 spread=0.5 shape=0 phase=0.25
+part gr "Mist" colour #8a8f98 level=0.35
+  module grg Shavings size=0.6 density=0.35 spray=0.4 pitch=0.62
+part mac "Macros" colour #b5654f
+  module macjig Jig m1=0.1 m2=0.5 m3=0.5 m4=0.5
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padwarp.in
+cable padwarp.out -> padply.voct
+cable padply.l -> padflt.in
+cable padply.r -> padfltr.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable paddrift.lfo2 -> padfltr.cutoff
+cable padfltr.out -> padampr.in
+cable padswell.out -> padampr.cv
+cable padampr.out -> mix.in6
+cable padampr.out -> grg.in
+cable padflt.out -> padamp.in
+cable padswell.out -> padamp.cv
+cable padamp.out -> mix.in6
+cable clock.bar -> pad2seq.clock
+cable pad2seq.pitch -> pad2fret.pitch
+cable pad2fret.pitch -> pad2ply.voct
+cable pad2ply.l -> pad2flt.in
+cable pad2ply.r -> pad2flt.in
+cable pad2drift.lfo1 -> pad2flt.cutoff
+cable pad2flt.out -> mix.in6
+cable padamp.out -> grg.in
+cable grg.l -> mix.in6
+cable grg.r -> mix.in6
+cable macjig.m1 -> padflt.cutoff
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+scene A padflt.cutoff=0.3 pad2flt.cutoff=0.2 grg.spray=0.25 macjig.m1=0
+scene B padflt.cutoff=0.65 pad2flt.cutoff=0.55 grg.spray=0.6 macjig.m1=0.22

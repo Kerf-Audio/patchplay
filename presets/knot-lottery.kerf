@@ -1,0 +1,75 @@
+kerf 1
+tempo 96
+key B phrygian
+tags chance generative abstract
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.1875 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.3 tone=0.5
+  module r_chat Ruler hits_a=0 hits_b=0.3125 hits_c=0 hits_d=0 steps_b=1 chance=0.6
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.06 tone=0.65
+  module chat_coin Burl rate=0.4 smooth=0.5 bias=0.5
+  module r_snare Ruler hits_a=0 hits_b=0.125 hits_c=0 hits_d=0 steps_b=1 rotate=0.25 chance=0.5
+  module snare Mortise engine=0.25 pitch=0.55 punch=0.5 decay=0.3 tone=0.5
+  module r_tom Ruler hits_a=0 hits_b=0.2727 hits_c=0 hits_d=0 steps_b=0.6667 rotate=0.1818 chance=0.7
+  module tom Mortise engine=1 pitch=0.35 punch=0.5 decay=0.35 tone=0.5
+
+part mal "Bells" colour #3da36b level=0.7
+  module malseq Dovetail steps_a=0.6667 steps_b=0.8 interlock=0.3 chance=0.4 glide=0 range=0.6
+  module malfret Fret root=0.9167 scale=0.86 octave=0.625
+  module malmal Mallet material=0.7 size=0.4 strike=0.5 damp=0.5
+  module malecho Bandsaw time=0.5 feedback=0.55 wear=0.4 mix=1
+
+part pad "Drift" colour #7a4fb5 level=0.4
+  module padseq Dovetail steps_a=1 steps_b=0.0667 interlock=0 chance=0.6 glide=0.1 range=0.3
+  module padfret Fret root=0.9167 scale=0.86 octave=0.5
+  module padply Ply layers=0.6 detune=0.3 width=1 tone=0.35
+  module padflt Plane cutoff=0.4 res=0.15 mode=0 drive=0
+  module paddrift Spokeshave rate=0.05 spread=0.5 shape=0 phase=0.25
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable r_chat.b -> chat_coin.trig
+cable clock.clock -> r_chat.clock
+cable chat_coin.coin -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_snare.clock
+cable r_snare.b -> snare.trig
+cable snare.out -> mix.in4
+cable clock.clock -> r_tom.clock
+cable r_tom.b -> tom.trig
+cable tom.out -> mix.in4
+
+cable clock.clock -> malseq.clock
+cable malseq.pitch -> malfret.pitch
+cable malfret.pitch -> malmal.voct
+cable malseq.gate -> malmal.trig
+cable malmal.out -> mix.in5
+cable clock.clock -> malecho.clock
+cable malmal.out -> malecho.in
+cable malecho.l -> mix.in5
+cable malecho.r -> mix.in5
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padply.voct
+cable padply.l -> padflt.in
+cable padply.r -> padflt.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable padflt.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A malmal.damp=0.35 padflt.cutoff=0.25
+scene B malmal.damp=0.7 padflt.cutoff=0.6

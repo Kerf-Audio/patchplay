@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>patchplay</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="g-cap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffefa"/><stop offset="1" stop-color="#e9e0cc"/></linearGradient>
+    <linearGradient id="g-skirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d0bc"/><stop offset="1" stop-color="#b9ae97"/></linearGradient>
+    <radialGradient id="g-sheen" cx=".35" cy=".28" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs></svg>
+  <header>
+    <div class="logo"><svg class="mark" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="114" fill="#1d1e21"/><circle cx="150" cy="150" r="62" fill="#f1f0eb"/><circle cx="362" cy="362" r="62" fill="#f1f0eb"/><circle cx="150" cy="150" r="38" fill="#101012"/><circle cx="362" cy="362" r="38" fill="#101012"/><path d="M150 150C150 330 362 182 362 362" fill="none" stroke="#ff5a1f" stroke-width="34" stroke-linecap="round"/><circle cx="150" cy="150" r="21" fill="#ff5a1f"/><circle cx="362" cy="362" r="21" fill="#ff5a1f"/></svg><span class="wm">patchplay<small>by kerf audio</small></span></div>
+    <nav aria-label="Views">
+      <button data-view="bench" class="on" aria-current="page">workbench</button>
+      <button data-view="catalogue">modules</button>
+      <button data-view="starting-points">starting points</button>
+      <button data-view="docs">docs</button>
+    </nav>
+    <div class="files">
+      <button class="btn" id="btn-theme" data-tip="Switch between day and night mode." data-tip-title="theme"></button>
+      <button class="btn" id="btn-open" data-ico="open" data-tip="Open a .kerf patch file." data-tip-title="open  (⌘O)">open</button>
+      <button class="btn" id="btn-save" data-ico="save" data-tip="Save the patch as .kerf text. Shift-click to save under a new name." data-tip-title="save  (⌘S)">save</button>
+      <button class="btn" id="btn-wav" data-ico="wav" data-tip="Render sixteen seconds of the patch to a WAV file, offline." data-tip-title="export wav">export</button>
+      <button class="btn" id="btn-code" data-ico="code" data-tip="Open the .kerf code editor in its own window, with the language docs beside it. Edits apply to the patch here." data-tip-title="code editor">code</button>
+    </div>
+    <div class="transport">
+      <span class="pill" data-tip="Beats per minute. Changing it is one undoable step." data-tip-title="tempo"><input id="bpm" type="number" min="20" max="300" step="1" value="120" aria-label="Tempo in beats per minute"> bpm</span>
+      <span class="pill key" data-tip="The key the generator picked. Fret modules snap to it." data-tip-title="key"><b id="key">—</b></span>
+      <span class="level" data-tip="Output level, left and right." data-tip-title="level"><span><i id="lvl-l"></i></span><span><i id="lvl-r"></i></span></span>
+      <span class="pill cpu" id="cpu" data-tip="How hard the audio engine is working: the time it spends making each block of sound, as a share of how long that block plays. Near 100% the sound starts to break up." data-tip-title="cpu">cpu <span class="cpu-bar"><i id="cpu-bar"></i></span><b id="cpu-val">0%</b></span>
+      <button id="play" data-tip="Start or stop the sound." data-tip-title="play  (space)" aria-label="Play"></button>
+    </div>
+  </header>
+
+  <div class="toolbar" id="toolbar">
+    <button class="btn primary" id="btn-add" data-ico="plus" data-tip="Add a module to the patch: pick one, or drag it onto the rack." data-tip-title="add module">module</button>
+    <select id="style" aria-label="Style" data-tip="Each style is a rulebook: which parts, which modules, what tempo and key." data-tip-title="style"></select>
+    <button class="btn primary" id="btn-random" data-ico="random" data-tip="A new patch in this style, wired and checked. It is added to the lineage, so nothing is lost." data-tip-title="random  (R)">random</button>
+    <span class="sep"></span>
+    <button class="btn" id="btn-evolve" data-ico="evolve" data-tip="Mutates everything that is not locked. Alt-click a knob, or use the padlock on a module, to keep it." data-tip-title="evolve  (E)">evolve</button>
+    <input type="range" id="strength" aria-label="Evolve strength" min="0.05" max="1" step="0.05" value="0.3" data-tip="How far Evolve moves things. Low = a nudge, high = a new idea." data-tip-title="evolve strength">
+    <button class="btn" id="btn-breed" data-ico="breed" disabled data-tip="Crosses the current patch with the one marked with a heart in the lineage. Each knob comes from one parent." data-tip-title="breed">breed</button>
+    <span class="sep"></span>
+    <button class="btn" id="btn-undo" data-ico="undo" data-tip="Steps back one command." data-tip-title="undo  (⌘Z)">undo</button>
+    <button class="btn" id="btn-redo" data-ico="redo" data-tip="Steps forward again." data-tip-title="redo  (⇧⌘Z)">redo</button>
+    <button class="btn" id="btn-explain" data-ico="explain" data-tip="Point at a module or part to light up what feeds it and where it goes, with a plain-English trace on the right." data-tip-title="explain  (X)">explain</button>
+    <button class="btn" id="btn-beginner" data-ico="wand" data-tip="On: dragging a module over another shows cables that would suit, and dropping wires them. Off: dropping only places the module." data-tip-title="beginner mode">beginner</button>
+    <span class="check" id="check"></span>
+    <div id="announce" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap"></div>
+  </div>
+
+  <main>
+    <div class="view" id="bench-scroll"><div id="bench"></div></div>
+    <div class="view hidden page" id="catalogue"></div>
+    <div class="view hidden page" id="starting-points"></div>
+    <div class="view hidden page docs-page" id="docs"></div>
+    <aside>
+      <section id="lineage-sec">
+        <h3>lineage <span class="hint">click to go back · heart to pick a mate</span></h3>
+        <div id="lineage"></div>
+      </section>
+      <section>
+        <h3>explain</h3>
+        <div id="explain-text"></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="morph">
+      <h3>scenes &amp; morph</h3>
+      <div class="scenes" id="scenes"></div>
+      <div class="fader"><b>A</b><input type="range" id="morph" aria-label="Morph from scene A to scene B" min="0" max="1" step="0.01" value="0" data-tip="Glides every unlocked knob from scene A to scene B. You hear it as you drag; letting go is one undo step." data-tip-title="morph"><b>B</b></div>
+      <p class="hint scene-hint">Click an empty slot to store · click a full one to recall · right-click to clear</p>
+    </div>
+    <div class="console">
+      <h3><button data-con="log" class="on" aria-pressed="true">commands</button><button data-con="text" aria-pressed="false">.kerf text</button>
+        <span class="hint">GUI, CLI and agents send the same commands</span></h3>
+      <pre id="log"></pre>
+      <div id="editor-slot" class="hidden"></div>
+      <div class="prompt">kerf ›<input id="cmd" aria-label="Command" placeholder='try: {"op":"set_tempo","bpm":120} · undo · redo' autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="scope-box" id="scope-box">
+      <h3>output
+        <span class="scope-tabs" role="group" aria-label="Output display">
+          <button data-scope-mode="wave" class="on" aria-pressed="true" data-tip="Show the shape of the sound leaving the speakers." data-tip-title="scope">scope</button>
+          <button data-scope-mode="spectrum" aria-pressed="false" data-tip="Show how loud the sound is at each pitch." data-tip-title="spectrum">spectrum</button>
+        </span>
+      </h3>
+      <canvas id="scope" class="idle" width="160" height="56" role="img" aria-label="Oscilloscope of the master output" data-tip="" data-tip-title="oscilloscope"></canvas>
+    </div>
+  </footer>
+
+  <div id="tip" class="hidden"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

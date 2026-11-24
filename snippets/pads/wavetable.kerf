@@ -1,0 +1,19 @@
+# title: Wavetable pad
+# about: A held wavetable tone that changes its timbre slowly, with a gentle low-pass.
+# port: wpad_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: wpad_turn.lfo1 (cv): the slow LFO on the table position.
+# port: wpad_filter.out (audio): the pad, already cabled to out.
+part wpad "Wavetable pad" colour #7a4fb5 level=0.5
+  module wpad_seq Dovetail steps_a=0.2 steps_b=0.2 interlock=0 chance=1 glide=0.5 range=0.2
+  module wpad_scale Fret root=0.75 scale=0.43 octave=0.5
+  module wpad_osc Lathe tune=0.5 table=0.55 turn=0.5 warp=0.1
+  module wpad_turn Spokeshave rate=0.04 spread=0.4 shape=0 phase=0.25
+  module wpad_filter Plane cutoff=0.55 res=0.15 mode=0 drive=0
+
+cable clock.div4 -> wpad_seq.clock
+cable wpad_seq.pitch -> wpad_scale.pitch
+cable wpad_scale.pitch -> wpad_osc.voct
+cable wpad_turn.lfo1 -> wpad_osc.turn
+cable wpad_osc.out -> wpad_filter.in
+cable wpad_filter.out -> out.l
+cable wpad_filter.out -> out.r

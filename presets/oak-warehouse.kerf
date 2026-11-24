@@ -1,0 +1,92 @@
+kerf 1
+tempo 131
+key D minor
+tags four-four techno
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.85 level2=0.7 level3=0.5 level4=0.55 level5=0.5 level6=0.45 send=0.2
+module room   Kiln   size=0.7 heat=0.6 bloom=0.35 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat     Ruler   hits_a=0.25 steps_a=1 hits_b=0 hits_c=0.6 steps_c=0.267 hits_d=0 chance=0.7
+  module backbeat Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25 chance=1
+  module offbeat  Ruler   hits_a=0.25 steps_a=1 hits_b=0.4 steps_b=1 hits_c=0 hits_d=0 rotate=0.125 chance=0.6
+  module kick     Mortise engine=0 pitch=0.3 punch=0.75 decay=0.35 tone=0.35
+  module grit     Rasp    drive=0.45 fold=0.1 bias=0.5 mix=0.5
+  module clap     Mortise engine=0.75 pitch=0.45 punch=0.7 decay=0.3 tone=0.5
+  module ohat     Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.3 tone=0.65
+  module chat     Mortise engine=0.5 pitch=0.65 punch=0.5 decay=0.07 tone=0.7
+  module tom      Mortise engine=1 pitch=0.6 punch=0.6 decay=0.25 tone=0.5
+
+part bass "Rolling bass" colour #3d63c9 level=0.85
+  module bseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=1 chance=0.85 glide=0 range=0.1
+  module bfret Fret     root=0.1667 scale=0.429 octave=0.25
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.3 sustain=0 release=0.25 curve=0.3
+  module bflt  Plane    cutoff=0.35 res=0.4 mode=0 drive=0.5
+  module bamp  Clamp    level=0 response=0.1
+  module squeeze Vise   squeeze=0.7 speed=0.7 makeup=0.35
+
+part siren "Siren lead" colour #d1a233 level=0.6
+  module lseq  Dovetail steps_a=0.8 steps_b=0.4 interlock=0.4 chance=0.45 glide=0.3 range=0.3
+  module lfret Fret     root=0.1667 scale=0.857 octave=0.5
+  module losc  Lathe    tune=0.5 table=0.45 turn=0.4 warp=0.25
+  module lwob  Burl     rate=0.6 smooth=0.7 bias=0.5
+  module lenv  Bevel    attack=0.02 decay=0.4 sustain=0.3 release=0.35 curve=0.4
+  module lamp  Clamp    level=0 response=0.3
+  module lflt  Plane    cutoff=0.5 res=0.35 mode=0.333 drive=0.2
+  module pump  Level    attack=0.05 release=0.5 gain=0.7
+  module lecho Bandsaw  time=0.375 feedback=0.5 wear=0.35 mix=0.4
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> backbeat.clock
+cable tally1.clock -> offbeat.clock
+cable beat.a -> kick.trig
+cable beat.c -> tom.trig
+cable backbeat.a -> clap.trig
+cable offbeat.a -> ohat.trig
+cable offbeat.b -> chat.trig
+cable kick.out -> grit.in
+cable grit.out -> mix.in1
+cable clap.out -> mix.in4
+cable tom.out -> mix.in4
+cable ohat.out -> mix.in3
+cable chat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.clock -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> losc.voct
+cable lwob.drift -> losc.turn
+cable lseq.gate -> lenv.gate
+cable losc.out -> lamp.in
+cable lenv.env -> lamp.cv
+cable lamp.out -> lflt.in
+cable kick.out -> pump.in
+cable pump.env -> lflt.cutoff
+cable lflt.out -> lecho.in
+cable tally1.clock -> lecho.clock
+cable lecho.l -> mix.in5
+cable lecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bflt.cutoff=0.3 lflt.res=0.3 lseq.chance=0.3 losc.warp=0.15 offbeat.chance=0.4
+scene B bflt.cutoff=0.6 lflt.res=0.6 lseq.chance=0.7 losc.warp=0.6 offbeat.chance=0.9

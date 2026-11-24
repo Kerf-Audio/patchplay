@@ -1,0 +1,109 @@
+kerf 1
+tempo 84
+key F major
+style tape-keys seed 1
+tags abstract lofi
+
+module tally1 Tally tempo=0.5 swing=0.22 divide=0.5
+module mix    Router level1=0.45 level2=0.42 level3=0.3 level4=0.6 level5=0.4 level6=0 send=0.25
+module room   Kiln   size=0.5 heat=0.65 bloom=0.3 mix=1
+module out    Finish volume=0.64 glue=0.5 ceiling=0.8
+
+part drums "Dusty drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.125 steps_a=1 hits_b=0.5 steps_b=1 hits_c=0.43 steps_c=0.4 hits_d=0.15 steps_d=0.8 chance=0.7
+  module ruler2 Ruler   hits_a=0.125 steps_a=1 hits_b=0.2 steps_b=0.733 hits_c=0 hits_d=0 rotate=0.25 chance=0.4
+  module kick   Mortise engine=0 pitch=0.28 punch=0.45 decay=0.3 tone=0.3
+  module snare  Mortise engine=0.25 pitch=0.42 punch=0.5 decay=0.35 tone=0.35
+  module hat    Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.15 tone=0.5
+  module ghost  Mortise engine=0.5 pitch=0.35 punch=0.3 decay=0.1 tone=0.4
+  module grit   Rasp    drive=0.3 fold=0.05 bias=0.55 mix=0.6
+  module dull   Plane   cutoff=0.74 res=0.15 mode=0 drive=0.1
+
+part dust "Dust and hiss" colour #8a7a5a
+  module sand  Sawdust  colour=0.75 crackle=0.55
+  module hiss  Clamp    level=0.08 response=0
+  module radio Static tune=0.42 width=0.5 hiss=0.5 crackle=0.5 whistle=0.2 fade=0.4 ghost=0.3 level=0.5
+
+part keys "Keys" colour #7a4fb5
+  module kseq   Dovetail steps_a=0.4 steps_b=0.2 interlock=0.5 chance=0.75 glide=0 range=0.35
+  module kfret  Fret     root=0.4167 scale=0.2857 octave=0.5
+  module third  Fret     root=0.4167 scale=0.2857 octave=0.5
+  module fifth  Fret     root=0.4167 scale=0.2857 octave=0.5
+  module chord  Jig      m1=0.0333 m2=0.0583 m3=0.5 m4=0.5
+  module key1   Lathe    tune=0.5 table=0.15 turn=0.3 warp=0.1
+  module key2   Lathe    tune=0.5 table=0.15 turn=0.3 warp=0.1
+  module key3   Lathe    tune=0.5 table=0.15 turn=0.35 warp=0.1
+  module kenv   Bevel    attack=0 decay=0.6 sustain=0.1 release=0.5 curve=0.35
+  module kamp   Clamp    level=0 response=0.65
+  module tape   Bandsaw  time=0.4 feedback=0.4 wear=0.75 mix=0.4
+  module wow Warp amount=0.6 speed=0.3 rough=0.3 chaos=0.4
+
+part bells "Glass bells" colour #3d9c8a
+  module bfret Fret     root=0.4167 scale=0.2857 octave=0.625
+  module bell  Mallet   material=0.15 size=0.5 strike=0.35 damp=0.5
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=0.5 chance=0.9 glide=0.15 range=0.2
+  module bbass Fret     root=0.4167 scale=0.2857 octave=0.25
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.6 sustain=0.4 release=0.4 curve=0.4
+  module bamp  Clamp    level=0 response=0.2
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler1.d -> kick.trig
+cable ruler1.b -> hat.trig
+cable ruler1.c -> ghost.trig
+cable ruler2.a -> snare.trig
+cable ruler2.b -> snare.trig
+cable kick.out -> grit.in
+cable snare.out -> grit.in
+cable hat.out -> grit.in
+cable ghost.out -> grit.in
+cable grit.out -> dull.in
+cable dull.out -> mix.in1
+
+cable sand.noise -> hiss.in
+cable hiss.out -> mix.in2
+cable sand.dust -> mix.in2
+
+cable tally1.div4 -> kseq.clock
+cable kseq.pitch -> kfret.pitch
+cable kseq.pitch -> third.pitch
+cable kseq.pitch -> fifth.pitch
+cable chord.m1 -> third.pitch
+cable chord.m2 -> fifth.pitch
+cable kfret.pitch -> key1.voct
+cable third.pitch -> key2.voct
+cable fifth.pitch -> key3.voct
+cable kseq.gate -> kenv.gate
+cable key1.out -> kamp.in
+cable key2.out -> kamp.in
+cable key3.out -> kamp.in
+cable kenv.env -> kamp.cv
+cable kamp.out -> tape.in
+cable tally1.clock -> tape.clock
+cable tape.l -> mix.in3
+cable tape.r -> mix.in3
+
+cable kseq.pitch -> bfret.pitch
+cable bfret.pitch -> bell.voct
+cable kseq.gate -> bell.trig
+cable bell.out -> mix.in4
+
+cable tally1.bar -> bseq.clock
+cable bseq.pitch -> bbass.pitch
+cable bbass.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.sine -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable wow.out -> tape.time
+cable radio.out -> mix.in2

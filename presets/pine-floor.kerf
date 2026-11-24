@@ -1,0 +1,84 @@
+kerf 1
+tempo 124
+key F minor
+tags four-four house
+
+module tally1 Tally tempo=0.5 swing=0.12 divide=0.5
+module mix    Router level1=0.85 level2=0.85 level3=0.5 level4=0.6 level5=0.55 level6=0.4 send=0.3
+module room   Kiln   size=0.55 heat=0.5 bloom=0.3 mix=1
+module out    Finish volume=0.7 glue=0.45 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat     Ruler   hits_a=0.25 steps_a=1 hits_b=0.75 steps_b=1 hits_c=0.4 steps_c=0.4 hits_d=0 chance=0.55
+  module backbeat Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25 chance=1
+  module offbeat  Ruler   hits_a=0.25 steps_a=1 hits_b=0.375 steps_b=1 hits_c=0 hits_d=0 rotate=0.125 chance=0.7
+  module kick     Mortise engine=0 pitch=0.35 punch=0.7 decay=0.3 tone=0.4
+  module clap     Mortise engine=0.75 pitch=0.5 punch=0.6 decay=0.4 tone=0.5
+  module ohat     Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.4 tone=0.7
+  module chat     Mortise engine=0.5 pitch=0.6 punch=0.5 decay=0.08 tone=0.65
+  module shaker   Mortise engine=0.5 pitch=0.75 punch=0.3 decay=0.12 tone=0.8
+  module duck     Bevel   attack=0 decay=0.45 sustain=0 release=0.45 curve=0.3
+
+part bass "Offbeat bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=0.8 chance=0.9 glide=0.05 range=0.15
+  module bfret Fret     root=0.4167 scale=0.429 octave=0.25
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.3 sustain=0.2 release=0.2 curve=0.35
+  module bflt  Plane    cutoff=0.35 res=0.35 mode=0 drive=0.35
+  module bamp  Clamp    level=0 response=0.1
+  module bduck Clamp    level=0 response=0
+
+part stabs "Chord stabs" colour #d1a233 level=0.45
+  module sseq  Dovetail steps_a=0.47 steps_b=0.33 interlock=0.5 chance=0.6 glide=0 range=0.2
+  module sfret Fret     root=0.4167 scale=0.571 octave=0.5
+  module sply  Ply      layers=0.6 detune=0.3 width=0.8 tone=0.45
+  module sflt  Plane    cutoff=0.45 res=0.25 mode=0 drive=0.1
+  module secho Bandsaw  time=0.375 feedback=0.4 wear=0.3 mix=0.35
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> backbeat.clock
+cable tally1.clock -> offbeat.clock
+cable beat.a -> kick.trig
+cable beat.a -> duck.gate
+cable beat.b -> shaker.trig
+cable backbeat.a -> clap.trig
+cable offbeat.a -> ohat.trig
+cable offbeat.b -> chat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable ohat.out -> mix.in3
+cable chat.out -> mix.in3
+cable shaker.out -> mix.in3
+
+cable offbeat.a -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bduck.in
+cable duck.inverted -> bduck.cv
+cable bduck.out -> mix.in2
+
+cable tally1.clock -> sseq.clock
+cable sseq.pitch -> sfret.pitch
+cable sfret.pitch -> sply.voct
+cable sseq.gate -> sply.gate
+cable sply.l -> sflt.in
+cable sply.r -> sflt.in
+cable sflt.out -> secho.in
+cable tally1.clock -> secho.clock
+cable secho.l -> mix.in5
+cable secho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A bflt.cutoff=0.3 sflt.cutoff=0.35 sseq.chance=0.5 offbeat.chance=0.5 shaker.decay=0.1
+scene B bflt.cutoff=0.6 sflt.cutoff=0.7 sseq.chance=0.85 offbeat.chance=0.95 shaker.decay=0.2

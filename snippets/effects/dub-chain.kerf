@@ -1,0 +1,14 @@
+# title: Dub echo into reverb
+# about: A feedback-heavy tape echo whose repeats run into a room, so each echo gets smeared further back. Wet only.
+# feed: dub_echo.in
+# port: dub_echo.time (cv): move the echo time; fast moves bend the pitch.
+# port: dub_room.l, dub_room.r (audio): echoes and room together, already cabled to out.
+part dub "Dub chain" colour #d1a233
+  module dub_echo Bandsaw time=0.5 feedback=0.65 wear=0.5 mix=1
+  module dub_room Kiln size=0.85 heat=0.55 bloom=0.6 mix=1
+
+cable clock.clock -> dub_echo.clock
+cable dub_echo.l -> dub_room.in_l
+cable dub_echo.r -> dub_room.in_r
+cable dub_room.l -> out.l
+cable dub_room.r -> out.r

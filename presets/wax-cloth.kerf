@@ -1,0 +1,94 @@
+kerf 1
+tempo 78
+key E minor
+tags lofi crackle
+
+module clock Tally tempo=0.5 swing=0.3 divide=0.5
+module mix Router level1=0.8 level2=0.7 level3=0.5 level4=0.55 level5=0.5 level6=0.45 send=0.3
+module room Kiln size=0.5 heat=0.7 bloom=0.3 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.4 punch=0.55 decay=0.3 tone=0.5
+  module r_snare Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.5
+  module snare Mortise engine=0.25 pitch=0.5 punch=0.5 decay=0.28 tone=0.4
+  module r_chat Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.07 tone=0.5
+  module r_shuf Ruler hits_a=0 hits_b=0.1875 hits_c=0 hits_d=0 steps_b=1 rotate=0.3125 chance=0.6
+  module shuf Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.05 tone=0.4
+
+part keys "Keys" colour #d1a233 level=0.5
+  module keysseq Dovetail steps_a=0.4667 steps_b=0.2667 interlock=0.5 chance=0.8 glide=0.1 range=0.3
+  module keysfret Fret root=0.3333 scale=0.43 octave=0.5
+  module keysosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module keysenv Bevel attack=0 decay=0.35 sustain=0.2 release=0.4 curve=0.4
+  module keysflt Plane cutoff=0.4 res=0.15 mode=0 drive=0.1
+  module keysamp Clamp level=0 response=0.5
+  module keysecho Bandsaw time=0.375 feedback=0.45 wear=0.35 mix=1
+  module wow Warp amount=0.25 speed=0.3 rough=0.2 chaos=0.3
+
+part bass "Bass" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=1 steps_b=0.2667 interlock=0.4 chance=0.9 glide=0.2 range=0.1
+  module bassfret Fret root=0.3333 scale=0.43 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.35 sustain=0.5 release=0.5 curve=0.4
+  module bassflt Plane cutoff=0.3 res=0.2 mode=0 drive=0.1
+  module bassamp Clamp level=0 response=0.1
+
+part tex "Vinyl" colour #3da3a3 level=0.3
+  module texsrc Sawdust colour=0.4 crackle=0.9
+  module texflt Plane cutoff=0.55 res=0.1 mode=0 drive=0.1
+  module texamp Clamp level=0.5 response=0.4
+  module radio Static tune=0.42 width=0.5 hiss=0.4 crackle=0.35 whistle=0.2 fade=0.4 ghost=0.3 level=0.2
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_snare.clock
+cable r_snare.a -> snare.trig
+cable snare.out -> mix.in4
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_shuf.clock
+cable r_shuf.b -> shuf.trig
+cable shuf.out -> mix.in3
+
+cable clock.clock -> keysseq.clock
+cable keysseq.pitch -> keysfret.pitch
+cable keysfret.pitch -> keysosc.voct
+cable keysseq.gate -> keysenv.gate
+cable keysosc.sine -> keysflt.in
+cable keysflt.out -> keysamp.in
+cable keysenv.env -> keysamp.cv
+cable keysamp.out -> mix.in5
+cable clock.clock -> keysecho.clock
+cable keysamp.out -> keysecho.in
+cable keysecho.l -> mix.in5
+cable keysecho.r -> mix.in5
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.sine -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> mix.in2
+
+cable texsrc.dust -> texflt.in
+cable texflt.out -> texamp.in
+cable texamp.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable wow.out -> keysecho.time
+cable radio.out -> texflt.in
+scene A keysflt.cutoff=0.28 bassflt.cutoff=0.18 texflt.cutoff=0.43
+scene B keysflt.cutoff=0.55 bassflt.cutoff=0.45 texflt.cutoff=0.7

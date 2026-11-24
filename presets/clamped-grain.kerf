@@ -1,0 +1,42 @@
+kerf 1
+tempo 58
+key A minor
+tags abstract granular ambient
+
+module clock Tally tempo=0.5 swing=0 divide=0.5
+module room Kiln size=0.9 heat=0.55 bloom=0.75 mix=1
+module out Finish volume=0.75 glue=0.3 ceiling=0.8
+
+part root "Frozen root" colour #b5527a level=1
+  module rootsp Splinter position=0.385 spray=0.06 size=0.92 density=0.95 pitch=0.25 scatter=0.02 reverse=0 shape=0.1 spread=1 level=0.9 hold=1
+
+part fifth "Frozen fifth" colour #7a4fb5 level=0.8
+  module fifthsp Splinter position=0.385 spray=0.08 size=0.9 density=0.9 pitch=0.3958 scatter=0.02 reverse=0.1 shape=0.1 spread=1 level=0.9 hold=1
+  module fifthwarp Warp amount=0.06 speed=0.15 rough=0.1 chaos=0.2
+
+part air "Air" colour #3da3a3 level=0.5
+  module airsp Splinter position=0.385 spray=0.18 size=0.85 density=0.85 pitch=0.75 scatter=0.04 reverse=0.3 shape=0.15 spread=1 level=0.9 hold=1
+
+part tone "Filters" colour #8a8f98 level=1
+  module fltl Plane cutoff=0.36 res=0.2 mode=0 drive=0
+  module fltr Plane cutoff=0.36 res=0.2 mode=0 drive=0
+  module drift Spokeshave rate=0.04 spread=0.5 shape=0 phase=0.25 depth=0.4
+
+cable rootsp.l -> fltl.in
+cable rootsp.r -> fltr.in
+cable fifthsp.l -> fltl.in
+cable fifthsp.r -> fltr.in
+cable airsp.l -> fltl.in
+cable airsp.r -> fltr.in
+cable fifthwarp.out -> fifthsp.voct
+cable drift.lfo1 -> fltl.cutoff
+cable drift.lfo2 -> fltr.cutoff
+cable fltl.out -> out.l
+cable fltr.out -> out.r
+cable fltl.out -> room.in_l
+cable fltr.out -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A fltl.cutoff=0.28 fltr.cutoff=0.28 airsp.spray=0.1
+scene B fltl.cutoff=0.5 fltr.cutoff=0.5 airsp.spray=0.4

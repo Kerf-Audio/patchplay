@@ -1,0 +1,53 @@
+kerf 1
+tempo 66
+key F major
+tags abstract wash
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.6 level2=0.55 level3=0 level4=0 level5=0 level6=0 send=0.5
+module room   Kiln   size=0.95 heat=0.45 bloom=0.8 mix=1
+module out    Finish volume=0.65 glue=0.3 ceiling=0.8
+
+part tones "Lathe tones" colour #7a4fb5 level=0.9
+  module tseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=0.5 chance=0.9 glide=0.4 range=0.25
+  module tfret  Fret     root=0.4167 scale=0.286 octave=0.5
+  module tdrift Warp     amount=0.12 speed=0.2 rough=0.1 chaos=0.1
+  module trock  Rocker   rate=0.12 shape=0 depth=0.35 offset=0.5
+  module tlathe Lathe    tune=0.5 table=0.3 turn=0.3 warp=0.2
+  module tenv   Bevel    attack=0.35 decay=0.6 sustain=0.5 release=0.8 curve=0.6
+  module tamp   Clamp    level=0 response=0.3
+
+part haze "Sawdust haze" colour #8a6b4a level=0.8
+  module dust   Sawdust  colour=0.3 crackle=0.15
+  module hflt   Plane    cutoff=0.4 res=0.5 mode=0.333 drive=0
+  module hvise  Vise     squeeze=0.7 speed=0.2 makeup=0.5
+  module wander Burl     rate=0.15 smooth=0.9 bias=0.5
+
+part macros "Macros" colour #d1a233
+  module jig    Jig      m1=0.2 m2=0.4 m3=0.3 m4=0.5
+
+cable tally1.bar -> tseq.clock
+cable tseq.pitch -> tfret.pitch
+cable tfret.pitch -> tdrift.in
+cable tdrift.out -> tlathe.voct
+cable trock.out -> tlathe.turn
+cable tseq.gate -> tenv.gate
+cable tlathe.out -> tamp.in
+cable tenv.env -> tamp.cv
+cable tamp.out -> mix.in1
+cable tamp.out -> hvise.side
+cable jig.m1 -> tlathe.turn
+cable jig.m2 -> hflt.cutoff
+cable dust.noise -> hflt.in
+cable hflt.out -> hvise.in
+cable hvise.out -> mix.in2
+cable wander.drift -> hflt.cutoff
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A jig.m1=0.2 jig.m2=0.3 hvise.squeeze=0.8 tenv.attack=0.5 room.bloom=0.6
+scene B jig.m1=0.7 jig.m2=0.6 hvise.squeeze=0.4 tenv.attack=0.2 room.bloom=0.9

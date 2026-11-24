@@ -1,0 +1,64 @@
+kerf 1
+tempo 52
+key E phrygian
+tags ominous sub dub
+
+module clock Tally tempo=0.5 swing=0 divide=0
+module mix Router level1=0.9 level2=0.55 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.7 heat=0.7 bloom=0.4 mix=1
+module out Finish volume=0.7 glue=0.35 ceiling=0.8
+
+part sub "Sub" colour #3d63c9 level=0.9
+  module subtr Tread step1=0.2333 step2=0.2333 step3=0.2417 step4=0.2333 step5=0.2333 step6=0.2583 step7=0.2417 step8=0.2333 length=1.0 glide=0.9
+  module subwarp Warp amount=0.05 speed=0.1 rough=0.1 chaos=0.1
+  module sub1 Chisel tune=0.5 fine=0.5 shape=0.2 pw=0.5
+  module sub2 Chisel tune=0.5 fine=0.56 shape=0.2 pw=0.5
+  module subamp Clamp level=0.12 response=0
+  module swell Rocker rate=0.12 sync=0 shape=0 depth=0.5 offset=0.5
+
+part dread "Dread layer" colour #5a4a7a level=0.6
+  module dpl Ply layers=0.7 detune=0.85 width=0.9 tone=0.25
+  module dfret Fret root=0.3333 scale=0.86 octave=0.5
+  module dflt Plane cutoff=0.3 res=0.4 mode=0 drive=0.25
+  module dlfo Rocker rate=0.1 sync=0 shape=0 depth=0.5 offset=0.5 phase=0.5
+  module dgate Clamp level=0.25 response=0.1
+  module agit Chatter energy=0.75 tension=0.2 damping=0.15 rate=0.07 depth=0.7
+
+part fx "Dub echo" colour #3da3a3 level=0.8
+  module echo Dado time=0.62 sync=0 feedback=0.78 tone=0.3 thin=0.4 wobble=0.45 drive=0.35 mix=1
+  module rumble Static tune=0.2 width=0.2 hiss=0.15 crackle=0.2 whistle=0.05 fade=0.7 ghost=0.2 level=0.5
+  module throwrl Ruler hits_a=0.0625 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25 chance=1
+
+cable clock.bar -> subtr.clock
+cable subtr.cv -> subwarp.in
+cable subwarp.out -> sub1.voct
+cable subwarp.out -> sub2.voct
+cable sub1.sine -> subamp.in
+cable sub2.sine -> subamp.in
+cable swell.out -> subamp.cv
+cable subamp.out -> mix.in1
+cable subtr.cv -> dfret.pitch
+cable dfret.pitch -> dpl.voct
+cable dpl.l -> dflt.in
+cable dpl.r -> dflt.in
+cable dlfo.out -> dflt.cutoff
+cable agit.position -> dflt.cutoff
+cable dlfo.out -> dgate.cv
+cable dflt.out -> dgate.in
+cable dgate.out -> mix.in2
+cable dgate.out -> echo.in_l
+cable clock.clock -> throwrl.clock
+cable throwrl.a -> echo.throw
+cable rumble.out -> echo.in_l
+cable rumble.out -> mix.in3
+cable echo.l -> mix.in4
+cable echo.r -> mix.in4
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A swell.depth=0.3 dflt.cutoff=0.22 echo.feedback=0.65
+scene B swell.depth=0.8 dflt.cutoff=0.45 echo.feedback=0.86

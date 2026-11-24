@@ -1,0 +1,74 @@
+kerf 1
+tempo 72
+key C minor
+tags ominous lullaby eerie
+
+module clock Tally tempo=0.5 swing=0 divide=0
+module mix Router level1=0.8 level2=0.6 level3=0.55 level4=0.5 level5=0.5 level6=0.5 send=0.5
+module room Kiln size=0.7 heat=0.4 bloom=0.3 mix=1
+module out Finish volume=0.7 glue=0.3 ceiling=0.8
+
+part melody "Celesta" colour #d1a233
+  module lulrl Ruler hits_a=0.5 hits_b=0.25 hits_c=0 hits_d=0 steps_a=0.7333 steps_b=0.7333 rotate=0 chance=1
+  module luletr Tread step1=0.6583 step2=0.625 step3=0.6 step4=0.625 step5=0.6583 step6=0.65 step7=0.6583 step8=0.625 length=0.7143 glide=0
+  module lulwarp Warp amount=0.14 speed=0.15 rough=0.5 chaos=0.35
+  module celesta Mallet material=0.3 size=0.2 strike=0.4 damp=0.55
+  module cradle Rocker rate=0.18 sync=0 shape=0 depth=0.3 offset=0.5
+
+part pad "Wrong pad" colour #5a4a7a level=0.6
+  module padmit Mitre chord=0.3077 inversion=0.34 spread=0.34 root=0.0
+  module padtr Tread step1=0.4 step2=0.4 step3=0.3583 step4=0.4 step5=0.4 step6=0.4 step7=0.4 step8=0.4 length=0.4286 glide=0.3
+  module padwarp Warp amount=0.1 speed=0.08 rough=0.1 chaos=0.2
+  module padlathe Lathe tune=0.5 table=0.4 turn=0.3 warp=0.2
+  module padflt Plane cutoff=0.35 res=0.25 mode=0 drive=0.05
+  module padamp Clamp level=0.25 response=0
+  module padlfo Rocker rate=0.09 sync=0 shape=0 depth=0.5 offset=0.5
+
+part sway "Rocking arp" colour #7ab55a level=0.45
+  module rung Rung pattern=0.2857 octaves=0.34 rate=0.5 length=0.4 swing=0.2 ratchet=0
+  module swayosc Chisel tune=0.5 fine=0.5 shape=0.6 pw=0.5
+  module swayenv Bevel attack=0.02 decay=0.5 sustain=0.1 release=0.4 curve=0.35
+  module swayamp Clamp level=0 response=0.3
+
+part dust "Distant radio" colour #3da3a3 level=0.5
+  module dust Static tune=0.45 width=0.4 hiss=0.2 crackle=0.2 whistle=0.15 fade=0.6 ghost=0.6 level=0.35
+  module wob Chatter energy=0.35 tension=0.3 damping=0.3 rate=0.1 depth=0.8
+
+cable clock.clock -> lulrl.clock
+cable lulrl.a -> luletr.clock
+cable lulrl.a -> celesta.trig
+cable luletr.cv -> lulwarp.in
+cable lulwarp.out -> celesta.voct
+cable celesta.out -> mix.in1
+cable clock.bar -> padtr.clock
+cable padtr.cv -> padwarp.in
+cable padwarp.out -> padmit.pitch
+cable padmit.voice1 -> padlathe.voct
+cable padlathe.out -> padflt.in
+cable padlfo.out -> padflt.cutoff
+cable padlfo.out -> padamp.cv
+cable cradle.out -> padlathe.turn
+cable wob.position -> padflt.cutoff
+cable padflt.out -> padamp.in
+cable padamp.out -> mix.in2
+cable clock.clock -> rung.clock
+cable padmit.voice1 -> rung.voice1
+cable padmit.voice2 -> rung.voice2
+cable padmit.voice3 -> rung.voice3
+cable padmit.voice4 -> rung.voice4
+cable rung.pitch -> swayosc.voct
+cable rung.gate -> swayenv.gate
+cable swayosc.sine -> swayamp.in
+cable swayenv.env -> swayamp.cv
+cable swayamp.out -> mix.in3
+cable dust.out -> mix.in4
+cable dust.crackle -> wob.kick
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A padflt.cutoff=0.3 celesta.damp=0.4 dust.fade=0.4
+scene B padflt.cutoff=0.55 celesta.damp=0.7 dust.fade=0.8

@@ -1,0 +1,84 @@
+kerf 1
+tempo 128
+key E phrygian
+style broken-joinery seed 1
+tags crazy polyrhythm
+
+module tally1 Tally tempo=0.5 swing=0.05 divide=0.5
+module mix    Router level1=0.55 level2=0.34 level3=0.9 level4=0.5 level5=0.55 level6=0.65 send=0.2
+module room   Kiln   size=0.4 heat=0.6 bloom=0.2 mix=1
+module out    Finish volume=0.68 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.25 steps_a=1 hits_b=0.58 steps_b=0.733 hits_c=0.5 steps_c=0.6 hits_d=0 chance=0.7
+  module ruler2 Ruler   hits_a=0.31 steps_a=0.8 hits_b=0.2 steps_b=0.267 hits_c=0 hits_d=0 chance=0.55
+  module kick   Mortise engine=0 pitch=0.32 punch=0.7 decay=0.25 tone=0.4
+  module hat    Mortise engine=0.5 pitch=0.55 punch=0.5 decay=0.12 tone=0.65
+  module snare  Mortise engine=0.25 pitch=0.5 punch=0.6 decay=0.3 tone=0.5
+  module duck   Bevel   attack=0 decay=0.4 sustain=0 release=0.4 curve=0.3
+
+part perc "Modal perc" colour #3d9c8a
+  module pseq   Dovetail steps_a=0.33 steps_b=0.4 interlock=0.3 chance=0.9 glide=0 range=0.45
+  module pfret  Fret     root=0.333 scale=0.857 octave=0.5
+  module pfret2 Fret     root=0.333 scale=0.857 octave=0.375
+  module ruler3 Ruler    hits_a=0.4 steps_a=0.267 hits_b=0.43 steps_b=0.4 hits_c=0.4 steps_c=0.667 hits_d=0 chance=0.65
+  module coin   Burl     rate=0.5 smooth=0.5 bias=0.5
+  module mal1   Mallet   material=0.2 size=0.5 strike=0.55 damp=0.45
+  module mal2   Mallet   material=0.75 size=0.5 strike=0.6 damp=0.5
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.33 steps_b=0.2 interlock=0.8 chance=0.8 glide=0.1 range=0.2
+  module bfret Fret     root=0.333 scale=0.857 octave=0.375
+  module bosc  Chisel   tune=0.5 shape=0.1 pw=0.4
+  module benv  Bevel    attack=0 decay=0.3 sustain=0.15 release=0.2 curve=0.35
+  module bflt  Plane    cutoff=0.3 res=0.5 mode=0 drive=0.4
+  module bamp  Clamp    level=0 response=0.2
+  module bduck Clamp    level=0 response=0
+  module rnd   Burl     rate=0.5 smooth=0.4 bias=0.5
+  module rtrim Clamp    level=0.35 response=0
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler1.a -> duck.gate
+cable ruler1.b -> hat.trig
+cable ruler1.c -> hat.trig
+cable ruler2.a -> snare.trig
+cable ruler2.b -> snare.trig
+cable kick.out -> mix.in1
+cable hat.out -> mix.in3
+cable snare.out -> mix.in4
+
+cable tally1.clock -> pseq.clock
+cable tally1.clock -> ruler3.clock
+cable pseq.pitch -> pfret.pitch
+cable pseq.pitch -> pfret2.pitch
+cable pfret.pitch -> mal1.voct
+cable pfret2.pitch -> mal2.voct
+cable ruler3.a -> mal1.trig
+cable ruler3.b -> mal1.trig
+cable ruler3.c -> coin.trig
+cable coin.coin -> mal2.trig
+cable mal1.out -> mix.in5
+cable mal2.out -> mix.in6
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable ruler1.b -> rnd.trig
+cable rnd.stepped -> rtrim.in
+cable rtrim.out -> bflt.cutoff
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bduck.in
+cable duck.inverted -> bduck.cv
+cable bduck.out -> mix.in2
+
+cable mix.send -> room.in_l
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r

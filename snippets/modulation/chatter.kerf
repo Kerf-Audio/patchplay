@@ -1,0 +1,17 @@
+# title: Chatter spring
+# about: A spring knocked once a beat. Its swing moves the filter, and it settles before the next knock.
+# port: spring_chatter.position (cv): where the spring is, above and below 0 V.
+# port: spring_chatter.velocity (cv): how fast it moves. Patch it for a second, offset motion.
+# port: spring_amp.out (audio): the sound, already cabled to out.
+part spring "Chatter spring" colour #c94a3d level=0.4
+  module spring_chatter Chatter energy=0.7 tension=0.5 damping=0.4 rate=0 depth=1
+  module spring_osc Chisel tune=0.3 shape=0.1 pw=0.5
+  module spring_filter Plane cutoff=0.4 res=0.4 mode=0 drive=0.1
+  module spring_amp Clamp level=0.5 response=0
+
+cable clock.div4 -> spring_chatter.kick
+cable spring_chatter.position -> spring_filter.cutoff
+cable spring_osc.saw -> spring_filter.in
+cable spring_filter.out -> spring_amp.in
+cable spring_amp.out -> out.l
+cable spring_amp.out -> out.r

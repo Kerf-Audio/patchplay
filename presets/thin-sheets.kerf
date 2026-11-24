@@ -1,0 +1,56 @@
+kerf 1
+tempo 58
+key D minor
+tags abstract texture
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=1 level2=1 level3=1 level4=1 level5=0.7 level6=0.7 send=0.4
+module room   Kiln   size=0.85 heat=0.5 bloom=0.6 mix=1
+module out    Finish volume=0.9 glue=0.3 ceiling=0.8
+
+part sheets "Looped sheets" colour #8a6b4a level=0.9
+  module sheet  Veneer   slice=0.2 speed=0.12 reverse=0 looped=1
+  module sheet2 Veneer   slice=0.6 speed=0.08 reverse=0.7 looped=1
+  module flip   Spokeshave rate=0.1 spread=0.5 shape=0 phase=0.25
+  module gater  Spokeshave rate=0.1 spread=0.4 shape=1 phase=0.25
+  module soft   Plane    cutoff=0.5 res=0.2 mode=0 drive=0
+  module lift   Vise     squeeze=0.3 speed=0.6 makeup=1
+
+part scatter "Scatter" colour #3d9c8a level=0.8
+  module cloud  Shavings size=0.6 density=0.4 spray=0.6 pitch=0.5
+  module follow Level    attack=0.4 release=0.7 gain=0.7
+  module splint Splinter position=0.3 spray=0.3 size=0.7 density=0.5 pitch=0.4 scatter=0.2 reverse=0.3 spread=0.7 level=0.5
+  module scan Rocker rate=0.15 shape=0.1 depth=0.8 offset=0.5
+
+cable gater.lfo1 -> sheet.trig
+cable gater.lfo2 -> sheet2.trig
+cable flip.lfo1 -> sheet.slice
+cable flip.lfo3 -> sheet2.slice
+cable flip.lfo2 -> soft.cutoff
+cable sheet.l -> soft.in
+cable soft.out -> lift.in
+cable sheet.r -> lift.in
+cable sheet2.l -> lift.in
+cable sheet2.r -> lift.in
+cable lift.out -> mix.in1
+cable lift.out -> mix.in2
+cable sheet.l -> follow.in
+cable follow.over -> cloud.freeze
+cable sheet2.l -> cloud.in
+cable sheet2.r -> cloud.in
+cable cloud.l -> room.in_l
+cable cloud.r -> room.in_r
+cable cloud.l -> mix.in3
+cable cloud.r -> mix.in4
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable scan.out -> splint.position
+cable splint.l -> mix.in5
+cable splint.r -> mix.in6
+scene A sheet.speed=0.12 sheet2.speed=0.08 soft.cutoff=0.35 cloud.density=0.3 flip.rate=0.1
+scene B sheet.speed=0.08 sheet2.speed=0.2 soft.cutoff=0.7 cloud.density=0.7 flip.rate=0.25

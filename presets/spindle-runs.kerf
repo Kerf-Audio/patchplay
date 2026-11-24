@@ -1,0 +1,98 @@
+kerf 1
+tempo 125
+key D dorian
+tags four-four bleep bass
+
+module tally1 Tally tempo=0.5 swing=0.07 divide=0.5
+module mix    Router level1=0.8 level2=0.9 level3=0.3 level4=0.5 level5=0.55 level6=0.5 send=0.15
+module room   Kiln   size=0.5 heat=0.55 bloom=0.25 mix=1
+module out    Finish volume=0.7 glue=0.5 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0.1 steps_b=0.867 hits_c=0 hits_d=0 chance=0.3
+  module snap   Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.25 chance=1
+  module hats   Ruler   hits_a=0.25 steps_a=1 hits_b=0.5 steps_b=1 hits_c=0 hits_d=0 rotate=0.125 chance=0.3
+  module kick   Mortise engine=0 pitch=0.3 punch=0.7 decay=0.3 tone=0.3
+  module clap   Mortise engine=0.75 pitch=0.5 punch=0.8 decay=0.12 tone=0.6
+  module hat    Mortise engine=0.5 pitch=0.7 punch=0.5 decay=0.05 tone=0.8
+
+part sub "Sub" colour #3d63c9 level=0.9
+  module bseq   Dovetail steps_a=0.2 steps_b=0.27 interlock=0.9 chance=0.9 glide=0.3 range=0.15
+  module bfret  Fret     root=0.1667 scale=0.571 octave=0.25
+  module bosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module benv   Bevel    attack=0.01 decay=0.4 sustain=0.5 release=0.2 curve=0.45
+  module bamp   Clamp    level=0 response=0.05
+  module squeeze Vise    squeeze=0.6 speed=0.6 makeup=0.35
+
+part call "Call bleeps" colour #d1a233 level=0.5
+  module crhy   Ruler   hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.0625 chance=1
+  module ctread Tread   step1=0.5 step2=0.75 step3=0.6 step4=0.9 step5=0.5 step6=0.5 step7=0.5 step8=0.5 length=0.43 direction=0 glide=0 depth=0.25
+  module cfret  Fret    root=0.1667 scale=0.571 octave=0.625
+  module cosc   Chisel  tune=0.5 shape=0 pw=0.5
+  module cenv   Bevel   attack=0 decay=0.13 sustain=0 release=0.08 curve=0.3
+  module camp   Clamp   level=0 response=0.5
+
+part reply "Reply bells" colour #3d9c8a level=0.5
+  module rrhy   Ruler   hits_a=0.1875 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.5 chance=1
+  module rtread Tread   step1=0.3 step2=0.55 step3=0.2 step4=0.7 step5=0.4 step6=0.5 step7=0.5 step8=0.5 length=0.57 direction=0.333 glide=0 depth=0.25
+  module rfret  Fret    root=0.1667 scale=0.571 octave=0.5
+  module rosc   Chisel  tune=0.5 shape=0 pw=0.5
+  module rfm    Splice  mode=0 amount=0.35 coarse=0.6 fine=0.5 mix=0.8 level=0.5
+  module renv   Bevel   attack=0 decay=0.2 sustain=0 release=0.12 curve=0.35
+  module ramp   Clamp   level=0 response=0.4
+  module rmod   Rocker  rate=0.25 sync=0.2 shape=0 depth=0.8 offset=0.5 phase=0
+  module recho  Dado    time=0.43 sync=1 feedback=0.5 tone=0.45 thin=0.35 wobble=0.25 drive=0.15 mix=0.4
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> snap.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable beat.b -> kick.trig
+cable snap.a -> clap.trig
+cable hats.a -> hat.trig
+cable hats.b -> hat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable hat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.sine -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.clock -> crhy.clock
+cable tally1.clock -> ctread.clock
+cable ctread.cv -> cfret.pitch
+cable cfret.pitch -> cosc.voct
+cable crhy.a -> cenv.gate
+cable cosc.square -> camp.in
+cable cenv.env -> camp.cv
+cable camp.out -> mix.in5
+
+cable tally1.clock -> rrhy.clock
+cable tally1.clock -> rtread.clock
+cable rtread.cv -> rfret.pitch
+cable rfret.pitch -> rosc.voct
+cable rrhy.a -> renv.gate
+cable rosc.sine -> rfm.carrier
+cable rmod.out -> rfm.amount
+cable rfm.out -> ramp.in
+cable renv.env -> ramp.cv
+cable ramp.out -> recho.in_l
+cable recho.l -> mix.in6
+cable recho.r -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A rfm.amount=0.2 rmod.depth=0.4 recho.feedback=0.3 crhy.hits_a=0.25
+scene B rfm.amount=0.6 rmod.depth=1 recho.feedback=0.6 crhy.hits_a=0.4

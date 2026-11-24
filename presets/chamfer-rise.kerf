@@ -1,0 +1,101 @@
+kerf 1
+tempo 133
+key E minor
+tags four-four techno detroit
+
+module tally1 Tally tempo=0.5 swing=0.04 divide=0.5
+module mix    Router level1=0.85 level2=0.75 level3=0.4 level4=0.5 level5=0.65 level6=0.5 send=0.22
+module room   Kiln   size=0.65 heat=0.45 bloom=0.35 mix=1
+module out    Finish volume=0.7 glue=0.45 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module beat   Ruler   hits_a=0.25 steps_a=1 hits_b=0 hits_c=0 hits_d=0 chance=1
+  module snap   Ruler   hits_a=0.125 steps_a=1 hits_b=0.3 steps_b=0.47 hits_c=0 hits_d=0 rotate=0.25 chance=0.4
+  module hats   Ruler   hits_a=0.25 steps_a=1 hits_b=0.7 steps_b=1 hits_c=0 hits_d=0 rotate=0.125 chance=0.45
+  module kick   Mortise engine=0 pitch=0.34 punch=0.75 decay=0.28 tone=0.4
+  module clap   Mortise engine=0.75 pitch=0.5 punch=0.65 decay=0.3 tone=0.55
+  module hat    Mortise engine=0.5 pitch=0.62 punch=0.45 decay=0.15 tone=0.7
+
+part bass "Bass" colour #3d63c9 level=0.85
+  module bseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=1 chance=0.9 glide=0.1 range=0.12
+  module bfret  Fret     root=0.333 scale=0.429 octave=0.25
+  module bosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module benv   Bevel    attack=0 decay=0.25 sustain=0.15 release=0.15 curve=0.3
+  module bflt   Plane    cutoff=0.3 res=0.3 mode=0 drive=0.3
+  module bamp   Clamp    level=0 response=0.1
+  module squeeze Vise    squeeze=0.65 speed=0.7 makeup=0.35
+
+part arp "Rising arpeggio" colour #d1a233 level=0.6
+  module aseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=0 chance=1 glide=0 range=0.12
+  module afret  Fret     root=0.333 scale=0.429 octave=0.5
+  module amit   Mitre    chord=0.538 inversion=0 spread=0.33 root=0.333
+  module arung  Rung     pattern=0.286 octaves=0.33 rate=0.75 length=0.4 swing=0 ratchet=0.1
+  module aosc   Chisel   tune=0.5 shape=0 pw=0.5
+  module aenv   Bevel    attack=0 decay=0.22 sustain=0.05 release=0.2 curve=0.35
+  module aflt   Plane    cutoff=0.4 res=0.3 mode=0 drive=0.2
+  module aamp   Clamp    level=0 response=0.2
+  module rise   Rocker   rate=0.3 sync=0.1 shape=0.2 depth=0.8 offset=0.5 phase=0
+  module aecho  Dado     time=0.43 sync=1 feedback=0.5 tone=0.45 thin=0.35 wobble=0.3 drive=0.15 mix=0.4
+
+part pad "Pad" colour #3d9c8a level=0.35
+  module ppl    Ply      layers=0.6 detune=0.4 width=0.9 tone=0.3
+  module pflt   Plane    cutoff=0.45 res=0.15 mode=0 drive=0.1
+  module pslow  Rocker   rate=0.2 sync=0.05 shape=0 depth=0.6 offset=0.5 phase=0.25
+
+cable tally1.clock -> beat.clock
+cable tally1.clock -> snap.clock
+cable tally1.clock -> hats.clock
+cable beat.a -> kick.trig
+cable snap.a -> clap.trig
+cable snap.b -> clap.trig
+cable hats.a -> hat.trig
+cable hats.b -> hat.trig
+cable kick.out -> mix.in1
+cable clap.out -> mix.in4
+cable hat.out -> mix.in3
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> squeeze.in
+cable kick.out -> squeeze.side
+cable squeeze.out -> mix.in2
+
+cable tally1.div4 -> aseq.clock
+cable aseq.pitch -> afret.pitch
+cable afret.pitch -> amit.pitch
+cable amit.voice1 -> arung.voice1
+cable amit.voice2 -> arung.voice2
+cable amit.voice3 -> arung.voice3
+cable amit.voice4 -> arung.voice4
+cable tally1.clock -> arung.clock
+cable arung.pitch -> aosc.voct
+cable arung.gate -> aenv.gate
+cable aosc.saw -> aflt.in
+cable aenv.env -> aflt.cutoff
+cable rise.out -> aflt.cutoff
+cable aflt.out -> aamp.in
+cable aenv.env -> aamp.cv
+cable aamp.out -> aecho.in_l
+cable aecho.l -> mix.in5
+cable aecho.r -> mix.in5
+
+cable bfret.pitch -> ppl.voct
+cable ppl.l -> pflt.in
+cable pslow.out -> pflt.cutoff
+cable pflt.out -> mix.in6
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A rise.depth=0.4 aflt.res=0.2 aecho.feedback=0.4 arung.ratchet=0
+scene B rise.depth=1 aflt.res=0.55 aecho.feedback=0.65 arung.ratchet=0.3

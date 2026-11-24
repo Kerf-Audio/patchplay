@@ -1,0 +1,22 @@
+# title: Drifting pad
+# about: A wide, stacked pad that drones and swells in and out, moving between four notes of A minor.
+# port: pad_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: pad_swell.lfo1 (cv): the slow swell. Patch it elsewhere to move something with the pad.
+# port: pad_amp_l.out, pad_amp_r.out (audio): the pad, already cabled to out.
+part pad "Drifting pad" colour #7a4fb5 level=0.5
+  module pad_seq Dovetail steps_a=0.2 steps_b=0.2 interlock=0 chance=1 glide=0.6 range=0.2
+  module pad_scale Fret root=0.75 scale=0.43 octave=0.5
+  module pad_voice Ply layers=0.7 detune=0.3 width=0.9 tone=0.35
+  module pad_swell Spokeshave rate=0.05 spread=0.3 shape=0 phase=0.25
+  module pad_amp_l Clamp level=0.4 response=0
+  module pad_amp_r Clamp level=0.4 response=0
+
+cable clock.div4 -> pad_seq.clock
+cable pad_seq.pitch -> pad_scale.pitch
+cable pad_scale.pitch -> pad_voice.voct
+cable pad_voice.l -> pad_amp_l.in
+cable pad_voice.r -> pad_amp_r.in
+cable pad_swell.lfo1 -> pad_amp_l.cv
+cable pad_swell.lfo1 -> pad_amp_r.cv
+cable pad_amp_l.out -> out.l
+cable pad_amp_r.out -> out.r

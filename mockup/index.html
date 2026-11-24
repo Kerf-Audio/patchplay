@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kerf Modular — mockup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="g-cap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffefa"/><stop offset="1" stop-color="#e9e0cc"/></linearGradient>
+    <linearGradient id="g-skirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d0bc"/><stop offset="1" stop-color="#b9ae97"/></linearGradient>
+    <radialGradient id="g-sheen" cx=".35" cy=".28" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs></svg>
+  <header>
+    <div class="logo"><i></i>kerf modular <small>mockup</small></div>
+    <nav>
+      <button data-view="bench" class="on">Workbench</button>
+      <button data-view="catalogue">Modules</button>
+      <button data-view="styles">Styles &amp; presets</button>
+    </nav>
+    <div class="transport">
+      <span class="pill" data-tip="Set by the Tempo knob on Tally." data-tip-title="Tempo"><b id="bpm">120</b> bpm</span>
+      <span class="pill" data-tip="The key the generator picked. Fret modules snap to it." data-tip-title="Key"><b id="key">A minor</b></span>
+      <button id="play" data-tip="Start or stop the clock. The mockup animates lights only; it makes no sound." data-tip-title="Play  (Space)" aria-label="Play"></button>
+    </div>
+  </header>
+
+  <div class="toolbar" id="toolbar">
+    <select id="style" data-tip="Each style is a rulebook: which parts, which modules, what tempo and key." data-tip-title="Style"></select>
+    <button class="btn primary" id="btn-random" data-ico="random" data-tip="A new patch in this style, wired and checked. It is added to the lineage, so nothing is lost." data-tip-title="Random  (R)">Random</button>
+    <span class="sep"></span>
+    <button class="btn" id="btn-evolve" data-ico="evolve" data-tip="Mutates everything that is not locked. Alt-click a knob, or use the padlock on a module, to keep it." data-tip-title="Evolve  (E)">Evolve</button>
+    <input type="range" id="strength" min="0.05" max="1" step="0.05" value="0.3" data-tip="How far Evolve moves things. Low = a nudge, high = a new idea." data-tip-title="Evolve strength">
+    <button class="btn" id="btn-breed" data-ico="breed" disabled data-tip="Crosses the current patch with the one marked with a heart in the lineage. Each knob comes from one parent." data-tip-title="Breed">Breed</button>
+    <span class="sep"></span>
+    <button class="btn" id="btn-undo" data-ico="undo" data-tip="Steps back one command." data-tip-title="Undo  (Z)">Undo</button>
+    <button class="btn" id="btn-explain" data-ico="explain" data-tip="Point at a module to light up what feeds it and where it goes, with a plain-English trace on the right." data-tip-title="Explain  (X)">Explain</button>
+    <span class="check" id="check"></span>
+  </div>
+
+  <main>
+    <div class="view" id="bench-scroll"><div id="bench"></div></div>
+    <div class="view hidden page" id="catalogue"></div>
+    <div class="view hidden page" id="styles"></div>
+    <aside>
+      <section id="lineage-sec">
+        <h3>Lineage <span class="hint">click to go back · heart to pick a mate</span></h3>
+        <div id="lineage"></div>
+      </section>
+      <section>
+        <h3>Explain</h3>
+        <div id="explain-text"><p class="hint">Turn on Explain and point at a module.</p></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="morph">
+      <h3>Scenes &amp; morph</h3>
+      <div class="scenes" id="scenes"></div>
+      <div class="fader"><b>A</b><input type="range" id="morph" min="0" max="1" step="0.01" value="0" data-tip="Glides every unlocked knob from scene A to scene B." data-tip-title="Morph"><b>B</b></div>
+      <p class="hint" style="margin:8px 0 0">Click an empty slot to store · click a full one to recall · right-click to clear</p>
+    </div>
+    <div class="console">
+      <h3><button data-con="log" class="on">Commands</button><button data-con="text">.kerf text</button>
+        <span class="hint" style="text-transform:none;letter-spacing:0;margin-left:auto">GUI, CLI and agents send the same commands</span></h3>
+      <pre id="log"></pre>
+      <pre id="text" class="hidden"></pre>
+      <div class="prompt">kerf ›<input id="cmd" placeholder="try: random foundry · evolve 0.5 part=bass · set plane1.Cutoff 0.8 · lock chisel1 · help" autocomplete="off" spellcheck="false"></div>
+    </div>
+  </footer>
+
+  <div id="tip" class="hidden"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

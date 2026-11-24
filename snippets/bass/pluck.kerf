@@ -1,0 +1,19 @@
+# title: Plucked bass
+# about: A short, round square-wave bass: a low-pass gate closes after each note, eight steps to a bar.
+# port: pluck_seq.pitch (pitch): the notes, before Fret snaps them to the scale.
+# port: pluck_amp.out (audio): the bass, already cabled to out.
+part pluck "Plucked bass" colour #3d63c9 level=0.8
+  module pluck_seq Dovetail steps_a=0.47 steps_b=0.47 interlock=0.5 chance=1 glide=0 range=0.2
+  module pluck_scale Fret root=0.75 scale=0.43 octave=0.25
+  module pluck_osc Chisel tune=0.5 shape=0 pw=0.5
+  module pluck_env Bevel attack=0 decay=0.25 sustain=0 release=0.1 curve=0.3
+  module pluck_amp Clamp level=0 response=0.8
+
+cable clock.clock -> pluck_seq.clock
+cable pluck_seq.pitch -> pluck_scale.pitch
+cable pluck_scale.pitch -> pluck_osc.voct
+cable pluck_seq.gate -> pluck_env.gate
+cable pluck_osc.square -> pluck_amp.in
+cable pluck_env.env -> pluck_amp.cv
+cable pluck_amp.out -> out.l
+cable pluck_amp.out -> out.r

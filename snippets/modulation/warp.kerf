@@ -1,0 +1,17 @@
+# title: Warp pitch drift
+# about: A Warp lets a held note wander out of tune, the way an old oscillator would.
+# port: drift_warp.out (pitch): the wobbling pitch. Patch it to any V/Oct input.
+# port: drift_warp.noise (cv): the wandering on its own, in volts.
+# port: drift_amp.out (audio): the sound, already cabled to out.
+part drift "Warp drift" colour #7a4fb5 level=0.4
+  module drift_warp Warp amount=0.35 speed=0.4 rough=0.2 chaos=0.3
+  module drift_osc Chisel tune=0.4 shape=0.2 pw=0.5
+  module drift_filter Plane cutoff=0.55 res=0.2 mode=0 drive=0
+  module drift_amp Clamp level=0.5 response=0
+
+cable drift_warp.out -> drift_osc.voct
+cable drift_osc.saw -> drift_filter.in
+cable drift_osc.sub -> drift_filter.in
+cable drift_filter.out -> drift_amp.in
+cable drift_amp.out -> out.l
+cable drift_amp.out -> out.r

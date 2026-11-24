@@ -1,0 +1,21 @@
+# title: Drawn melody
+# about: A sixteen-step tune drawn on an Inlay. Steps 5 and 6 tie, and step 9 is accented.
+# port: draw_roll.pitch (pitch): the notes. Change the steps, transpose or octave to rewrite it.
+# port: draw_roll.gate (gate): one gate per note; tied steps share one.
+# port: draw_amp.out (audio): the melody, already cabled to out.
+part draw "Drawn melody" colour #e0802e level=0.5
+  module draw_roll Inlay length=1 transpose=0.5 octave=0.375 rate=0.6 gate=0.6 glide=0.05 step1=0.04 step3=0.16 step5=0.32 step6=0.32 step7=0.4 step9=0.52 step11=0.16 step13=0.32 step15=0.4
+  module draw_osc Chisel tune=0.5 shape=0.15 pw=0.5
+  module draw_env Bevel attack=0.01 decay=0.3 sustain=0.3 release=0.2 curve=0.4
+  module draw_filter Plane cutoff=0.55 res=0.2 mode=0 drive=0.1
+  module draw_amp Clamp level=0 response=0.1
+
+cable clock.clock -> draw_roll.clock
+cable draw_roll.pitch -> draw_osc.voct
+cable draw_roll.gate -> draw_env.gate
+cable draw_osc.saw -> draw_filter.in
+cable draw_env.env -> draw_filter.cutoff
+cable draw_filter.out -> draw_amp.in
+cable draw_env.env -> draw_amp.cv
+cable draw_amp.out -> out.l
+cable draw_amp.out -> out.r

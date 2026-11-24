@@ -1,0 +1,29 @@
+[package]
+name = "kerf-cli"
+description = "The `kerf` command-line tool."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "kerf"
+path = "src/main.rs"
+
+[dependencies]
+kerf-core.workspace = true
+kerf-modules.workspace = true
+kerf-gen.workspace = true
+kerf-engine = { workspace = true, features = ["files"] }
+kerf-session.workspace = true
+kerf-audio = { workspace = true, features = ["device"] }
+kerf-mcp.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+ctrlc.workspace = true
+
+[lints]
+workspace = true

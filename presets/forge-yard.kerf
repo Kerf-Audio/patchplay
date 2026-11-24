@@ -1,0 +1,92 @@
+kerf 1
+tempo 138
+key E phrygian
+tags techno noise
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.75 level3=0.5 level4=0.6 level5=0.5 level6=0.5 send=0.3
+module room Kiln size=0.6 heat=0.45 bloom=0.35 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.4 punch=0.75 decay=0.32 tone=0.5
+  module r_clap Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module clap Mortise engine=0.75 pitch=0.55 punch=0.5 decay=0.28 tone=0.5
+  module r_chat Ruler hits_a=0 hits_b=1 hits_c=0 hits_d=0 steps_b=1 chance=0.8
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.04 tone=0.65
+  module r_ohat Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module ohat Mortise engine=0.5 pitch=0.5 punch=0.5 decay=0.4 tone=0.7
+  module r_tom Ruler hits_a=0 hits_b=0.125 hits_c=0 hits_d=0 steps_b=1 rotate=0.6875 chance=0.5
+  module tom Mortise engine=1 pitch=0.4 punch=0.5 decay=0.3 tone=0.5
+  module duck Bevel attack=0 decay=0.3 sustain=0 release=0.3 curve=0.3
+
+part bass "Rumble" colour #3d63c9 level=0.7
+  module bassseq Dovetail steps_a=1 steps_b=0.1333 interlock=0.9 chance=1 glide=0 range=0.1
+  module bassfret Fret root=0.3333 scale=0.86 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.25 sustain=0.2 release=0.1 curve=0.4
+  module bassflt Plane cutoff=0.3 res=0.4 mode=0 drive=0.6
+  module bassamp Clamp level=0 response=0.1
+  module bassrasp Rasp drive=0.7 fold=0.4 bias=0.5 mix=0.8
+  module bassduck Clamp level=0 response=0
+  module steps Tread rate=0.5 depth=0.6
+
+part tex "Steam" colour #3da3a3 level=0.35
+  module texsrc Sawdust colour=0.7 crackle=0.2
+  module texflt Plane cutoff=0.55 res=0.4 mode=0.33 drive=0.1
+  module texamp Clamp level=0 response=0.4
+  module texrhy Ruler hits_a=0.3125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0
+  module texenv Bevel attack=0.02 decay=0.3 sustain=0 release=0.25 curve=0.35
+  module texburl Burl rate=0.2 smooth=0.8 bias=0.5
+  module texlfo Spokeshave rate=0.1 spread=0.5 shape=0 phase=0.25
+
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_clap.clock
+cable r_clap.a -> clap.trig
+cable clap.out -> mix.in4
+cable clock.clock -> r_chat.clock
+cable r_chat.b -> chat.trig
+cable chat.out -> mix.in3
+cable clock.clock -> r_ohat.clock
+cable r_ohat.a -> ohat.trig
+cable ohat.out -> mix.in3
+cable clock.clock -> r_tom.clock
+cable r_tom.b -> tom.trig
+cable tom.out -> mix.in4
+cable r_kick.a -> duck.gate
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.saw -> bassflt.in
+cable bassflt.out -> bassrasp.in
+cable bassrasp.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> bassduck.in
+cable duck.inverted -> bassduck.cv
+cable bassduck.out -> mix.in2
+
+cable texsrc.noise -> texflt.in
+cable texflt.out -> texamp.in
+cable clock.clock -> texrhy.clock
+cable texrhy.a -> texenv.gate
+cable texenv.env -> texamp.cv
+cable texamp.out -> mix.in6
+cable texburl.drift -> texflt.cutoff
+cable texlfo.lfo1 -> texflt.cutoff
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable clock.clock -> steps.clock
+cable steps.cv -> bassflt.cutoff
+scene A bassflt.cutoff=0.18 texflt.cutoff=0.43
+scene B bassflt.cutoff=0.45 texflt.cutoff=0.7

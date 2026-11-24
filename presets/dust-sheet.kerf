@@ -1,0 +1,47 @@
+kerf 1
+tempo 60
+key E minor
+tags abstract crackle
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.9 level2=0.9 level3=0.6 level4=0.4 level5=0 level6=0 send=0.4
+module room   Kiln   size=0.7 heat=0.55 bloom=0.4 mix=1
+module out    Finish volume=0.65 glue=0.3 ceiling=0.8
+
+part crackle "Crackle rings" colour #8a6b4a level=0.9
+  module dust   Sawdust  colour=0.5 crackle=0.35
+  module ring   Plane    cutoff=0.55 res=0.85 mode=0.333 drive=0
+  module ring2  Plane    cutoff=0.3 res=0.9 mode=0.333 drive=0
+  module roam   Burl     rate=0.2 smooth=0.8 bias=0.5
+  module slow   Spokeshave rate=0.07 spread=0.5 shape=0 phase=0.25
+  module echo   Bandsaw  time=0.75 feedback=0.5 wear=0.5 mix=0.4
+
+part hum "Square hum" colour #7a4fb5 level=0.45
+  module hosc   Chisel   tune=0.38 shape=0.2 pw=0.5
+  module hsq    Vise     squeeze=0.8 speed=0.3 makeup=0.5
+  module radio Static tune=0.42 width=0.5 hiss=0.4 crackle=0.35 whistle=0.2 fade=0.4 ghost=0.3 level=0.25
+
+cable dust.dust -> ring.in
+cable dust.dust -> ring2.in
+cable roam.drift -> ring.cutoff
+cable slow.lfo1 -> ring2.cutoff
+cable ring.out -> mix.in1
+cable ring2.out -> mix.in2
+cable ring.out -> echo.in
+cable tally1.clock -> echo.clock
+cable echo.l -> mix.in3
+cable echo.r -> mix.in3
+cable hosc.sine -> hsq.in
+cable hosc.sub -> hsq.in
+cable dust.dust -> hsq.side
+cable hsq.out -> mix.in4
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable radio.out -> ring2.in
+scene A dust.crackle=0.25 ring.res=0.8 ring2.res=0.85 hsq.squeeze=0.9 echo.feedback=0.4
+scene B dust.crackle=0.55 ring.res=0.92 ring2.res=0.95 hsq.squeeze=0.5 echo.feedback=0.7

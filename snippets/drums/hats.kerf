@@ -1,0 +1,16 @@
+# title: Eighth hats with ghosts
+# about: Closed hats on every eighth note, plus a quiet 16th ghost hat that plays about half the time.
+# port: hats_rhythm.a (gate): the steady hat. hats_rhythm.b is the ghost lane.
+# port: hats_closed.out, hats_ghost.out (audio): both already cabled to out.
+part hats "Hats" colour #c94a3d level=0.6
+  module hats_rhythm Ruler hits_a=0.5 steps_a=1 hits_b=0.3 steps_b=1 hits_c=0 hits_d=0 chance=0.45
+  module hats_closed Mortise engine=0.5 pitch=0.55 punch=0.5 decay=0.1 tone=0.7
+  module hats_ghost Mortise engine=0.5 pitch=0.6 punch=0.3 decay=0.06 tone=0.8
+
+cable clock.clock -> hats_rhythm.clock
+cable hats_rhythm.a -> hats_closed.trig
+cable hats_rhythm.b -> hats_ghost.trig
+cable hats_closed.out -> out.l
+cable hats_closed.out -> out.r
+cable hats_ghost.out -> out.l
+cable hats_ghost.out -> out.r

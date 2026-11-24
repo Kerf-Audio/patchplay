@@ -1,0 +1,120 @@
+kerf 1
+tempo 140
+key E minor
+tags trance four-four ambient
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.85 level2=0.7 level3=0.45 level4=0.6 level5=0.5 level6=0.6 send=0.4
+module room Kiln size=0.8 heat=0.4 bloom=0.5 mix=1
+module out Finish volume=0.7 glue=0.4 ceiling=0.8
+
+part drums "Drums" colour #c94a3d level=0.9
+  module r_kick Ruler hits_a=0.25 hits_b=0 hits_c=0 hits_d=0 steps_a=1
+  module kick Mortise engine=0 pitch=0.45 punch=0.55 decay=0.3 tone=0.5
+  module r_clap Ruler hits_a=0.125 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.25
+  module clap Mortise engine=0.75 pitch=0.55 punch=0.5 decay=0.28 tone=0.5
+  module r_chat Ruler hits_a=0.5 hits_b=0 hits_c=0 hits_d=0 steps_a=1 rotate=0.125
+  module chat Mortise engine=0.5 pitch=0.62 punch=0.5 decay=0.1 tone=0.65
+  module duck Bevel attack=0 decay=0.3 sustain=0 release=0.3 curve=0.3
+
+part bass "Pulse" colour #3d63c9 level=0.85
+  module bassseq Dovetail steps_a=1 steps_b=0.1333 interlock=1 chance=1 glide=0 range=0.05
+  module bassfret Fret root=0.3333 scale=0.43 octave=0.25
+  module bassosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module bassenv Bevel attack=0 decay=0.15 sustain=0 release=0.1 curve=0.4
+  module bassflt Plane cutoff=0.35 res=0.25 mode=0 drive=0.2
+  module bassamp Clamp level=0 response=0.1
+  module bassduck Clamp level=0 response=0
+
+part pad "Swell" colour #7a4fb5 level=0.55
+  module padseq Dovetail steps_a=0.2 steps_b=0.0667 interlock=0 chance=0.9 glide=0.1 range=0.5
+  module padfret Fret root=0.3333 scale=0.43 octave=0.5
+  module padply Ply layers=1 detune=0.55 width=1 tone=0.55
+  module padflt Plane cutoff=0.55 res=0.15 mode=0 drive=0
+  module paddrift Spokeshave rate=0.06 spread=0.5 shape=0 phase=0.25
+
+part lead "Pluck" colour #d1a233 level=0.45
+  module leadseq Dovetail steps_a=1 steps_b=0.2667 interlock=0.5 chance=0.8 glide=0 range=0.4
+  module leadfret Fret root=0.3333 scale=0.43 octave=0.625
+  module leadosc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module leadenv Bevel attack=0 decay=0.1 sustain=0 release=0.2 curve=0.4
+  module leadflt Plane cutoff=0.5 res=0.3 mode=0 drive=0.08
+  module leadamp Clamp level=0 response=0.5
+  module leadecho Bandsaw time=0.375 feedback=0.55 wear=0.35 mix=1
+
+part arp "Arp" colour #3d9c8a level=0.9
+  module arpmit Mitre chord=0.1 inversion=0 spread=0.2 root=0.75
+  module arprung Rung pattern=0 octaves=0.5 rate=0.75 length=0.5 swing=0 ratchet=0
+  module arposc Chisel tune=0.5 fine=0.5 shape=0 pw=0.5
+  module arpenv Bevel attack=0 decay=0.12 sustain=0 release=0.15 curve=0.4
+  module arpflt Plane cutoff=0.5 res=0.3 mode=0 drive=0.05
+  module arpamp Clamp level=0 response=0.5
+  module arpstep Tread rate=0.5 depth=0.6
+cable clock.clock -> r_kick.clock
+cable r_kick.a -> kick.trig
+cable kick.out -> mix.in1
+cable clock.clock -> r_clap.clock
+cable r_clap.a -> clap.trig
+cable clap.out -> mix.in4
+cable clock.clock -> r_chat.clock
+cable r_chat.a -> chat.trig
+cable chat.out -> mix.in3
+cable r_kick.a -> duck.gate
+
+cable clock.clock -> bassseq.clock
+cable bassseq.pitch -> bassfret.pitch
+cable bassfret.pitch -> bassosc.voct
+cable bassseq.gate -> bassenv.gate
+cable bassosc.square -> bassflt.in
+cable bassflt.out -> bassamp.in
+cable bassenv.env -> bassamp.cv
+cable bassamp.out -> bassduck.in
+cable duck.inverted -> bassduck.cv
+cable bassduck.out -> mix.in2
+
+cable clock.bar -> padseq.clock
+cable padseq.pitch -> padfret.pitch
+cable padfret.pitch -> padply.voct
+cable padply.l -> padflt.in
+cable padply.r -> padflt.in
+cable paddrift.lfo1 -> padflt.cutoff
+cable padflt.out -> mix.in6
+
+cable clock.clock -> leadseq.clock
+cable leadseq.pitch -> leadfret.pitch
+cable leadfret.pitch -> leadosc.voct
+cable leadseq.gate -> leadenv.gate
+cable leadosc.saw -> leadflt.in
+cable leadflt.out -> leadamp.in
+cable leadenv.env -> leadamp.cv
+cable leadamp.out -> mix.in5
+cable clock.clock -> leadecho.clock
+cable leadamp.out -> leadecho.in
+cable leadecho.l -> mix.in5
+cable leadecho.r -> mix.in5
+
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+cable padfret.pitch -> arpmit.pitch
+cable padseq.gate -> arpmit.gate
+cable arpmit.voice1 -> arprung.voice1
+cable arpmit.voice2 -> arprung.voice2
+cable arpmit.voice3 -> arprung.voice3
+cable arpmit.voice4 -> arprung.voice4
+cable arpmit.gate -> arprung.gate
+cable clock.clock -> arprung.clock
+cable arprung.pitch -> arposc.voct
+cable arprung.gate -> arpenv.gate
+cable arposc.saw -> arpflt.in
+cable arpflt.out -> arpamp.in
+cable arpenv.env -> arpamp.cv
+cable arpamp.out -> mix.in5
+cable clock.clock -> arpstep.clock
+cable arpstep.cv -> arpflt.cutoff
+scene A bassflt.cutoff=0.23 padflt.cutoff=0.4 leadflt.cutoff=0.38
+scene B bassflt.cutoff=0.5 padflt.cutoff=0.75 leadflt.cutoff=0.65

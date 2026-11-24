@@ -1,0 +1,96 @@
+kerf 1
+tempo 70
+key D dorian
+style slow-grain seed 1
+tags abstract ambient
+
+module tally1 Tally tempo=0.5 swing=0 divide=0.5
+module mix    Router level1=0.32 level2=0.3 level3=0.6 level4=0.4 level5=0.4 level6=0 send=0.35
+module out    Finish volume=0.62 glue=0.3 ceiling=0.8
+
+part pad "Pad" colour #7a4fb5
+  module pseq   Dovetail steps_a=0.2 steps_b=0.13 interlock=0.4 chance=0.9 glide=0.35 range=0.3
+  module pfret  Fret     root=0.1667 scale=0.571 octave=0.375
+  module pmit   Mitre    chord=0.54 inversion=0.33 spread=0.67 root=0.1667
+  module ps1    Chisel   tune=0.5 fine=0.5 shape=0.5 pw=0.5
+  module ps2    Chisel   tune=0.5 fine=0.52 shape=0.5 pw=0.5
+  module ps3    Chisel   tune=0.5 fine=0.48 shape=0.5 pw=0.5
+  module ps4    Chisel   tune=0.5 fine=0.51 shape=0.5 pw=0.5
+  module lathe1 Lathe    tune=0.6458 table=0.4 turn=0.3 warp=0.15
+  module pflt   Plane    cutoff=0.5 res=0.25 mode=0 drive=0.05
+  module pfltr  Plane    cutoff=0.5 res=0.25 mode=0 drive=0.05
+  module pswell Bevel    attack=0.9 decay=0.5 sustain=0.8 release=0.9 curve=0.7
+  module pamp   Clamp    level=0 response=0.1
+  module pampr  Clamp    level=0 response=0.1
+  module drift  Burl     rate=0.2 smooth=0.9 bias=0.5
+  module sweep  Spokeshave rate=0.3 spread=0.5 shape=0 phase=0.25
+  module vib    Warp     amount=0.15 speed=0.5 rough=0.1 chaos=0.2
+
+part grain "Grain texture" colour #3d9c8a
+  module cloud Shavings  size=0.55 density=0.4 spray=0.55 pitch=0.5
+  module cloud2 Shavings size=0.7 density=0.3 spray=0.7 pitch=0.75
+
+part lead "Lead" colour #d1a233
+  module lseq   Dovetail steps_a=0.4 steps_b=0.27 interlock=0.6 chance=0.5 glide=0.2 range=0.4
+  module lfret  Fret     root=0.1667 scale=0.571 octave=0.5
+  module losc   Chisel   tune=0.5 shape=0.8 pw=0.5
+  module lenv   Bevel    attack=0.3 decay=0.55 sustain=0.25 release=0.7 curve=0.6
+  module lamp   Clamp    level=0 response=0.5
+
+part space "Space" colour #c9a23d
+  module echo Bandsaw    time=0.75 feedback=0.55 wear=0.5 mix=0.5
+  module room Kiln       size=0.9 heat=0.5 bloom=0.7 mix=1
+
+cable tally1.bar -> pseq.clock
+cable pseq.pitch -> pfret.pitch
+cable drift.drift -> lathe1.turn
+cable sweep.lfo1 -> pflt.cutoff
+
+cable cloud.l -> room.in_l
+cable cloud.r -> room.in_r
+cable cloud2.l -> room.in_l
+cable cloud2.r -> room.in_r
+cable cloud.l -> mix.in4
+cable cloud2.r -> mix.in5
+
+cable tally1.div4 -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> losc.voct
+cable lseq.gate -> lenv.gate
+cable losc.sine -> lamp.in
+cable lenv.env -> lamp.cv
+cable lamp.out -> mix.in3
+cable lamp.out -> echo.in
+cable tally1.clock -> echo.clock
+cable echo.l -> room.in_l
+cable echo.r -> room.in_r
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+cable pfret.pitch -> pmit.pitch
+cable pmit.voice1 -> vib.in
+cable vib.out -> ps1.voct
+cable pmit.voice2 -> ps2.voct
+cable pmit.voice3 -> ps3.voct
+cable pmit.voice4 -> ps4.voct
+cable pfret.pitch -> lathe1.voct
+cable ps1.saw -> pflt.in
+cable ps3.saw -> pflt.in
+cable ps2.saw -> pfltr.in
+cable ps4.saw -> pfltr.in
+cable lathe1.out -> pflt.in
+cable lathe1.out -> pfltr.in
+cable pseq.gate -> pswell.gate
+cable pswell.env -> pamp.cv
+cable pswell.env -> pampr.cv
+cable pflt.out -> pamp.in
+cable pfltr.out -> pampr.in
+cable sweep.lfo2 -> pfltr.cutoff
+cable pamp.out -> mix.in1
+cable pampr.out -> mix.in2
+cable pamp.out -> cloud.in
+cable pampr.out -> cloud2.in

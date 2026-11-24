@@ -1,0 +1,85 @@
+kerf 1
+tempo 102
+key A minor
+style tape-keys seed 33
+tags four-four samples
+
+module tally1 Tally tempo=0.5 swing=0.15 divide=0.5
+module mix    Router level1=0.8 level2=0.55 level3=0.6 level4=0.5 level5=0.45 level6=0 send=0.3
+module room   Kiln   size=0.6 heat=0.5 bloom=0.4 mix=1
+module out    Finish volume=0.68 glue=0.45 ceiling=0.8
+
+part kit "Sampled kit" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.25 steps_a=1 hits_b=0.2 steps_b=0.667 hits_c=0.45 steps_c=0.4 hits_d=0 chance=0.6
+  module ruler2 Ruler   hits_a=0.125 steps_a=1 hits_b=0 hits_c=0 hits_d=0 rotate=0.5
+  module kick   Veneer  slice=0.03 speed=0.2 reverse=0 looped=0
+  module snap   Veneer  slice=0.34 speed=0.5 reverse=0 looped=0
+  module tick   Veneer  slice=0.97 speed=0.65 reverse=0 looped=0
+  module rattle Veneer  slice=0.6 speed=0.55 reverse=0 looped=0
+  module pickr  Burl    rate=0.5 smooth=0.1 bias=0.6
+
+part notes "Ping notes" colour #d1a233
+  module nseq  Dovetail steps_a=0.47 steps_b=0.33 interlock=0.5 chance=0.7 glide=0 range=0.3
+  module nfret Fret     root=0.75 scale=0.4286 octave=0.5
+  module ping  Veneer   slice=0.28 speed=0.5 reverse=0 looped=0
+
+part low "Low pings" colour #3d63c9
+  module lseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=0.6 chance=0.8 glide=0 range=0.1
+  module lfret Fret     root=0.75 scale=0.4286 octave=0.25
+  module sub   Veneer   slice=0.15 speed=0.5 reverse=0 looped=0
+
+part cloud "Cloud" colour #3d9c8a
+  module hold   Veneer    slice=0.4 speed=0.4 reverse=0 looped=1
+  module drift  Spokeshave rate=0.2 spread=0.6 shape=0 phase=0.25
+  module fog    Shavings  size=0.6 density=0.5 spray=0.5 pitch=0.5
+  module echo   Bandsaw   time=0.45 feedback=0.4 wear=0.45 mix=0.4
+
+cable tally1.clock -> ruler1.clock
+cable tally1.clock -> ruler2.clock
+cable ruler1.a -> kick.trig
+cable ruler2.a -> snap.trig
+cable ruler1.c -> tick.trig
+cable ruler1.b -> rattle.trig
+cable ruler1.b -> pickr.trig
+cable pickr.stepped -> rattle.slice
+cable kick.l -> mix.in1
+cable kick.r -> mix.in1
+cable snap.l -> mix.in1
+cable snap.r -> mix.in1
+cable tick.l -> mix.in5
+cable tick.r -> mix.in5
+cable rattle.l -> mix.in5
+cable rattle.r -> mix.in5
+
+cable tally1.clock -> nseq.clock
+cable nseq.pitch -> nfret.pitch
+cable nfret.pitch -> ping.voct
+cable nseq.gate -> ping.trig
+cable ping.l -> mix.in3
+cable ping.r -> mix.in3
+cable ping.l -> echo.in
+cable tally1.clock -> echo.clock
+cable echo.l -> mix.in4
+cable echo.r -> mix.in4
+
+cable tally1.clock -> lseq.clock
+cable lseq.pitch -> lfret.pitch
+cable lfret.pitch -> sub.voct
+cable lseq.gate -> sub.trig
+cable sub.l -> mix.in2
+cable sub.r -> mix.in2
+
+cable tally1.bar -> hold.trig
+cable drift.lfo1 -> hold.slice
+cable hold.l -> fog.in
+cable fog.l -> mix.in4
+cable fog.r -> mix.in4
+
+cable mix.send -> room.in_l
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A fog.density=0.3 fog.spray=0.3 ping.speed=0.5 drift.rate=0.1
+scene B fog.density=0.85 fog.spray=0.8 ping.speed=0.6 drift.rate=0.5

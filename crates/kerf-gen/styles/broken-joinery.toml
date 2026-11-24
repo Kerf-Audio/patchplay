@@ -1,0 +1,456 @@
+# Broken Joinery: a straight kick under off-kilter hats, struck modal
+# percussion that phases against the grid, and a driven bass that the kick
+# squeezes.
+#
+# Rhythm rule: the kick and the snare are Ruler lane A at 16 steps and never
+# thin. Every other lane (hats, rim, ghost snares and all the modal
+# percussion) has its own shorter length (none is 16, none repeats within a
+# Ruler) and a chance below 1, so the loops drift against the kick. The
+# percussion Ruler has no lane A: nothing in it is meant to be straight.
+#
+# Key: every pitch goes through a Fret whose root is the patch key and whose
+# scale is a subset of natural minor. The struck objects keep Size at 0.5,
+# because Size also bends their pitch.
+
+name = "broken-joinery"
+title = "Broken Joinery"
+summary = "A straight kick under off-kilter hats, tuned wooden and metal percussion that drifts against it, and a squeezed, driven bass."
+tempo = [124, 132]
+keys = ["A minor", "C minor", "D minor", "E minor", "F minor", "G minor"]
+
+[[modules]]
+id = "tally1"
+kind = "Tally"
+[modules.params]
+tempo = 0.5
+swing = [0.05, 0.25]
+divide = 0.5
+
+[[modules]]
+id = "mix"
+kind = "Router"
+[modules.params]
+level1 = [0.45, 0.55]
+level2 = [0.4, 0.5]
+level3 = [0.3, 0.4]
+level4 = [0.4, 0.5]
+level5 = [0.45, 0.55]
+level6 = [0.4, 0.5]
+
+[[modules]]
+id = "out"
+kind = "Finish"
+[modules.params]
+volume = [0.62, 0.7]
+glue = [0.35, 0.5]
+ceiling = 0.8
+
+[[cables]]
+from = "mix.mix_l"
+to = "out.l"
+
+[[cables]]
+from = "mix.mix_r"
+to = "out.r"
+
+[[parts]]
+id = "drums"
+name = "Drums"
+colour = "#c94a3d"
+
+[[parts.modules]]
+id = "ruler1"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = { pick = [0.1875, 0.25] }
+steps_a = 1
+hits_b = [0.5, 0.8]
+steps_b = { steps = [5, 7] }
+hits_c = [0.25, 0.4]
+steps_c = { steps = [9, 11] }
+hits_d = 0
+chance = [0.55, 0.8]
+
+[[parts.modules]]
+id = "ruler2"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0.125
+steps_a = 1
+hits_b = [0.12, 0.22]
+steps_b = { steps = [11, 14] }
+hits_c = 0
+hits_d = 0
+rotate = 0.25
+chance = [0.4, 0.6]
+
+[[parts.modules]]
+id = "kick"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0
+pitch = [0.3, 0.42]
+punch = [0.6, 0.75]
+decay = [0.22, 0.32]
+tone = [0.35, 0.5]
+
+[[parts.modules]]
+id = "snare"
+kind = "Mortise"
+[parts.modules.params]
+engine = { pick = [0.25, 0.75] }
+pitch = [0.45, 0.6]
+punch = [0.55, 0.7]
+decay = [0.25, 0.35]
+tone = [0.45, 0.6]
+
+[[parts.modules]]
+id = "hat"
+kind = "Mortise"
+[parts.modules.params]
+engine = 0.5
+pitch = [0.5, 0.65]
+punch = [0.4, 0.5]
+decay = [0.08, 0.16]
+tone = [0.6, 0.75]
+
+[[parts.modules]]
+id = "rim"
+kind = "Mortise"
+[parts.modules.params]
+engine = 1
+pitch = [0.7, 0.85]
+punch = [0.6, 0.75]
+decay = [0.08, 0.15]
+tone = [0.5, 0.65]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler1.clock"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler2.clock"
+
+[[parts.cables]]
+from = "ruler1.a"
+to = "kick.trig"
+
+[[parts.cables]]
+from = "ruler1.b"
+to = "hat.trig"
+
+[[parts.cables]]
+from = "ruler1.c"
+to = "rim.trig"
+
+[[parts.cables]]
+from = "ruler2.a"
+to = "snare.trig"
+
+[[parts.cables]]
+from = "ruler2.b"
+to = "snare.trig"
+
+[[parts.cables]]
+from = "kick.out"
+to = "mix.in1"
+
+[[parts.cables]]
+from = "hat.out"
+to = "mix.in3"
+
+[[parts.cables]]
+from = "rim.out"
+to = "mix.in3"
+
+[[parts.cables]]
+from = "snare.out"
+to = "mix.in4"
+
+# Two struck objects tuned to the key, played by a Ruler with no straight lane,
+# and a short echo that smears them. A sequencer picks notes at its own length;
+# one Fret per object puts them an octave apart.
+[[parts]]
+id = "perc"
+name = "Modal percussion"
+colour = "#c9a23d"
+
+[[parts.modules]]
+id = "ruler3"
+kind = "Ruler"
+[parts.modules.params]
+hits_a = 0
+hits_b = [0.4, 0.6]
+steps_b = { steps = [5, 7] }
+hits_c = [0.3, 0.45]
+steps_c = { steps = [9, 11] }
+hits_d = [0.2, 0.3]
+steps_d = { steps = [13, 15] }
+rotate = { pick = [0, 0.0625, 0.125] }
+chance = [0.6, 0.8]
+
+[[parts.modules]]
+id = "pseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [5, 7] }
+steps_b = { steps = [9, 12] }
+interlock = [0.3, 0.6]
+chance = [0.8, 0.95]
+glide = 0
+range = [0.25, 0.4]
+
+[[parts.modules]]
+id = "pfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.42857] }
+octave = 0.5
+
+[[parts.modules]]
+id = "pfret2"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.42857] }
+octave = 0.625
+
+[[parts.modules]]
+id = "mal1"
+kind = "Mallet"
+[parts.modules.params]
+material = [0.1, 0.4]
+size = 0.5
+strike = [0.4, 0.6]
+damp = [0.45, 0.65]
+
+[[parts.modules]]
+id = "mal2"
+kind = "Mallet"
+[parts.modules.params]
+material = [0.55, 0.85]
+size = 0.5
+strike = [0.35, 0.55]
+damp = [0.5, 0.7]
+
+[[parts.modules]]
+id = "echo"
+kind = "Bandsaw"
+[parts.modules.params]
+time = { pick = [0.28, 0.4, 0.53] }
+feedback = [0.35, 0.5]
+wear = [0.3, 0.45]
+mix = [0.3, 0.45]
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "ruler3.clock"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "pseq.clock"
+
+[[parts.cables]]
+from = "pseq.pitch"
+to = "pfret.pitch"
+
+[[parts.cables]]
+from = "pseq.pitch"
+to = "pfret2.pitch"
+
+[[parts.cables]]
+from = "pfret.pitch"
+to = "mal1.voct"
+
+[[parts.cables]]
+from = "pfret2.pitch"
+to = "mal2.voct"
+
+[[parts.cables]]
+from = "ruler3.b"
+to = "mal1.trig"
+
+[[parts.cables]]
+from = ["ruler3.c", "ruler3.d"]
+to = "mal2.trig"
+
+[[parts.cables]]
+from = "ruler3.d"
+to = "mal1.trig"
+chance = 0.5
+
+[[parts.cables]]
+from = "mal1.out"
+to = "mix.in5"
+
+[[parts.cables]]
+from = "mal2.out"
+to = "mix.in5"
+
+[[parts.cables]]
+from = "mal1.out"
+to = "echo.in"
+
+[[parts.cables]]
+from = "mal2.out"
+to = "echo.in"
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "echo.clock"
+
+[[parts.cables]]
+from = "echo.l"
+to = "mix.in6"
+
+[[parts.cables]]
+from = "echo.r"
+to = "mix.in6"
+
+# The bass: a short Dovetail loop into a driven oscillator and a resonant
+# filter, squeezed by the kick through a compressor's side input. A random
+# voltage nudges the filter on every beat.
+[[parts]]
+id = "bass"
+name = "Bass"
+colour = "#3d63c9"
+
+[[parts.modules]]
+id = "bseq"
+kind = "Dovetail"
+[parts.modules.params]
+steps_a = { steps = [6, 10] }
+steps_b = { steps = [3, 5] }
+interlock = [0.6, 0.9]
+chance = [0.7, 0.9]
+glide = [0.0, 0.2]
+range = [0.1, 0.25]
+
+[[parts.modules]]
+id = "bfret"
+kind = "Fret"
+[parts.modules.params]
+root = { root = true }
+scale = { pick = [0.14286, 0.42857] }
+octave = 0.25
+
+[[parts.modules]]
+id = "bosc"
+kind = "Chisel"
+[parts.modules.params]
+tune = 0.5
+shape = [0.0, 0.2]
+pw = [0.4, 0.6]
+
+[[parts.modules]]
+id = "benv"
+kind = "Bevel"
+[parts.modules.params]
+attack = 0
+decay = [0.35, 0.5]
+sustain = 0
+release = [0.2, 0.3]
+curve = [0.25, 0.4]
+
+[[parts.modules]]
+id = "bdrive"
+kind = "Rasp"
+[parts.modules.params]
+drive = [0.2, 0.4]
+fold = [0.1, 0.3]
+bias = [0.5, 0.6]
+mix = [0.7, 0.95]
+
+[[parts.modules]]
+id = "bflt"
+kind = "Plane"
+[parts.modules.params]
+cutoff = [0.28, 0.4]
+res = [0.45, 0.7]
+mode = 0
+drive = [0.2, 0.4]
+
+[[parts.modules]]
+id = "bamp"
+kind = "Clamp"
+[parts.modules.params]
+level = 0
+response = [0.08, 0.2]
+
+[[parts.modules]]
+id = "bpump"
+kind = "Vise"
+[parts.modules.params]
+squeeze = [0.5, 0.7]
+speed = [0.3, 0.5]
+makeup = [0.3, 0.4]
+
+[[parts.modules]]
+id = "wander"
+kind = "Burl"
+[parts.modules.params]
+rate = [0.3, 0.5]
+smooth = [0.2, 0.5]
+bias = 0.5
+
+[[parts.cables]]
+from = "tally1.clock"
+to = "bseq.clock"
+
+[[parts.cables]]
+from = "bseq.pitch"
+to = "bfret.pitch"
+
+[[parts.cables]]
+from = "bfret.pitch"
+to = "bosc.voct"
+
+[[parts.cables]]
+from = "bseq.gate"
+to = "benv.gate"
+
+[[parts.cables]]
+from = ["bosc.saw", "bosc.square"]
+to = "bdrive.in"
+
+[[parts.cables]]
+from = "bseq.accent"
+to = "bdrive.drive"
+
+[[parts.cables]]
+from = "bdrive.out"
+to = "bflt.in"
+
+[[parts.cables]]
+from = "benv.env"
+to = "bflt.cutoff"
+
+[[parts.cables]]
+from = "tally1.div4"
+to = "wander.trig"
+
+[[parts.cables]]
+from = ["wander.stepped", "wander.drift"]
+to = "bflt.cutoff"
+
+[[parts.cables]]
+from = "bflt.out"
+to = "bamp.in"
+
+[[parts.cables]]
+from = "benv.env"
+to = "bamp.cv"
+
+[[parts.cables]]
+from = "bamp.out"
+to = "bpump.in"
+
+[[parts.cables]]
+from = "kick.out"
+to = "bpump.side"
+
+[[parts.cables]]
+from = "bpump.out"
+to = "mix.in2"

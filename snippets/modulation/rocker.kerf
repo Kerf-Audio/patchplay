@@ -1,0 +1,17 @@
+# title: Rocker filter sweep
+# about: A held saw whose filter is rocked by a Rocker. Depth sets how far the sweep goes.
+# port: rock_lfo.out (cv): the wave, above and below 0 V. Patch it anywhere.
+# port: rock_lfo.pulse (gate): a clock at the speed of the wave.
+# port: rock_amp.out (audio): the sound, already cabled to out.
+part rock "Rocker sweep" colour #3d9c8a level=0.4
+  module rock_lfo Rocker rate=0.3 sync=0 shape=0.1 depth=0.6 offset=0.5 phase=0
+  module rock_osc Chisel tune=0.35 shape=0.1 pw=0.5
+  module rock_filter Plane cutoff=0.4 res=0.45 mode=0 drive=0.1
+  module rock_amp Clamp level=0.5 response=0
+
+cable rock_lfo.out -> rock_filter.cutoff
+cable rock_osc.saw -> rock_filter.in
+cable rock_osc.sub -> rock_filter.in
+cable rock_filter.out -> rock_amp.in
+cable rock_amp.out -> out.l
+cable rock_amp.out -> out.r

@@ -1,0 +1,10 @@
+# title: Radio static
+# about: A radio sitting between stations: hiss, a drifting whistle, and clicks and pops.
+# port: radio_static.tune (cv): turns the dial. A slow LFO makes it hunt for stations.
+# port: radio_static.crackle (gate): a pulse for every click and pop.
+# port: radio_static.out (audio): the radio, already cabled to out.
+part radio "Radio static" colour #8a8f98 level=0.4
+  module radio_static Static tune=0.4 width=0.4 hiss=0.5 crackle=0.3 whistle=0.4 fade=0.3 ghost=0.3 level=0.5
+
+cable radio_static.out -> out.l
+cable radio_static.out -> out.r

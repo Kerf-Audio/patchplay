@@ -1,0 +1,55 @@
+kerf 1
+tempo 140
+key A minor
+tags crazy granular glitch
+
+module clock Tally tempo=0.5 swing=0.1 divide=0.5
+module mix Router level1=0.8 level2=0.7 level3=0.8 level4=0.5 level5=0.5 level6=0.5 send=0.25
+module room Kiln size=0.3 heat=0.5 bloom=0.1 mix=1
+module out Finish volume=0.55 glue=0.4 ceiling=0.8
+
+part ticks "Ticks" colour #b5527a level=1
+  module tickrl Ruler hits_a=0.625 hits_b=0.375 hits_c=0.1875 hits_d=0.25 steps_a=1 steps_b=0.6 steps_c=1 steps_d=0.2 rotate=0 chance=0.8
+  module tickpos Tread step1=0.05 step2=0.385 step3=0.62 step4=0.135 step5=0.88 step6=0.26 step7=0.5 step8=0.75 length=1 direction=0.75 glide=0 depth=1
+  module ticksp Splinter position=0.5 spray=0.01 size=0.12 density=1 pitch=0.75 scatter=0.4 reverse=0.5 shape=0.6 spread=1 level=0.85 hold=0
+
+part hat "Dust hat" colour #d1a233 level=0.9
+  module hatsp Splinter position=0.96 spray=0.02 size=0.25 density=1 pitch=0.65 scatter=0.1 reverse=0.3 shape=0.7 spread=0.9 level=0.8 hold=0
+  module hatflt Plane cutoff=0.65 res=0.2 mode=0.67 drive=0
+
+part thud "Thud" colour #c94a3d level=0.6
+  module thudsp Splinter position=0.005 spray=0.01 size=0.5 density=0.9 pitch=0.3 scatter=0 reverse=0 shape=0.3 spread=0.2 level=0.9 hold=0
+
+part fx "Glitch echo" colour #3da3a3 level=0.5
+  module glitchdado Dado time=0.2857 sync=1 feedback=0.4 tone=0.55 thin=0.35 wobble=0.1 drive=0.3 mix=1
+
+cable clock.clock -> tickrl.clock
+cable tickrl.d -> tickpos.clock
+cable tickrl.a -> ticksp.trig
+cable tickpos.cv -> ticksp.position
+cable tickrl.b -> hatsp.trig
+cable tickrl.c -> thudsp.trig
+cable ticksp.l -> mix.in1
+cable ticksp.r -> mix.in1
+cable ticksp.l -> out.l
+cable ticksp.r -> out.r
+cable hatsp.l -> hatflt.in
+cable hatsp.r -> hatflt.in
+cable hatflt.out -> out.l
+cable hatflt.out -> out.r
+cable thudsp.l -> out.l
+cable thudsp.r -> out.r
+cable ticksp.l -> glitchdado.in_l
+cable ticksp.r -> glitchdado.in_r
+cable hatflt.out -> glitchdado.in_l
+cable glitchdado.l -> out.l
+cable glitchdado.r -> out.r
+cable glitchdado.l -> room.in_l
+cable glitchdado.r -> room.in_r
+cable mix.send -> room.in_l
+cable mix.send -> room.in_r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A ticksp.size=0.08 ticksp.scatter=0.15 glitchdado.feedback=0.3
+scene B ticksp.size=0.25 ticksp.scatter=0.6 glitchdado.feedback=0.6

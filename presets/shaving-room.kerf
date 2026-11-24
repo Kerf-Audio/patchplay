@@ -1,0 +1,91 @@
+kerf 1
+tempo 96
+key A minor
+style tape-keys seed 21
+tags abstract granular
+
+module tally1 Tally tempo=0.5 swing=0.12 divide=0.5
+module mix    Router level1=0.75 level2=0.5 level3=0.6 level4=0.45 level5=0.4 level6=0 send=0.35
+module room   Kiln   size=0.75 heat=0.45 bloom=0.5 mix=1
+module out    Finish volume=0.68 glue=0.45 ceiling=0.8
+
+part drums "Drums" colour #c94a3d
+  module ruler1 Ruler   hits_a=0.25 steps_a=1 hits_b=0.45 steps_b=0.4 hits_c=0 hits_d=0 chance=0.6
+  module kick   Mortise engine=0 pitch=0.3 punch=0.55 decay=0.3 tone=0.35
+  module hat    Mortise engine=0.5 pitch=0.5 punch=0.4 decay=0.1 tone=0.6
+
+part chop "Sample chop" colour #d1a233
+  module ruler2 Ruler   hits_a=0.2 steps_a=1 hits_b=0.25 steps_b=0.667 hits_c=0.2 steps_c=0.4 hits_d=0 chance=0.65
+  module pick   Burl    rate=0.5 smooth=0.2 bias=0.5
+  module chop   Veneer  slice=0.2 speed=0.5 reverse=0 looped=0
+  module echo   Bandsaw time=0.4 feedback=0.45 wear=0.4 mix=0.4
+
+part cloud "Cloud" colour #3d9c8a
+  module hold   Veneer    slice=0.4 speed=0.35 reverse=0 looped=1
+  module drift  Spokeshave rate=0.2 spread=0.6 shape=0 phase=0.25
+  module fog    Shavings  size=0.7 density=0.45 spray=0.55 pitch=0.5
+  module flip   Burl      rate=0.15 smooth=0.5 bias=0.5
+  module glint  Shavings  size=0.3 density=0.65 spray=0.4 pitch=0.75
+
+part bass "Bass" colour #3d63c9
+  module bseq  Dovetail steps_a=0.2 steps_b=0.13 interlock=0.6 chance=0.7 glide=0.3 range=0.1
+  module bfret Fret     root=0.75 scale=0.4286 octave=0.375
+  module bosc  Chisel   tune=0.5 shape=0 pw=0.5
+  module benv  Bevel    attack=0 decay=0.4 sustain=0.3 release=0.3 curve=0.35
+  module bflt  Plane    cutoff=0.3 res=0.25 mode=0 drive=0.2
+  module bamp  Clamp    level=0 response=0.15
+  module bduck Clamp    level=0 response=0
+  module duck  Bevel    attack=0 decay=0.45 sustain=0 release=0.45 curve=0.3
+
+cable tally1.clock -> ruler1.clock
+cable ruler1.a -> kick.trig
+cable ruler1.a -> duck.gate
+cable ruler1.b -> hat.trig
+cable kick.out -> mix.in1
+
+cable tally1.clock -> ruler2.clock
+cable ruler2.a -> chop.trig
+cable ruler2.b -> chop.trig
+cable ruler2.c -> chop.trig
+cable ruler2.a -> pick.trig
+cable ruler2.b -> pick.trig
+cable ruler2.c -> pick.trig
+cable pick.stepped -> chop.slice
+cable chop.l -> echo.in
+cable tally1.clock -> echo.clock
+cable chop.l -> mix.in3
+cable echo.l -> mix.in3
+cable echo.r -> mix.in3
+
+cable tally1.bar -> hold.trig
+cable drift.lfo1 -> hold.slice
+cable hold.l -> fog.in
+cable flip.coin -> fog.freeze
+cable fog.l -> mix.in4
+cable fog.r -> mix.in4
+cable chop.r -> glint.in
+cable flip.coin -> glint.freeze
+cable glint.l -> mix.in5
+cable glint.r -> mix.in5
+cable hat.out -> mix.in5
+
+cable tally1.clock -> bseq.clock
+cable bseq.pitch -> bfret.pitch
+cable bfret.pitch -> bosc.voct
+cable bseq.gate -> benv.gate
+cable bosc.saw -> bflt.in
+cable benv.env -> bflt.cutoff
+cable bflt.out -> bamp.in
+cable benv.env -> bamp.cv
+cable bamp.out -> bduck.in
+cable duck.inverted -> bduck.cv
+cable bduck.out -> mix.in2
+
+cable mix.send -> room.in_l
+cable mix.mix_l -> out.l
+cable mix.mix_r -> out.r
+cable room.l -> out.l
+cable room.r -> out.r
+
+scene A fog.density=0.3 fog.spray=0.3 glint.pitch=0.5 drift.rate=0.1
+scene B fog.density=0.8 fog.spray=0.8 glint.pitch=0.85 drift.rate=0.5
